@@ -1,5 +1,6 @@
 class Accordion {
     constructor(selector = 'accordion') {
+      this.selector = selector;
       this.accordions = document.querySelectorAll(selector);
       this.init();
     }
@@ -15,7 +16,7 @@ class Accordion {
       if (!title) return;
   
       const currentItem = title.closest('.item');
-      const allItems = currentItem.closest('accordion').querySelectorAll('.item');
+      const allItems = currentItem.closest(this.selector).querySelectorAll('.item');
   
       currentItem.classList.toggle('active');
   
@@ -29,3 +30,4 @@ class Accordion {
 
   // Export an instance of Accordion to initialize it when imported
   export default new Accordion();
+  export {Accordion};

@@ -87,3 +87,4 @@ class Draggable {
 }
 
 export default new Draggable();
+export {Draggable};

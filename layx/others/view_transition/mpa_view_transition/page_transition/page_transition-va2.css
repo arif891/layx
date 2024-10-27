@@ -1,5 +1,7 @@
-@view-transition {
-    navigation: auto;
+@media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+        navigation: auto;
+    }
 }
 
 :root {
@@ -15,14 +17,14 @@
 }
 
 @keyframes page_out {
-    0% {  
-      clip-path: inset(0% 0% 0% 0%);
+    0% {
+        clip-path: inset(0% 0% 0% 0%);
     }
 
     50% {
         clip-path: inset(0% 0% 100% 0%);
     }
-   
+
     100% {
         clip-path: inset(0% 0% 100% 0%);
     }

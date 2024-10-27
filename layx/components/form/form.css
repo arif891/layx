@@ -299,9 +299,19 @@ select {
         font-weight: 500;
         transition: .3s;
 
-        &:hover{
+        &:is(:focus, :hover) {
+            background-color: rgb(236, 249, 255);
+            outline: none;
+        }
+
+        &:checked {
             background-color: var(--accent-color);
         }
+
+        &:not(:last-child) {
+            margin-bottom: .25rem;
+        }
+
     }
 
     &,&::picker(select) {

@@ -1,7 +1,7 @@
 container,.container {
     --edge-offset-x: .75rem;
     display: block;
-    margin-inline:var(--edge-offset-x);
+    margin-inline: var(--edge-offset-x);
 
     &.edge {
         display: grid;

@@ -2,15 +2,17 @@ class Sheet {
     constructor(selector = 'sheet', dragThreshold = .4) {
         this.sheets = document.querySelectorAll(selector);
         this.dragThreshold = dragThreshold; // % of sheet size
-        this.togglers =  document.querySelectorAll('[data-sheet-target]');
+        this.togglers = document.querySelectorAll('[data-sheet-target]');
         this.init();
     }
 
     init() {
         this.addTriggerListeners();
-        this.addCloseButtonListeners();
-        this.addBackdropListeners();
         this.addDragListeners();
+
+        this.sheets.forEach(sheet => {
+            this.addCloseButtonListeners(sheet);
+        });
     }
 
     addTriggerListeners() {
@@ -26,26 +28,12 @@ class Sheet {
         });
     }
 
-    addCloseButtonListeners() {
-        document.querySelectorAll('.close').forEach(closeButton => {
+    addCloseButtonListeners(sheet) {
+        sheet.querySelectorAll('.close').forEach(closeButton => {
             closeButton.addEventListener('click', (e) => {
                 e.preventDefault();
-                const sheet = closeButton.closest('sheet');
-                if (sheet) {
-                    this.closeSheet(sheet);
-                }
+                this.closeSheet(sheet);
             });
-        });
-    }
-
-    addBackdropListeners() {
-        document.addEventListener('click', (e) => {
-            if (e.target.tagName.toLowerCase() === 'backdrop') {
-                const sheet = e.target.previousElementSibling;
-                if (sheet && (sheet.tagName.toLowerCase() === 'sheet' || sheet.classList.contains('sheet'))) {
-                    this.closeSheet(sheet);
-                }
-            }
         });
     }
 
@@ -128,7 +116,7 @@ class Sheet {
                 }
             };
 
-            
+
             const addTouchListeners = () => {
                 draggableArea.addEventListener('touchstart', onStart);
                 draggableArea.addEventListener('touchmove', onMove);
@@ -141,11 +129,11 @@ class Sheet {
                 window.addEventListener('mouseup', onEnd);
             };
 
-         
+
             if ('ontouchstart' in window) {
-                addTouchListeners(); 
+                addTouchListeners();
             } else {
-                addMouseListeners(); 
+                addMouseListeners();
             }
         });
     }
@@ -155,13 +143,17 @@ class Sheet {
         sheet.setAttribute('open', '');
         sheet.style.transform = '';
         if (!sheet.classList.contains('none-modal')) {
-            let sheetBackdrop = sheet.parentElement.querySelector('backdrop');
+            let sheetBackdrop = sheet.parentElement.querySelector('.sheet-backdrop');
             if (!sheetBackdrop) {
                 sheetBackdrop = document.createElement('backdrop');
                 sheetBackdrop.classList.add('sheet-backdrop');
                 sheet.insertAdjacentElement('afterend', sheetBackdrop);
             }
             sheetBackdrop.setAttribute('open', '');
+
+            sheetBackdrop.addEventListener('click',() => {
+              this.closeSheet(sheet);
+            })
         }
     }
 
@@ -169,8 +161,8 @@ class Sheet {
         sheet.removeAttribute('open');
         sheet.style.transform = '';
         if (!sheet.classList.contains('none-modal')) {
-            let sheetBackdrop = sheet.nextElementSibling;
-            if (sheetBackdrop && sheetBackdrop.tagName.toLowerCase() === 'backdrop') {
+            let sheetBackdrop = sheet.parentElement.querySelector('.sheet-backdrop');
+            if (sheetBackdrop) {
                 sheetBackdrop.removeAttribute('open');
             }
         }
@@ -186,4 +178,4 @@ class Sheet {
 
 }
 
-export default new Sheet();
+export { Sheet };

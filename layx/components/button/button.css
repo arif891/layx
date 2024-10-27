@@ -3,6 +3,9 @@ button:not(.defult),.btn {
     --padding-y: .6rem;
     --radius: .35rem;
 
+    --dark-rgb:0,0,0;
+    --light-rgb:255,255,255;
+
     display: inline-block;
     padding: var(--padding-y, var(--padding, .5rem)) var(--padding-x, var(--padding, .5rem));
     color: var(--color, inherit);
@@ -69,13 +72,13 @@ button:not(.defult),.btn {
     }
 
     &.dark {
-        --color: rgb(var(--bg-color-rgb));
-        --bg: rgb(var(--color-rgb));
+        --color: rgb(var(--bg-color-rgb,var(--light-rgb)));
+        --bg: rgb(var(--color-rgb,var(--dark-rgb)));
     }
 
     &.light {
-        --color: rgb(var(--color-rgb));
-        --bg: rgb(var(--bg-color-rgb));
+        --color: rgb(var(--color-rgb,var(--dark-rgb)));
+        --bg: rgb(var(--bg-color-rgb,var(--light-rgb)));
     }
 
     &.close {

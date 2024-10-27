@@ -18,3 +18,4 @@ class Alert {
 }
 
 export default new Alert();
+export {Alert};

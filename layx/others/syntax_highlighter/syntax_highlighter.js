@@ -49,13 +49,58 @@ class CodeHighlighter {
         { type: 'url', regex: /url\(([^)]+)\)/ },  
         { type: 'unknown', regex: /\S+/ },
     ]),
-    
+    batch: this.compileLanguage([
+      { type: 'comment', regex: /^(\s*)(::|\s*REM\s|\/\/).*$/im }, 
+      { type: 'program-name', regex: /\b(layx)\b/i }, 
+      { type: 'program-command', regex: /\b(build|unbuild|create|optimage|install|uninstall)\b/i },
+      { type: 'label', regex: /^\s*:\w+/m },
+      { type: 'variable', regex: /%[^%\s]+%|\%\w+\%/g },
+      { type: 'operator', regex: /\b(EQU|NEQ|LSS|LEQ|GTR|GEQ|NOT|AND|OR)\b/i },
+      { type: 'keyword', regex: /\b(IF|ELSE|FOR|IN|DO|GOTO|CALL|EXIT|ECHO|SET|SETLOCAL|ENDLOCAL|PAUSE|SHIFT)\b/i },
+      { type: 'string', regex: /"[^"]*"/g },
+      { type: 'number', regex: /\b\d+\b/g },
+      { type: 'path', regex: /\b([a-zA-Z]:\\(?:[^\\\/:*?"<>|\r\n]+\\)*[^\\\/:*?"<>|\r\n]*)/g },
+      { type: 'parameter', regex: /%[0-9*]/ },
+      { type: 'special-character', regex: /[&|<>^]/ },
+      { type: 'punctuation', regex: /[()[\]{}]/g },
+    ]),
     };
 
     this.defaultRules = [
       { type: 'whitespace', regex: /\s+/ },
       { type: 'unknown', regex: /\S+/ },
     ];
+
+    this.init();
+    this.addCopyButtons();
+  }
+
+  init() {
+    this.highlightCodeElements();
+  }
+
+  addCopyButtons() {
+    const codeElements = document.querySelectorAll('[data-code-lang][copy]');
+    codeElements.forEach(element => {
+      const button = document.createElement('button');
+      button.className = 'copy-btn';
+      button.addEventListener('click', () => this.copyToClipboard(element));
+      
+      element.appendChild(button);
+    });
+  }
+
+  copyToClipboard(element) {
+    const text = element.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const button = element.querySelector('.copy-btn');
+      button.classList.add('copied');
+      setTimeout(() => {
+        button.classList.remove('copied');
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy text: ', err);
+    });
   }
 
   compileLanguage(rules) {
@@ -169,6 +214,5 @@ class CodeHighlighter {
   }
 }
 
-// Usage
-const highlighter = new CodeHighlighter();
-highlighter.highlightCodeElements();
+export default new CodeHighlighter();
+export {CodeHighlighter};

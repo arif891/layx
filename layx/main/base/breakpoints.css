@@ -1,110 +1,107 @@
 /* Define breakpoints for different screen sizes */
 :root {
-    --breakpoint-xs: 576px;   /* Extra small (landscape phones) */
-    --breakpoint-sm: 768px;   /* Small (tablets) */
-    --breakpoint-md: 992px;   /* Medium (desktops) */
-    --breakpoint-lg: 1200px;  /* Large (large desktops) */
-    --breakpoint-xl: 1400px;  /* Extra large (larger desktops) */
-    --breakpoint-xxl: 1800px; /* Extra extra large (extra large desktops) */
+    --breakpoint-xs: 0px;       /* Extra small (phones, less than 576px) */
+    --breakpoint-sm: 576px;     /* Small (tablets) */
+    --breakpoint-md: 768px;     /* Medium (desktops) */
+    --breakpoint-lg: 992px;     /* Large (desktops) */
+    --breakpoint-xl: 1200px;    /* Extra large (large desktops) */
+    --breakpoint-xxl: 1400px;   /* Extra extra large (very large desktops) */
+    --breakpoint-xxxl: 1800px;  /* Ultra-wide (extra large desktops) */
     
     /* Aspect ratio breakpoints */
-    --breakpoint-wd: 16 / 9;            /* Wide aspect ratio (16:9) */
-    --breakpoint-uwd: 21 / 9;       /* Ultrawide aspect ratio (21:9) */
-    --breakpoint-suwd: 32 / 9; /* Super ultrawide aspect ratio (32:9) */
+    --breakpoint-wd: 16 / 9;    /* Standard widescreen */
+    --breakpoint-uwd: 21 / 9;   /* Ultrawide */
+    --breakpoint-suwd: 32 / 9;  /* Super ultrawide */
 }
 
-
-/* (sm) Small devices (landscape phones, 576px and up) */
-@media (width >= 576px) { 
-    
+/* (sm) Small devices (576px and up) */
+@media (width >= 576px) {
+    /* Styles for small devices */
 }
 
-/* (md) Medium devices (tablets, 768px and up) */
-@media (width >= 768px) { 
-    
+/* (md) Medium devices (768px and up) */
+@media (width >= 768px) {
+    /* Styles for medium devices */
 }
 
-/* (lg) Large devices (desktops, 992px and up) */
-@media (width >= 992px) { 
-   
+/* (lg) Large devices (992px and up) */
+@media (width >= 992px) {
+    /* Styles for large devices */
 }
 
-/* (xl) X-Large devices (large desktops, 1200px and up) */
-@media (width >= 1200px) { 
-    
+/* (xl) X-Large devices (1200px and up) */
+@media (width >= 1200px) {
+    /* Styles for extra-large devices */
 }
 
-/* (xxl) XX-Large devices (larger desktops, 1400px and up) */
-@media (width >= 1400px) { 
-   
+/* (xxl) XX-Large devices (1400px and up) */
+@media (width >= 1400px) {
+    /* Styles for extra-extra large devices */
 }
 
-/* (xxxl) XXX-Large devices (Extra larger desktops, 1800px and up) */
-@media (width >= 1800px) { 
-
+/* (xxxl) XXX-Large devices (1800px and up) */
+@media (width >= 1800px) {
+    /* Styles for ultra-wide devices */
 }
 
-/* Wide screens */
-@media (aspect-ratio >= 16 / 9) and (width >= 1800px) { 
-    
+/* Aspect ratio-based media queries */
+
+/* Wide screens (16:9 and wider, 1800px and up) */
+@media (aspect-ratio >= 16 / 9) and (width >= 1800px) {
+    /* Styles for widescreen displays */
 }
 
-/* Ultrawide screens */
-@media (aspect-ratio >= 21 / 9) and (width >= 2000px) { 
-    
+/* Ultrawide screens (21:9 and wider, 2000px and up) */
+@media (aspect-ratio >= 21 / 9) and (width >= 2000px) {
+    /* Styles for ultrawide displays */
 }
 
-/* Super ultrawide screens */
-@media (aspect-ratio >= 32 / 9) and (width >= 3000px) { 
-    
+/* Super ultrawide screens (32:9 and wider, 3000px and up) */
+@media (aspect-ratio >= 32 / 9) and (width >= 3000px) {
+    /* Styles for super ultrawide displays */
 }
 
-
-
-
-
-
-/* (sm) Small devices (landscape phones below  576px) */
-@media (width < 576px) { 
-    
+/* (xs) Extra small devices (below 576px) */
+@media (width < 576px) {
+    /* Styles for extra small devices */
 }
 
-/* (md) Medium devices (tablets, below  768px) */
-@media (width < 768px) { 
-    
+/* (sm) Small devices (below 768px) */
+@media (width < 768px) {
+    /* Styles for small devices */
 }
 
-/* (lg) Large devices (desktops, below  992px) */
-@media (width < 992px) { 
-   
+/* (md) Medium devices (below 992px) */
+@media (width < 992px) {
+    /* Styles for medium devices */
 }
 
-/* (xl) X-Large devices (large desktops,  below 1200px) */
-@media (width < 1200px) { 
-    
+/* (lg) Large devices (below 1200px) */
+@media (width < 1200px) {
+    /* Styles for large devices */
 }
 
-/* (xxl) XX-Large devices (larger desktops,  below 1400px) */
-@media (width < 1400px) { 
-   
+/* (xl) Extra large devices (below 1400px) */
+@media (width < 1400px) {
+    /* Styles for extra large devices */
 }
 
-/* (xxxl) XXX-Large devices (Extra larger desktops,  below 1800px) */
-@media (width < 1800px) { 
-
+/* (xxl) Extra extra large devices (below 1800px) */
+@media (width < 1800px) {
+    /* Styles for extra extra large devices */
 }
 
-/* Wide screens */
-@media (aspect-ratio < 16 / 9) and (width >= 1800px) { 
-    
+/* Smaller than wide screens (below 16:9, 1800px) */
+@media (aspect-ratio < 16 / 9) and (width < 1800px) {
+    /* Styles for smaller than widescreen displays */
 }
 
-/* Ultrawide screens */
-@media (aspect-ratio < 21 / 9) and (width >= 2000px) { 
-    
+/* Smaller than ultrawide screens (below 21:9, 2000px) */
+@media (aspect-ratio < 21 / 9) and (width < 2000px) {
+    /* Styles for smaller than ultrawide displays */
 }
 
-/* Super ultrawide screens */
-@media (aspect-ratio < 32 / 9) and (width >= 3000px) { 
-    
+/* Smaller than super ultrawide screens (below 32:9, 3000px) */
+@media (aspect-ratio < 32 / 9) and (width < 3000px) {
+    /* Styles for smaller than super ultrawide displays */
 }

@@ -127,5 +127,6 @@ class SmoothScroll {
     }
 }
 
-// Usage example:
+
 export default new SmoothScroll();
+export {SmoothScroll};

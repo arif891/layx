@@ -82,3 +82,4 @@ class Dialog {
 
 // Export an instance of Dialog to initialize it when imported
 export default new Dialog();
+export {Dialog};

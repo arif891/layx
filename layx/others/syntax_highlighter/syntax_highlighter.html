@@ -94,26 +94,16 @@
         </code>
 
 
-        <code data-code-lang="batch">
-            layx install
+        <code data-code-lang="batch" copy>
+            //comment
+            layx install 
         </code>
 
-        <script src="syntax_highlighter.js">
+        <script type="module">
+            import CodeHighlighter from './syntax_highlighter.js';
         </script>
 
-        <button onclick="writeClipboardText(text)">test</button>
-
         <script>
-
-            const text = document.getElementById('tem').textContent
-
-            async function writeClipboardText(text) {
-                try {
-                    await navigator.clipboard.writeText(text);
-                } catch (error) {
-                    console.error(error.message);
-                }
-            }
 
 
         </script>

@@ -35,7 +35,7 @@
             <h2 class="dynamic after">Hello, {name|user}</h2>
             <h3 class="dynamic">Role: {role|default-role}</h3>
             <h3 class="dynamic">Date: {Date()}</h3>
-            <h3 class="dynamic">Info: <br>Height {window.innerHeight}px <br>Width {window.innerWidth}px</h3>
+            <h3 class="dynamic">Info: <br>Height {window.innerHeight}px ,<br>Width {window.innerWidth}px</h3>
         </container>
 
 
@@ -52,8 +52,8 @@
                 });
             }
             (async () => {
-                const UserName = await delayValue('Jhon', 1000);
-                const UserImg = await delayValue('assets/user.webp', 1000);
+                const UserName = await delayValue('Jhon', 500);
+                const UserImg = await delayValue('assets/user.webp', 500);
                 name = UserName;
                 img = UserImg;
                 dynamic.updateAfterElements();

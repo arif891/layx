@@ -1,5 +1,7 @@
-@view-transition {
-    navigation: auto;
+@media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+        navigation: auto;
+    }
 }
 
 :root {
@@ -16,14 +18,14 @@
 
 @keyframes page_out {
     0% {
-       scale: 1;
-       translate: 0% 0%;
+        scale: 1;
+        translate: 0% 0%;
     }
 
     30% {
-        scale: .5; 
+        scale: .5;
     }
-   
+
     100% {
         scale: .5;
         translate: 100% 0%;
@@ -37,11 +39,11 @@
     }
 
     70% {
-        scale: .5; 
+        scale: .5;
     }
 
     100% {
         scale: 1;
-       translate: 0% 0%;
+        translate: 0% 0%;
     }
 }

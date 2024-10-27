@@ -1,4 +1,4 @@
-accordion {
+accordion, .accordion {
     --padding-x: 1rem;
     --padding-y: 1rem;
     --border-radius: .5rem;

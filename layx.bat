@@ -233,6 +233,7 @@ GOTO pause
 
 IF NOT EXIST "%PROGRAM_DIR%" (
     ECHO %COLOR_yellow% LayX is not installed on your system. %COLOR_RESET%
+    GOTO end
 )
 
 net session >nul 2>&1

@@ -181,13 +181,14 @@ GOTO end
 
 :install
 
-IF NOT "%CURRENT_DIR%"=="%SCRIPT_DIR%" (
-     ECHO %COLOR_red%Error: layx.bat not found in the specified directory.%COLOR_RESET%
-     GOTO end
-)
-
 net session >nul 2>&1
 IF ERRORLEVEL 1 (
+
+     IF NOT EXIST "%CURRENT_DIR%layx.bat" (
+     ECHO %COLOR_red%layx.bat not found in the current directory.%COLOR_RESET%
+     GOTO end
+    )
+
     ECHO %COLOR_yellow%Requesting Administrator privileges...%COLOR_RESET%
     powershell start-process -verb runas -filepath "%~0 install"
     EXIT /B

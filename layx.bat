@@ -230,6 +230,11 @@ ECHO %COLOR_green%Installation completed.%COLOR_RESET%
 GOTO pause
 
 :uninstall
+
+IF NOT EXIST "%PROGRAM_DIR%" (
+    ECHO %COLOR_yellow% LayX is not installed on your system. %COLOR_RESET%
+)
+
 net session >nul 2>&1
 IF ERRORLEVEL 1 (
     ECHO %COLOR_yellow%Requesting Administrator privileges...%COLOR_RESET%

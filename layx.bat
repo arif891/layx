@@ -217,10 +217,14 @@ ECHO Copying Files.
 Xcopy "%SCRIPT_DIR%" "%PROGRAM_DIR%" /Y /E /S /V /I 
 Xcopy "%SCRIPT_DIR%%CONFIG_DIR%syntax\layx.code-snippets" "C:\Users\%username%\AppData\Roaming\Code\User\snippets\" /Y /E /S /V /I 
 
-ECHO %PATH% | FIND /I "%PROGRAM_DIR%" >nul
+set "TEMPFILE=%TEMP%\pathcheck.tmp"
+path > "%TEMPFILE%"
+type "%TEMPFILE%" | FIND /I "%PROGRAM_DIR%" >nul 2>nul
+del "%TEMPFILE%" >nul 2>nul
+
 IF ERRORLEVEL 1 (
-    ECHO %COLOR_cyan%Adding "%PROGRAM_DIR%" to PATH%COLOR_RESET%
-    setx PATH "%PATH%;%PROGRAM_DIR%"
+    setx PATH "%PATH%;%PROGRAM_DIR%" >nul 2>nul
+    ECHO %COLOR_cyan%Added "%PROGRAM_DIR%" to PATH%COLOR_RESET%
 ) ELSE (
     ECHO %COLOR_yellow%"%PROGRAM_DIR%" is already in the PATH%COLOR_RESET%
 )

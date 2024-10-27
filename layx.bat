@@ -232,7 +232,7 @@ GOTO pause
 :uninstall
 
 IF NOT EXIST "%PROGRAM_DIR%" (
-    ECHO %COLOR_yellow% LayX is not installed on your system. %COLOR_RESET%
+    ECHO %COLOR_yellow%LayX is not installed on your system.%COLOR_RESET%
     GOTO end
 )
 

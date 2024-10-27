@@ -180,6 +180,12 @@ GOTO end
 
 
 :install
+
+IF NOT "%CURRENT_DIR%"=="%SCRIPT_DIR%" (
+     ECHO %COLOR_red%Error: layx.bat not found in the specified directory.%COLOR_RESET%
+     GOTO end
+)
+
 net session >nul 2>&1
 IF ERRORLEVEL 1 (
     ECHO %COLOR_yellow%Requesting Administrator privileges...%COLOR_RESET%
@@ -226,7 +232,7 @@ GOTO pause
 net session >nul 2>&1
 IF ERRORLEVEL 1 (
     ECHO %COLOR_yellow%Requesting Administrator privileges...%COLOR_RESET%
-    powershell start-process -verb runas -filepath "%~0 uninstall"
+    powershell -Command "Start-Process -Verb RunAs -FilePath '%PROGRAM_DIR%layx.bat' -ArgumentList 'uninstall'"
     EXIT /B
 )
 

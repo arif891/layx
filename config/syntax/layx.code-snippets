@@ -2,7 +2,7 @@
 	"layX Document": {
 		"scope": "html",
 		"prefix": "layx-doc",
-		"body": "<!DOCTYPE html>\r<html lang=\"en\">\r<head>\r    <meta charset=\"UTF-8\">\r    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r    <title>Demo Document</title>\r\r    <link rel=\"stylesheet\" href=\"/layx/layx.css\">\r\r    <link rel=\"stylesheet\" href=\"/assets/css/base.css\">\r    <link rel=\"stylesheet\" href=\"/assets/css/pages/features.css\">\r\r</head>\r<body>\r    \r    <script src=\"/layx/layx.js\" type=\"module\"></script>\r\r    <script src=\"/assets/js/base.js\"></script>\r    <script src=\"/assets/js/pages/features.js\"></script>\r</body>\r</html>"
+		"body": "<!DOCTYPE html>\r<html lang=\"en\">\r  <head>\r    <meta charset=\"UTF-8\">\r    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r    <title>LayX Document</title>\r\r    <link rel=\"stylesheet\" href=\"/layx/layx.css\">\r\r    <link rel=\"stylesheet\" href=\"/assets/css/base.css\">\r    <link rel=\"stylesheet\" href=\"/assets/css/pages/page.css\">\r  </head>\r\r  <body>\r\r    <script src=\"/layx/layx.js\" type=\"module\"></script>\r\r    <script src=\"/assets/js/base.js\"></script>\r    <script src=\"/assets/js/pages/page.js\"></script>\r  </body>\r</html>"
 	},
 	"Section": {
 		"scope": "html",

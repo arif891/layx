@@ -278,7 +278,7 @@ class BuildTool {
       assets: path.join(currentDirectory, 'assets'),
       layx: path.join(currentDirectory, 'layx'),
       pages: path.join(currentDirectory, 'pages'),
-      images: path.join(currentDirectory, 'assets/images'),
+      images: path.join(currentDirectory, 'assets/image'),
       css: path.join(currentDirectory, 'assets/css'),
       js: path.join(currentDirectory, 'assets/js'),
       layxAssets: path.join(currentDirectory, 'layx/assets'),

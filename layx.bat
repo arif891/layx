@@ -17,7 +17,7 @@ SET "CONFIG_DIR=config\"
 SET "IMAGES_DIR=assets\image\"
 SET "NODE_EXE=%CURRENT_DIR%%CONFIG_DIR%node.exe"
 SET "WEBP_EXE=%CURRENT_DIR%%CONFIG_DIR%webp.exe"
-SET "PROGRAM_DIR=C:\Program Files\layx\"
+SET "PROGRAM_DIR=C:\Program Files\LayX\"
 SET "FR_CURRENT_DIR=%CURRENT_DIR:\=/%"
 
 IF "%SCRIPT_DIR%"=="%PROGRAM_DIR%" (

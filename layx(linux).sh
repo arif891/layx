@@ -164,6 +164,26 @@ install() {
     mkdir -p "$HOME/.config/Code/User/snippets/"
     cp -r "${SCRIPT_DIR}${CONFIG_DIR}syntax/layx.code-snippets" "$HOME/.config/Code/User/snippets/"
     
+    # Set executable permissions
+    echo -e "${COLOR_CYAN}Setting executable permissions...${COLOR_RESET}"
+    chmod +x "${PROGRAM_DIR}layx.sh"
+    chmod +x "${PROGRAM_DIR}${CONFIG_DIR}node"
+    chmod +x "${PROGRAM_DIR}config/webp"
+    
+    # Create alias
+    echo -e "${COLOR_CYAN}Creating alias...${COLOR_RESET}"
+    if ! grep -q "alias layx=" /etc/bash.aliases 2>/dev/null; then
+        echo "alias layx='${PROGRAM_DIR}layx.sh'" >> /etc/bash.aliases
+        # Also add to bashrc to ensure the alias is loaded
+        if ! grep -q "source /etc/bash.aliases" /etc/bash.bashrc; then
+            echo "if [ -f /etc/bash.aliases ]; then" >> /etc/bash.bashrc
+            echo "    source /etc/bash.aliases" >> /etc/bash.bashrc
+            echo "fi" >> /etc/bash.bashrc
+        fi
+    else
+        echo -e "${COLOR_YELLOW}Alias 'layx' already exists${COLOR_RESET}"
+    fi
+    
     # Add to PATH
     if ! grep -q "${PROGRAM_DIR}" /etc/environment; then
         echo "PATH=\$PATH:${PROGRAM_DIR}" >> /etc/environment
@@ -173,6 +193,7 @@ install() {
     fi
 
     echo -e "${COLOR_GREEN}Installation completed.${COLOR_RESET}"
+    echo -e "${COLOR_YELLOW}Note: Please restart your terminal or run 'source /etc/bash.aliases' to use the 'layx' command${COLOR_RESET}"
 }
 
 uninstall() {

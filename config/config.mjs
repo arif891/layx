@@ -264,7 +264,7 @@ class BuildTool {
 
   constructor(options = {}) {
     this.initializePaths(options);
-    this.validateDirectories();
+    // this.validateDirectories();
   }
 
   async initializePaths(options) {

@@ -165,13 +165,22 @@ install() {
     mkdir -p "$HOME/Library/Application Support/Code/User/snippets/"
     cp -R "${SCRIPT_DIR}${CONFIG_DIR}syntax/layx.code-snippets" "$HOME/Library/Application Support/Code/User/snippets/"
     
-    # Add to PATH using .zshrc (default shell in modern macOS)
+    # Create and configure alias in macOS shell
     SHELL_RC="$HOME/.zshrc"
     if [ ! -f "$SHELL_RC" ]; then
         # Fallback to bash if zsh is not the default shell
         SHELL_RC="$HOME/.bash_profile"
     fi
     
+    # Add LayX alias to shell config
+    if ! grep -q "alias layx=" "$SHELL_RC"; then
+        echo "alias layx='${PROGRAM_DIR}layx.sh'" >> "$SHELL_RC"
+        echo -e "${COLOR_CYAN}Added layx alias to $SHELL_RC${COLOR_RESET}"
+    else
+        echo -e "${COLOR_YELLOW}layx alias already exists${COLOR_RESET}"
+    fi
+    
+    # Add to PATH
     if ! grep -q "${PROGRAM_DIR}" "$SHELL_RC"; then
         echo "export PATH=\$PATH:${PROGRAM_DIR}" >> "$SHELL_RC"
         echo -e "${COLOR_CYAN}Added ${PROGRAM_DIR} to PATH in $SHELL_RC${COLOR_RESET}"
@@ -179,12 +188,16 @@ install() {
         echo -e "${COLOR_YELLOW}${PROGRAM_DIR} is already in the PATH${COLOR_RESET}"
     fi
 
-    # Set permissions
+    # Set executable permissions and ownership
+    echo -e "${COLOR_CYAN}Setting permissions...${COLOR_RESET}"
+    chmod +x "${PROGRAM_DIR}layx.sh"
+    chmod +x "${PROGRAM_DIR}${CONFIG_DIR}node"
+    chmod +x "${PROGRAM_DIR}config/webp"
     chmod -R 755 "${PROGRAM_DIR}"
     chown -R $(whoami):admin "${PROGRAM_DIR}"
 
     echo -e "${COLOR_GREEN}Installation completed.${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}Please restart your terminal or run 'source $SHELL_RC' to update your PATH.${COLOR_RESET}"
+    echo -e "${COLOR_YELLOW}Please restart your terminal or run 'source $SHELL_RC' to use the layx command${COLOR_RESET}"
 }
 
 uninstall() {
@@ -215,6 +228,7 @@ uninstall() {
     
     if [ -f "$SHELL_RC" ]; then
         sed -i '' "\|export PATH=\$PATH:${PROGRAM_DIR}|d" "$SHELL_RC"
+        sed -i '' "\|alias layx=|d" "$SHELL_RC"
     fi
 
     echo "Uninstallation completed."

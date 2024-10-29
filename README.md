@@ -142,7 +142,7 @@ Key directories:
 
 To install Layx on your Windows system:
 
-1. [Download the Layx Windows setup](https://github.com/arif891/Layx/releases/download/v0.1.0-alpha/layx-setup-v0.1.0-alpha_win64.zip)
+1. [Download the Layx Windows setup](https://github.com/arif891/layx/releases/download/v0.1.0-alpha/layx-setup-v0.1.0-alpha_windows_x64.zip)
 2. Extract the ZIP file contents
 3. Run the following command or click `layx.bat`:
 

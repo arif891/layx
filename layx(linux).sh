@@ -161,8 +161,8 @@ install() {
     cp -r "${SCRIPT_DIR}"* "${PROGRAM_DIR}"
     
     # VS Code snippets installation
-    mkdir -p "$HOME/.config/Code/User/snippets/"
-    cp -r "${SCRIPT_DIR}${CONFIG_DIR}syntax/layx.code-snippets" "$HOME/.config/Code/User/snippets/"
+    mkdir -p "/home/$SUDO_USER/.config/Code/User/snippets/"
+    cp -r "${SCRIPT_DIR}${CONFIG_DIR}syntax/layx.code-snippets" "/home/$SUDO_USER/.config/Code/User/snippets/"
     
     # Set executable permissions
     echo -e "${COLOR_CYAN}Setting executable permissions...${COLOR_RESET}"

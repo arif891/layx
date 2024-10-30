@@ -193,7 +193,7 @@ navbar,.navbar {
                     text-decoration: none;
                     color: inherit;
                     padding: var(--link-padding-y, var(--link-padding, 0)) var(--link-padding-x, var(--link-padding, 0));
-                    font-weight: 475;
+                    font-weight: 500;
                 }
 
                 @media (width >=992px) {

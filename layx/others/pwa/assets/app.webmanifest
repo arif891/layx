@@ -57,7 +57,7 @@
    
     "screenshots": [
       {
-        "src": "screenshots/home.png",
+        "src": "assets/image/pwa/screenshots/home.png",
         "sizes": "1280x720",
         "type": "image/png",
         "platform": "wide",

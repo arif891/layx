@@ -15,5 +15,11 @@
             -webkit-app-region: drag;
             z-index: -1;
         }
+
+        &.not-pwa {
+            &::before {
+                background: linear-gradient(var(--bg-color,#fff),transparent);
+            }
+        }
     }
 }

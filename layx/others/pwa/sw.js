@@ -12,20 +12,21 @@ const STATIC_CACHE = makeCacheName("static-cache", STATIC_CACHE_VER);
 const RUNTIME_CACHE = "runtime-cache";
 
 // Fallback Urls
-const OFFLINE_FALLBACK_DOCUMENT = "_pwa/fallback.html";
-const OFFLINE_FALLBACK_IMAGE = "_pwa/caches/fallback.webp";
+const OFFLINE_FALLBACK_DOCUMENT = "pages/pwa/fallback.html";
+const OFFLINE_FALLBACK_IMAGE = "assets/image/pwa/fallback.webp";
 
 // This assets are downloded and added to chche when srvice worker install. Does not support RegExp url pattern
 const OFFLINE_CACHE_ASSETS = [
-    "_pwa/offline.html",
-    "_pwa/caches/style.css",
-    "_pwa/caches/script.js",
-    "_pwa/caches/fallback.webp",
+    "pages/pwa/offline_activity.html",
+    "pages/pwa/fallback.html",
+    "assets/css/pwa/pwa.css",
+    "assets/js/pwa/pwa.js",
+    "pwa/caches/fallback.webp",
 ];
 
 // This assets are downloded and added to chche when use accses them. Support RegExp url pattern
 const STATIC_CACHE_ASSETS = [
-    "/other.html",
+    "/pages/static/*",
     "/assets/static/*",
 ];
 

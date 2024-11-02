@@ -175,7 +175,7 @@ To install Layx on your Windows system:
 
 ## 📚 Documentation
 
-For comprehensive guides and API references, visit our [official documentation](https://layx.dev/docs).
+For comprehensive guides and API references, visit our [official documentation](https://layx.xyz/pages/docs/getting_started/introduction.html).
 
 ## 🤝 Contributing
 

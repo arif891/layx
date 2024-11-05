@@ -193,7 +193,6 @@ for /r "%CURRENT_DIR%%IMAGES_DIR%" %%d in (*.png *.jpg) do (
 
 GOTO end
 
-REM Install label - Installs LayX system-wide
 :install
 REM Check for admin privileges
 net session >nul 2>&1
@@ -232,24 +231,13 @@ ECHO Copying Files.
 Xcopy "%SCRIPT_DIR%" "%PROGRAM_DIR%" /Y /E /S /V /I 
 Xcopy "%SCRIPT_DIR%%CONFIG_DIR%syntax\layx.code-snippets" "C:\Users\%username%\AppData\Roaming\Code\User\snippets\" /Y /E /S /V /I 
 
-REM Add to PATH if not already present
-set "TEMPFILE=%TEMP%\pathcheck.tmp"
-path > "%TEMPFILE%"
-type "%TEMPFILE%" | FIND /I "%PROGRAM_DIR%" >nul 2>nul
-del "%TEMPFILE%" >nul 2>nul
-
-IF ERRORLEVEL 1 (
-    setx PATH "%PATH%;%PROGRAM_DIR%" >nul 2>nul
-    ECHO %COLOR_cyan%Added "%PROGRAM_DIR%" to PATH%COLOR_RESET%
-) ELSE (
-    ECHO %COLOR_yellow%"%PROGRAM_DIR%" is already in the PATH%COLOR_RESET%
-)
+REM Add to PATH using PowerShell to handle System PATH properly
+powershell -Command "$oldPath = [Environment]::GetEnvironmentVariable('PATH', 'Machine'); if ($oldPath -notlike '*%PROGRAM_DIR%*') { $newPath = $oldPath + ';%PROGRAM_DIR%'; [Environment]::SetEnvironmentVariable('PATH', $newPath, 'Machine'); Write-Host '%COLOR_cyan%Added to System PATH%COLOR_RESET%' } else { Write-Host '%COLOR_yellow%Already in System PATH%COLOR_RESET%' }"
 
 ECHO %COLOR_green%Installation completed.%COLOR_RESET%
 
 GOTO pause
 
-REM Uninstall label - Removes LayX from the system
 :uninstall
 IF NOT EXIST "%PROGRAM_DIR%" (
     ECHO %COLOR_yellow%LayX is not installed on your system.%COLOR_RESET%
@@ -266,14 +254,18 @@ IF ERRORLEVEL 1 (
 
 ECHO %COLOR_cyan%Uninstalling...%COLOR_RESET%
 
+REM Remove from PATH using PowerShell
+powershell -Command "$oldPath = [Environment]::GetEnvironmentVariable('PATH', 'Machine'); if ($oldPath -like '*%PROGRAM_DIR%*') { $newPath = ($oldPath -split ';' | Where-Object { $_ -ne '%PROGRAM_DIR%'.TrimEnd('\') }) -join ';'; [Environment]::SetEnvironmentVariable('PATH', $newPath, 'Machine'); Write-Host '%COLOR_cyan%Removed from System PATH%COLOR_RESET%' }"
+
 REM Remove program directory
 IF EXIST "%PROGRAM_DIR%" (
     rmdir "%PROGRAM_DIR%" /S /Q
+    ECHO %COLOR_green%Program directory removed.%COLOR_RESET%
 ) ELSE (
     ECHO "%PROGRAM_DIR%" not found.
 )
 
-ECHO Uninstallation completed.
+ECHO %COLOR_green%Uninstallation completed.%COLOR_RESET%
 
 GOTO end
 

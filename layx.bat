@@ -1,11 +1,11 @@
 @ECHO OFF
 
 REM Define ANSI color codes for formatted console output
-SET COLOR_red=[31m
-SET COLOR_green=[32m
-SET COLOR_yellow=[33m
-SET COLOR_cyan=[36m
-SET COLOR_RESET=[0m
+SET COLOR_red=[31m
+SET COLOR_green=[32m
+SET COLOR_yellow=[33m
+SET COLOR_cyan=[36m
+SET COLOR_RESET=[0m
 
 REM Define error messages with color formatting
 SET "STRING_node_fail=%COLOR_red%Failed to execute Node js. Please check the path and installation.%COLOR_RESET%"
@@ -42,7 +42,7 @@ IF NOT EXIST "%NODE_EXE%" (
     ) ELSE ( 
         ECHO Program Node js also not found.   
         REM Check for global Node.js installation
-        bun -v >nul 2>&1
+        node -v >nul 2>&1
         IF ERRORLEVEL 1 (
             ECHO Node js is not installed.
         ) ELSE (

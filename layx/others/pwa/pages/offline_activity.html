@@ -1,11 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Offline activity</title>
+
+        <style>
+            body {
+                margin: 0;
+            }
+
+            .activity-wrapper {
+                display: flex;
+                height: 100dvh;
+                overflow: auto;
+                scrollbar-width: none;
+                scroll-snap-type: x mandatory;
+
+                .actvity {
+                    flex-shrink: 0;
+                    height: 100dvh;
+                    width: 100%;
+                    overflow: auto;
+                    scrollbar-width: thin;
+                    scroll-snap-align: start;
+
+                    /*  */
+                    display: grid;
+                    place-content: center;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="activity-wrapper">
+            <div class="actvity">
+                <h1>Activity 1</h1>
+            </div>
+            <div class="actvity">
+                <h1>Activity 2</h1>
+            </div>
+            <div class="actvity">
+                <h1>Activity 3</h1>
+            </div>
+        </div>
+    </body>
+
 </html>

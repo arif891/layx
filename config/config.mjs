@@ -182,6 +182,7 @@ const layout = {
 import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { parseArgs, styleText } from "util";
 
 const colors = {
   // Basic formatting
@@ -259,7 +260,7 @@ const colors = {
 class BuildTool {
   static CONFIG = {
     fileTypes: ['css', 'js'],
-    mediaBreakpoints: ['sm', 'md', 'lg', 'xl', 'xxl']
+    mediaBreakpoints: ['sm', 'md', 'lg', 'xl', 'xxl', 'wd', 'swd', 'suwd']
   };
 
   constructor(options = {}) {

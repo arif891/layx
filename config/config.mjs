@@ -730,10 +730,14 @@ class BuildTool {
 
 // CLI interface
 const options = {
-  test: {
-    type: "boolean",
-    short: "t"
-  }
+  component: {
+    type: "string",
+    short: "c"
+  },
+  font: {
+    type: "string",
+    short: "f"
+  },
 };
 
 const argsObj = parseArgs({options ,strict: false});

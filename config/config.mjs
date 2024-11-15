@@ -729,6 +729,15 @@ class BuildTool {
 }
 
 // CLI interface
+const options = {
+  test: {
+    type: "boolean",
+    short: "t"
+  }
+};
+
+const argsObj = parseArgs({options ,strict: false});
+
 const [, , command] = process.argv;
 const buildTool = new BuildTool();
 
@@ -743,3 +752,4 @@ switch (command) {
     console.log(`${colors.style('config.mjs:', colors.fg.cyan)} Can not handle "${command}", supported command are ${colors.style('[build|unbuild]', colors.fg.yellow)}.`);
     process.exit(1);
 }
+

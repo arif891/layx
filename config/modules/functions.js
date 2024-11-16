@@ -141,7 +141,7 @@ async function processFontFamily(fontName, fontInfoObj) {
   }
 
   const formattedFamilyName = result.family.replace(' ', '_');
-  const fontDir = `../assets/font/${formattedFamilyName}`;
+  const fontDir = `./assets/font/${formattedFamilyName}`;
   const isVariable = isVariableFont(result.axes);
 
   try {

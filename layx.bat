@@ -54,19 +54,18 @@ IF NOT EXIST "%NODE_EXE%" (
 
 REM Process command line arguments if provided
 IF NOT "%~1"=="" (
-    FOR %%A IN (%*) DO (
         REM Check for valid commands and route to appropriate label
-        IF /I "%%A"=="build" (
+        IF /I "%~1"=="build" (
             GOTO build 
-        ) ELSE IF /I "%%A"=="unbuild" (
+        ) ELSE IF /I "%~1"=="unbuild" (
             GOTO unbuild 
-        ) ELSE IF /I "%%A"=="create" (
+        ) ELSE IF /I "%~1"=="create" (
             GOTO create
-        ) ELSE IF /I "%%A"=="optimage" (
+        ) ELSE IF /I "%~1"=="optimage" (
             GOTO optimizeImages
-        ) ELSE IF /I "%%A"=="install" (
+        ) ELSE IF /I "%~1"=="install" (
             GOTO install
-        ) ELSE IF /I "%%A"=="uninstall" (
+        ) ELSE IF /I "%~1"=="uninstall" (
             GOTO uninstall
         ) ELSE (
             REM Display available options if invalid command
@@ -78,7 +77,6 @@ IF NOT "%~1"=="" (
               ECHO %STRING_dir_error%
             )
         )
-    )
     GOTO end
 ) ELSE (
     GOTO option

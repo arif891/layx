@@ -178,6 +178,7 @@ const layout = {
   }
 };
 
+import { log } from 'console';
 // Node js code
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -669,7 +670,6 @@ class BuildTool {
     return [...content.matchAll(regex)].map(match => match[1].replace(/['"]/g, ''));
   }
 
-
   removeExportAndDefault(content) {
     return content
       .replace(/export\s+default\s+/g, '')
@@ -689,8 +689,9 @@ class BuildTool {
     const files = await fs.readdir(directory);
     return files.filter(file => path.extname(file) === `.${extension}`);
   }
-
 }
+
+
 
 
 async function readFile(filePath, encoding = 'utf8') {
@@ -701,7 +702,6 @@ async function writeFile(filePath, content, flag = 'w') {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   return await fs.writeFile(filePath, content, { flag });
 }
-
 
 function extractClasses(html, startClass, type = 'class') {
   if (!html || typeof html !== 'string') {
@@ -743,9 +743,16 @@ function extractClasses(html, startClass, type = 'class') {
 
 
 async function handleAdd() {
+
+  if (!argsObj.values.component && !argsObj.values.font) {
+    console.warn("Please specify a component by using '--component' or '-c', or a font by using '--font' or '-f'.");
+    return
+  }
+
   if (argsObj.values.component) {
     console.log('Component:', argsObj.values.component);
   }
+
   if (argsObj.values.font) {
     const fontInfoGF = await readFile(path.join(scriptDir, "/info/font_info_GF.json"));
     const fontInfoObj = JSON.parse(fontInfoGF);
@@ -761,7 +768,6 @@ async function handleAdd() {
           font => font.family.toLowerCase() === searchName
         );
       }
-
     }
 
     // Example usage:

@@ -20,7 +20,7 @@ async function handleAdd(scriptDir) {
 
 async function handleComponentAdd() {
   console.log('Component:', argsObj.values.component);
-  // Add component handling logic here
+  // Todo component handling logic here
 }
 
 async function handleFontAdd(scriptDir) {

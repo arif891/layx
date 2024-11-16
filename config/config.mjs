@@ -443,8 +443,8 @@ class BuildTool {
     const layxOutPath = fileType === 'css' ? this.files.layxCssOut : this.files.layxJsOut;
     const baseOutPath = fileType === 'css' ? this.files.baseCssOut : this.files.baseJsOut;
 
-    const layxContent = await this.readFile(layxPath);
-    let baseContent = await this.readFile(basePath).catch(() => {
+    const layxContent = await readFile(layxPath);
+    let baseContent = await readFile(basePath).catch(() => {
       console.warn(`Warning: Could not read ${basePath}. Continuing without it.`);
       return '';
     });
@@ -453,9 +453,9 @@ class BuildTool {
     const filteredContent = this.removeImportStatements(processedContent);
     const finalContent = fileType === 'js' ? this.removeExportAndDefault(filteredContent) : filteredContent;
 
-    await this.writeFile(layxOutPath, `/* layx ${fileType} code */\n${finalContent}`);
-    await this.writeFile(baseOutPath, `/* User base ${fileType} code */\n${this.removeComments(baseContent)}`);
-    await this.writeFile(basePath, this.minify(finalContent + baseContent, fileType));
+    await writeFile(layxOutPath, `/* layx ${fileType} code */\n${finalContent}`);
+    await writeFile(baseOutPath, `/* User base ${fileType} code */\n${this.removeComments(baseContent)}`);
+    await writeFile(basePath, this.minify(finalContent + baseContent, fileType));
 
     console.log(`Processed ${fileType.toUpperCase()} files successfully.`);
   }
@@ -469,18 +469,18 @@ class BuildTool {
     for (const file of pageFiles) {
       const filePath = path.join(pagesDir, file);
       const outPath = path.join(pagesOutDir, file);
-      const content = await this.readFile(filePath);
+      const content = await readFile(filePath);
 
-      await this.writeFile(outPath, content);
-      await this.writeFile(filePath, this.minify(content, fileType));
+      await writeFile(outPath, content);
+      await writeFile(filePath, this.minify(content, fileType));
       console.log(`Processed ${file}`);
     }
   }
 
   async restoreFile(sourcePath, destinationPath, fileType) {
     try {
-      const content = await this.readFile(sourcePath);
-      await this.writeFile(destinationPath, content);
+      const content = await readFile(sourcePath);
+      await writeFile(destinationPath, content);
       console.log(`Restored ${fileType.toUpperCase()} file: ${path.basename(destinationPath)}`);
     } catch (error) {
       console.error(`Error restoring ${fileType.toUpperCase()} file:`, error.message);
@@ -505,8 +505,8 @@ class BuildTool {
 
     try {
       const [sourceContent, baseContent] = await Promise.all([
-        this.readFile(source),
-        this.readFile(base).catch(() => '')
+        readFile(source),
+        readFile(base).catch(() => '')
       ]);
 
       const processed = await this.processImports(sourceContent, source, fileType);
@@ -514,9 +514,9 @@ class BuildTool {
       const final = fileType === 'js' ? this.removeExportAndDefault(filtered) : filtered;
 
       await Promise.all([
-        this.writeFile(output, `/* layx ${fileType} code */\n${final}`),
-        this.writeFile(baseOutput, `/* User base ${fileType} code */\n${this.removeComments(baseContent)}`),
-        this.writeFile(base, this.minify(final + baseContent, fileType))
+        writeFile(output, `/* layx ${fileType} code */\n${final}`),
+        writeFile(baseOutput, `/* User base ${fileType} code */\n${this.removeComments(baseContent)}`),
+        writeFile(base, this.minify(final + baseContent, fileType))
       ]);
     } catch (error) {
       throw new Error(`Failed to process ${fileType} files: ${error.message}`);
@@ -532,18 +532,18 @@ class BuildTool {
     for (const file of pageFiles) {
       const filePath = path.join(pagesDir, file);
       const outPath = path.join(pagesOutDir, file);
-      const content = await this.readFile(filePath);
+      const content = await readFile(filePath);
 
-      await this.writeFile(outPath, content);
-      await this.writeFile(filePath, this.minify(content, fileType));
+      await writeFile(outPath, content);
+      await writeFile(filePath, this.minify(content, fileType));
       console.log(`Processed ${file}`);
     }
   }
 
   async restoreFile(sourcePath, destinationPath, fileType) {
     try {
-      const content = await this.readFile(sourcePath);
-      await this.writeFile(destinationPath, content);
+      const content = await readFile(sourcePath);
+      await writeFile(destinationPath, content);
       console.log(`Restored ${fileType.toUpperCase()} file: ${path.basename(destinationPath)}`);
     } catch (error) {
       console.error(`Error restoring ${fileType.toUpperCase()} file:`, error.message);
@@ -584,7 +584,7 @@ class BuildTool {
   async genBuildInfo(buildState) {
     try {
       const buildInfo = JSON.stringify({ build: buildState }, null, 2);
-      await this.writeFile(this.files.buildInfo, buildInfo);
+      await writeFile(this.files.buildInfo, buildInfo);
     } catch (error) {
       console.error('Failed to generate build info:', error);
       throw error;
@@ -593,49 +593,12 @@ class BuildTool {
 
   async getBuildInfo() {
     try {
-      const content = await this.readFile(this.files.buildInfo);
+      const content = await readFile(this.files.buildInfo);
       return JSON.parse(content);
     } catch (error) {
       if (error.code === 'ENOENT') return null;
       throw error;
     }
-  }
-
-  extractClasses(html, startClass, type = 'class') {
-    if (!html || typeof html !== 'string') {
-      throw new Error('Invalid HTML input');
-    }
-
-    const escapedStartClass = startClass.replace(/[-_]/g, '\\$&');
-    const patterns = {
-      class: {
-        regex: new RegExp(`class="([^"]*?\\b${escapedStartClass}\\d+\\b[^"]*?)"`, 'g'),
-        process: match => match[1].split(/\s+/).filter(className => className.startsWith(startClass))
-      },
-      media: {
-        regex: new RegExp(`\\b${escapedStartClass}(\\w+)-\\d+\\b`, 'g'),
-        process: match => [match[1]]
-      }
-    };
-
-    if (!patterns[type]) {
-      throw new Error(`Invalid type: ${type}`);
-    }
-
-    const { regex, process } = patterns[type];
-    const resultSet = new Set();
-    let match;
-
-    while ((match = regex.exec(html)) !== null) {
-      process(match).forEach(item => resultSet.add(item));
-    }
-
-    const sortFunctions = {
-      class: (a, b) => parseInt(a.split(/[-_]/).pop()) - parseInt(b.split(/[-_]/).pop()),
-      media: (a, b) => BuildTool.CONFIG.mediaBreakpoints.indexOf(a) - BuildTool.CONFIG.mediaBreakpoints.indexOf(b)
-    };
-
-    return Array.from(resultSet).sort(sortFunctions[type]);
   }
 
   async handleBuildFailure() {
@@ -654,7 +617,7 @@ class BuildTool {
       const importedFilePath = path.resolve(path.dirname(filePath), url);
 
       try {
-        return await this.readFile(importedFilePath);
+        return await readFile(importedFilePath);
       } catch (error) {
         console.error(`Cannot read file ${importedFilePath}. Error: ${error.message}`);
         return '';
@@ -712,18 +675,59 @@ class BuildTool {
     return files.filter(file => path.extname(file) === `.${extension}`);
   }
 
-  async readFile(filePath, encoding = 'utf8') {
-    return await fs.readFile(filePath, { encoding });
-  }
-
-  async writeFile(filePath, content, flag = 'w') {
-    await fs.mkdir(path.dirname(filePath), { recursive: true });
-    return await fs.writeFile(filePath, content, { flag });
-  }
-
 }
 
-// CLI interface
+
+async function readFile(filePath, encoding = 'utf8') {
+  return await fs.readFile(filePath, { encoding });
+}
+
+async function writeFile(filePath, content, flag = 'w') {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  return await fs.writeFile(filePath, content, { flag });
+}
+
+
+function extractClasses(html, startClass, type = 'class') {
+  if (!html || typeof html !== 'string') {
+    throw new Error('Invalid HTML input');
+  }
+
+  const escapedStartClass = startClass.replace(/[-_]/g, '\\$&');
+  const patterns = {
+    class: {
+      regex: new RegExp(`class="([^"]*?\\b${escapedStartClass}\\d+\\b[^"]*?)"`, 'g'),
+      process: match => match[1].split(/\s+/).filter(className => className.startsWith(startClass))
+    },
+    media: {
+      regex: new RegExp(`\\b${escapedStartClass}(\\w+)-\\d+\\b`, 'g'),
+      process: match => [match[1]]
+    }
+  };
+
+  if (!patterns[type]) {
+    throw new Error(`Invalid type: ${type}`);
+  }
+
+  const { regex, process } = patterns[type];
+  const resultSet = new Set();
+  let match;
+
+  while ((match = regex.exec(html)) !== null) {
+    process(match).forEach(item => resultSet.add(item));
+  }
+
+  const sortFunctions = {
+    class: (a, b) => parseInt(a.split(/[-_]/).pop()) - parseInt(b.split(/[-_]/).pop()),
+    media: (a, b) => BuildTool.CONFIG.mediaBreakpoints.indexOf(a) - BuildTool.CONFIG.mediaBreakpoints.indexOf(b)
+  };
+
+  return Array.from(resultSet).sort(sortFunctions[type]);
+}
+
+
+
+
 const options = {
   component: {
     type: "string",
@@ -735,8 +739,21 @@ const options = {
   },
 };
 
-const argsObj = parseArgs({options ,strict: false});
+const argsObj = parseArgs({ options, strict: false });
 
+async function handleAdd() {
+  if (argsObj.values.component) {
+   console.log('Component:', argsObj.values.component);
+  }
+  if (argsObj.values.font) {
+    const fontInfoGF = await readFile(path.join(scriptDir,"/info/font_info_GF.json"));
+    const fontInfoJSON = fontInfoGF.toJSON();
+    console.log('Font:', fontInfoJSON);
+  }
+}
+
+
+// CLI interface
 const [, , command] = process.argv;
 const buildTool = new BuildTool();
 
@@ -746,6 +763,9 @@ switch (command) {
     break;
   case 'unbuild':
     await buildTool.unbuild();
+    break;
+  case 'add':
+    await handleAdd();
     break;
   default:
     console.log(`${colors.style('config.mjs:', colors.fg.cyan)} Can not handle "${command}", supported command are ${colors.style('[build|unbuild]', colors.fg.yellow)}.`);

@@ -70,7 +70,7 @@ IF NOT "%~1"=="" (
             GOTO uninstall
         ) ELSE (
             REM Display available options if invalid command
-            ECHO Available options are %COLOR_yellow%"build"%COLOR_RESET%, %COLOR_yellow%"unbuild"%COLOR_RESET%, %COLOR_yellow%"create"%COLOR_RESET%, %COLOR_yellow%"optimage"%COLOR_RESET%, %COLOR_yellow%"install"%COLOR_RESET% and %COLOR_yellow%"uninstall"%COLOR_RESET%.
+            ECHO Available options are %COLOR_yellow%"build"%COLOR_RESET%, %COLOR_yellow%"unbuild"%COLOR_RESET%, %COLOR_yellow%"create"%COLOR_RESET%, %COLOR_yellow%"add"%COLOR_RESET%, %COLOR_yellow%"optimage"%COLOR_RESET%, %COLOR_yellow%"install"%COLOR_RESET% and %COLOR_yellow%"uninstall"%COLOR_RESET%.
             IF NOT "%CURRENT_DIR%"=="%PROGRAM_DIR%" (
                ECHO Forwading cmd to "config.mjs"
                "%NODE_EXE%" "%USE_DIR%%CONFIG_DIR%config.mjs"  %*

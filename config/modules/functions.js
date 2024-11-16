@@ -155,6 +155,14 @@ async function processFontFamily(fontName, fontInfoObj) {
       createFontFaceDeclaration(result, variant)
     );
 
+    if (isVariable) {
+      console.log('It is a variable font and available axes:', result.axes.map(axis =>
+        `${axis.tag} (${axis.start}-${axis.end})`
+      ).join(', '));
+    } else {
+      console.log('Available variants:', result.variants.join(', '));
+    }
+
     // Download all font files in parallel
     await Promise.all(
       Object.entries(result.files).map(async ([variant, url]) => {
@@ -168,13 +176,6 @@ async function processFontFamily(fontName, fontInfoObj) {
     await fs.writeFile(`${fontDir}/font-face.css`, fontFaces.join('\n\n'));
 
     console.log(`Added ${result.family} font family successfully.`);
-    if (isVariable) {
-      console.log('Available axes:', result.axes.map(axis =>
-        `${axis.tag} (${axis.start}-${axis.end})`
-      ).join(', '));
-    } else {
-      console.log('Available variants:', result.variants.join(', '));
-    }
   } catch (error) {
     console.error(`Failed to add ${result.family}:`, error.message);
   }

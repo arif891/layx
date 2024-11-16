@@ -260,6 +260,21 @@ const colors = {
 const currentDir = process.cwd();
 const scriptDir = import.meta.dirname;
 
+const options = {
+  component: {
+    type: "string",
+    short: "c",
+    multiple: true
+  },
+  font: {
+    type: "string",
+    short: "f",
+    multiple: true
+  },
+};
+
+const argsObj = parseArgs({ options, strict: false });
+
 class BuildTool {
   static CONFIG = {
     fileTypes: ['css', 'js'],
@@ -610,7 +625,7 @@ class BuildTool {
     }
   }
 
-  // Utility methods (kept from original)
+  // Utility methods 
   async processImports(content, filePath, fileType) {
     const importUrls = this.extractImportUrls(content, fileType);
     const importedContents = await Promise.all(importUrls.map(async (url) => {
@@ -727,28 +742,57 @@ function extractClasses(html, startClass, type = 'class') {
 
 
 
-
-const options = {
-  component: {
-    type: "string",
-    short: "c"
-  },
-  font: {
-    type: "string",
-    short: "f"
-  },
-};
-
-const argsObj = parseArgs({ options, strict: false });
-
 async function handleAdd() {
   if (argsObj.values.component) {
-   console.log('Component:', argsObj.values.component);
+    console.log('Component:', argsObj.values.component);
   }
   if (argsObj.values.font) {
-    const fontInfoGF = await readFile(path.join(scriptDir,"/info/font_info_GF.json"));
-    const fontInfoJSON = fontInfoGF.toJSON();
-    console.log('Font:', fontInfoJSON);
+    const fontInfoGF = await readFile(path.join(scriptDir, "/info/font_info_GF.json"));
+    const fontInfoObj = JSON.parse(fontInfoGF);
+
+    // Function to find a font family in Google Fonts data
+    function findFontByFamily(fontsData, familyName) {
+      // Case insensitive search
+      const searchName = familyName.toLowerCase();
+
+      // Check if we're dealing with the API v1 structure
+      if (fontsData.items) {
+        return fontsData.items.find(
+          font => font.family.toLowerCase() === searchName
+        );
+      }
+
+    }
+
+    // Example usage:
+    const searchFont = (fontsData, familyName) => {
+      const font = findFontByFamily(fontsData, familyName);
+
+      if (!font) {
+        return {
+          found: false,
+          message: `Font family "${familyName}" not found`
+        };
+      }
+
+      return {
+        found: true,
+        font: font,
+        variants: font.variants,
+        category: font.category,
+        files: font.files
+      };
+    };
+
+    argsObj.values.font.forEach(font => {
+      const result = searchFont(fontInfoObj, font.toLowerCase());
+      if (result.found) {
+        console.log("Font details:", result.font);
+        console.log("Available variants:", result.variants);
+      } else {
+        console.log(result.message);
+      }
+    })
   }
 }
 
@@ -768,7 +812,7 @@ switch (command) {
     await handleAdd();
     break;
   default:
-    console.log(`${colors.style('config.mjs:', colors.fg.cyan)} Can not handle "${command}", supported command are ${colors.style('[build|unbuild]', colors.fg.yellow)}.`);
+    console.log(`${colors.style('config.mjs:', colors.fg.cyan)} Can not handle "${command}", supported command are ${colors.style('[build|unbuild|add]', colors.fg.yellow)}.`);
     process.exit(1);
 }
 

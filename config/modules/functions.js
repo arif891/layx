@@ -1,18 +1,7 @@
 import path from 'path';
 import { promises as fs } from 'fs';
 
-import { argsObj } from './vars.js';
-
-async function readFile(filePath, encoding = 'utf8') {
-  return await fs.readFile(filePath, { encoding });
-}
-
-async function writeFile(filePath, content, flag = 'w') {
-  await fs.mkdir(path.dirname(filePath), { recursive: true });
-  return await fs.writeFile(filePath, content, { flag });
-}
-
-
+import { argsObj} from './vars.js';
 
 async function handleAdd(scriptDir) {
 
@@ -55,22 +44,39 @@ async function handleAdd(scriptDir) {
 
       return {
         found: true,
-        font: font,
+        family: font.family,
         variants: font.variants,
         category: font.category,
-        files: font.files
+        subsets: font.subsets,
+        axes: font.axes,
+        version: font.version,
+        files: font.files,
+        font: font,
       };
     };
 
-    argsObj.values.font.forEach(font => {
+  
+    for (const font of argsObj.values.font) {
+      const fontFace = `
+      
+      `
       const result = searchFont(fontInfoObj, font.toLowerCase());
       if (result.found) {
-        console.log("Font details:", result.font);
-        console.log("Available variants:", result.variants);
+        console.log(`Adding ${result.family} font family...`);
+
+        try {
+          for (const [style, url] of Object.entries(result.files)) {
+            await downloadFile(url, `../assets/font/${result.family.replace(' ', '_')}/${result.family.replace(' ', '_')}_${style}_${result.version}.woff2`);
+          }
+          console.log(`Added ${result.family} font family successfully.`);
+        } catch (error) {
+          console.log(`Can't add ${result.family}. ${error}`);
+        }
+
       } else {
         console.warn(result.message);
       }
-    })
+    }
   }
 }
 
@@ -262,6 +268,15 @@ function extractClasses(html, startClass, type = 'class') {
   };
 
   return Array.from(resultSet).sort(sortFunctions[type]);
+}
+
+async function readFile(filePath, encoding = 'utf8') {
+  return await fs.readFile(filePath, { encoding });
+}
+
+async function writeFile(filePath, content, flag = 'w') {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  return await fs.writeFile(filePath, content, { flag });
 }
 
 

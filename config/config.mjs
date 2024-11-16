@@ -18,7 +18,6 @@ switch (command) {
     await buildTool.unbuild();
     break;
   case 'add':
-    await downloadFile('https://github.com/arif891/layx/releases/download/v0.1.0-alpha/layx-setup-v0.1.0-alpha_windows_x64.zip', './tem.zip');
     await handleAdd(scriptDir);
     break;
   default:

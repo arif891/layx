@@ -796,7 +796,7 @@ async function handleAdd() {
         console.log("Font details:", result.font);
         console.log("Available variants:", result.variants);
       } else {
-        console.log(result.message);
+        console.warn(result.message);
       }
     })
   }

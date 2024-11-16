@@ -1,82 +1,182 @@
 import path from 'path';
 import { promises as fs } from 'fs';
 
-import { argsObj} from './vars.js';
+import { argsObj } from './vars.js';
 
 async function handleAdd(scriptDir) {
-
   if (!argsObj.values.component && !argsObj.values.font) {
-    console.warn("Please specify a component by using '--component' or '-c', or a font by using '--font' or '-f'.");
-    return
+    console.warn("Please specify a component using '--component' or '-c', or a font using '--font' or '-f'.");
+    return;
   }
 
   if (argsObj.values.component) {
-    console.log('Component:', argsObj.values.component);
+    await handleComponentAdd();
   }
 
   if (argsObj.values.font) {
+    await handleFontAdd(scriptDir);
+  }
+}
+
+async function handleComponentAdd() {
+  console.log('Component:', argsObj.values.component);
+  // Add component handling logic here
+}
+
+async function handleFontAdd(scriptDir) {
+  try {
     const fontInfoGF = await readFile(path.join(scriptDir, "/info/font_info_GF.json"));
     const fontInfoObj = JSON.parse(fontInfoGF);
 
-    // Function to find a font family in Google Fonts data
-    function findFontByFamily(fontsData, familyName) {
-      // Case insensitive search
-      const searchName = familyName.toLowerCase();
+    await Promise.all(
+      argsObj.values.font.map(font => processFontFamily(font, fontInfoObj))
+    );
+  } catch (error) {
+    console.error('Error processing fonts:', error.message);
+  }
+}
 
-      // Check if we're dealing with the API v1 structure
-      if (fontsData.items) {
-        return fontsData.items.find(
-          font => font.family.toLowerCase() === searchName
-        );
-      }
-    }
+function findFontByFamily(fontsData, familyName) {
+  const searchName = familyName.toLowerCase();
+  return fontsData.items?.find(font => font.family.toLowerCase() === searchName);
+}
 
-    // Example usage:
-    const searchFont = (fontsData, familyName) => {
-      const font = findFontByFamily(fontsData, familyName);
+function searchFont(fontsData, familyName) {
+  const font = findFontByFamily(fontsData, familyName);
 
-      if (!font) {
-        return {
-          found: false,
-          message: `Font family "${familyName}" not found`
-        };
-      }
-
-      return {
-        found: true,
-        family: font.family,
-        variants: font.variants,
-        category: font.category,
-        subsets: font.subsets,
-        axes: font.axes,
-        version: font.version,
-        files: font.files,
-        font: font,
-      };
+  if (!font) {
+    return {
+      found: false,
+      message: `Font family "${familyName}" not found`
     };
+  }
 
-  
-    for (const font of argsObj.values.font) {
-      const fontFace = `
-      
-      `
-      const result = searchFont(fontInfoObj, font.toLowerCase());
-      if (result.found) {
-        console.log(`Adding ${result.family} font family...`);
+  return {
+    found: true,
+    family: font.family,
+    variants: font.variants,
+    category: font.category,
+    subsets: font.subsets,
+    axes: font.axes,
+    version: font.version,
+    files: font.files,
+    font
+  };
+}
 
-        try {
-          for (const [style, url] of Object.entries(result.files)) {
-            await downloadFile(url, `../assets/font/${result.family.replace(' ', '_')}/${result.family.replace(' ', '_')}_${style}_${result.version}.woff2`);
-          }
-          console.log(`Added ${result.family} font family successfully.`);
-        } catch (error) {
-          console.log(`Can't add ${result.family}. ${error}`);
-        }
+function isVariableFont(axes) {
+  return Boolean(axes && axes.length > 0);
+}
 
-      } else {
-        console.warn(result.message);
-      }
+function getWeightRange(axes) {
+  if (!axes) return '400';
+
+  const weightAxis = axes.find(axis => axis.tag === 'wght');
+  if (weightAxis) {
+    return `${weightAxis.start} ${weightAxis.end}`;
+  }
+
+  return '400';
+}
+
+function getWeightValue(variant) {
+  const weightMap = {
+    '100': '100',
+    '300': '300',
+    'regular': '400',
+    '500': '500',
+    '700': '700',
+    '900': '900'
+  };
+
+  return weightMap[variant] || '400';
+}
+
+function isItalicVariant(variant) {
+  return variant.includes('italic');
+}
+
+function createFontFaceDeclaration(fontInfo, variant) {
+  const formattedFamilyName = fontInfo.family.replace(' ', '_');
+  const isVariable = isVariableFont(fontInfo.axes);
+
+  if (isVariable) {
+    const weightRange = getWeightRange(fontInfo.axes);
+    return `
+@font-face {
+font-family: '${fontInfo.family}';
+font-style: ${isItalicVariant(variant) ? 'italic' : 'normal'};
+font-weight: ${weightRange};
+font-display: swap;
+src: url(/assets/font/${formattedFamilyName}/${formattedFamilyName}_${variant}_${fontInfo.version}.woff2) format('woff2');
+}`;
+  }
+
+  return `
+@font-face {
+font-family: '${fontInfo.family}';
+font-style: ${isItalicVariant(variant) ? 'italic' : 'normal'};
+font-weight: ${getWeightValue(variant.replace('italic', ''))};
+font-display: swap;
+src: url(/assets/font/${formattedFamilyName}/${formattedFamilyName}_${variant}_${fontInfo.version}.woff2) format('woff2');
+}`;
+}
+
+async function ensureDirectoryExists(dirPath) {
+  try {
+    await fs.mkdir(dirPath, { recursive: true });
+  } catch (error) {
+    if (error.code !== 'EEXIST') {
+      throw error;
     }
+  }
+}
+
+async function processFontFamily(fontName, fontInfoObj) {
+  const result = searchFont(fontInfoObj, fontName.toLowerCase());
+
+  if (!result.found) {
+    console.warn(result.message);
+    return;
+  }
+
+  const formattedFamilyName = result.family.replace(' ', '_');
+  const fontDir = `../assets/font/${formattedFamilyName}`;
+  const isVariable = isVariableFont(result.axes);
+
+  try {
+    console.log(`Adding ${result.family} ${isVariable ? 'variable' : 'static'} font family...`);
+
+    // Ensure the font directory exists
+    await ensureDirectoryExists(fontDir);
+
+    // Generate font-face declarations for all variants
+    const fontFaces = Object.keys(result.files).map(variant =>
+      createFontFaceDeclaration(result, variant)
+    );
+
+    // Download all font files in parallel
+    await Promise.all(
+      Object.entries(result.files).map(async ([variant, url]) => {
+        const filePath = `${fontDir}/${formattedFamilyName}_${variant}_${result.version}.woff2`;
+        console.log(`Downloading ${variant} variant...`);
+        await downloadFile(url, filePath);
+      })
+    );
+
+    // Optionally save the fontFaces to a CSS file
+    await fs.writeFile(`${fontDir}/font-face.css`, fontFaces.join('\n\n'));
+
+    console.log(`Added ${result.family} font family successfully.`);
+    if (isVariable) {
+      console.log('Available axes:', result.axes.map(axis =>
+        `${axis.tag} (${axis.start}-${axis.end})`
+      ).join(', '));
+    } else {
+      console.log('Available variants:', result.variants.join(', '));
+    }
+  } catch (error) {
+    console.error(`Failed to add ${result.family}:`, error.message);
   }
 }
 

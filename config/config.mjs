@@ -257,6 +257,9 @@ const colors = {
 // console.log(colors.style('Hello', colors.fg.red, colors.bg.white));
 // console.log(colors.style('RGB Text', colors.rgb.fg(255, 128, 0)));
 
+const currentDir = process.cwd();
+const scriptDir = import.meta.dirname;
+
 class BuildTool {
   static CONFIG = {
     fileTypes: ['css', 'js'],
@@ -264,31 +267,23 @@ class BuildTool {
   };
 
   constructor(options = {}) {
-    this.initializePaths(options);
     // this.validateDirectories();
-  }
-
-  async initializePaths(options) {
-    const currentDirectory = options.currentDirectory || process.cwd();
-    const programDirectory = options.programDirectory || 'C:/Program Files/layx/';
-
     this.directories = {
-      current: currentDirectory,
-      program: programDirectory,
-      config: path.join(currentDirectory, 'config'),
-      assets: path.join(currentDirectory, 'assets'),
-      layx: path.join(currentDirectory, 'layx'),
-      pages: path.join(currentDirectory, 'pages'),
-      images: path.join(currentDirectory, 'assets/image'),
-      css: path.join(currentDirectory, 'assets/css'),
-      js: path.join(currentDirectory, 'assets/js'),
-      layxAssets: path.join(currentDirectory, 'layx/assets'),
-      layxCss: path.join(currentDirectory, 'layx/assets/css'),
-      layxJs: path.join(currentDirectory, 'layx/assets/js'),
-      pagesCss: path.join(currentDirectory, 'assets/css/pages'),
-      pagesJs: path.join(currentDirectory, 'assets/js/pages'),
-      pagesCssOut: path.join(currentDirectory, 'layx/assets/css/pages'),
-      pagesJsOut: path.join(currentDirectory, 'layx/assets/js/pages')
+      current: currentDir,
+      config: path.join(currentDir, 'config'),
+      assets: path.join(currentDir, 'assets'),
+      layx: path.join(currentDir, 'layx'),
+      pages: path.join(currentDir, 'pages'),
+      images: path.join(currentDir, 'assets/image'),
+      css: path.join(currentDir, 'assets/css'),
+      js: path.join(currentDir, 'assets/js'),
+      layxAssets: path.join(currentDir, 'layx/assets'),
+      layxCss: path.join(currentDir, 'layx/assets/css'),
+      layxJs: path.join(currentDir, 'layx/assets/js'),
+      pagesCss: path.join(currentDir, 'assets/css/pages'),
+      pagesJs: path.join(currentDir, 'assets/js/pages'),
+      pagesCssOut: path.join(currentDir, 'layx/assets/css/pages'),
+      pagesJsOut: path.join(currentDir, 'layx/assets/js/pages')
     };
 
     this.files = {
@@ -422,7 +417,7 @@ class BuildTool {
 
       if (modified) {
         await fs.writeFile(filePath, content, 'utf8');
-        console.log(`${mode}ed layX files in ${filePath}`);
+        console.log(`${mode}ed LayX files in ${filePath}`);
       }
     }
 

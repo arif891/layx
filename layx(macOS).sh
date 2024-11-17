@@ -31,12 +31,10 @@ echo "LayX version 0.1.0 alpha"
 
 # Check for Node.js
 if [ ! -f "${NODE_EXE}" ]; then
-    echo "Local folder Node.js not found."
     
     if [ -f "${PROGRAM_DIR}${CONFIG_DIR}node" ]; then
         NODE_EXE="${PROGRAM_DIR}${CONFIG_DIR}node"
         WEBP_EXE="${PROGRAM_DIR}${CONFIG_DIR}webp"
-        echo "Using program Node.js."
     else
         echo "Program Node.js also not found."
         if ! command -v node &> /dev/null; then

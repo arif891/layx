@@ -32,13 +32,11 @@ ECHO LayX version 0.1.0 alpha
 
 REM Check for Node.js installation and set appropriate path
 IF NOT EXIST "%NODE_EXE%" (
-    ECHO Local folder Node js not found.
-
+    
     REM Check if Node.js exists in program directory
     IF EXIST "%PROGRAM_DIR%%CONFIG_DIR%node.exe" (
         SET "NODE_EXE=%PROGRAM_DIR%%CONFIG_DIR%node.exe"
         SET "WEBP_EXE=%PROGRAM_DIR%%CONFIG_DIR%webp.exe"
-        ECHO Using program Node js .
     ) ELSE ( 
         ECHO Program Node js also not found.   
         REM Check for global Node.js installation

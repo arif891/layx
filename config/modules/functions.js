@@ -10,7 +10,7 @@ async function handleAdd(scriptDir) {
   }
 
   if (argsObj.values.component) {
-    await handleComponentAdd();
+    await handleComponentAdd(scriptDir);
   }
 
   if (argsObj.values.font) {
@@ -18,7 +18,7 @@ async function handleAdd(scriptDir) {
   }
 }
 
-async function handleComponentAdd() {
+async function handleComponentAdd(scriptDir) {
   console.log('Component:', argsObj.values.component);
   // Todo component handling logic here
 }

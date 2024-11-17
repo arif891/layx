@@ -108,7 +108,7 @@ font-family: '${fontInfo.family}';
 font-style: ${isItalicVariant(variant) ? 'italic' : 'normal'};
 font-weight: ${weightRange};
 font-display: swap;
-src: url(/assets/font/${formattedFamilyName}/${formattedFamilyName}_${variant}_${fontInfo.version}.woff2) format('woff2');
+src: url(/assets/font/${formattedFamilyName}/${formattedFamilyName}_${variant}_variable_${fontInfo.version}.woff2) format('woff2');
 }`;
   }
 
@@ -166,14 +166,16 @@ async function processFontFamily(fontName, fontInfoObj) {
     // Download all font files in parallel
     await Promise.all(
       Object.entries(result.files).map(async ([variant, url]) => {
-        const filePath = `${fontDir}/${formattedFamilyName}_${variant}_${result.version}.woff2`;
+        const filePath = `${fontDir}/${formattedFamilyName}_${variant}_${isVariable ? 'variable_':''}${result.version}.woff2`;
         console.log(`Downloading ${variant} variant...`);
         await downloadFile(url, filePath);
       })
     );
 
     // Optionally save the fontFaces to a CSS file
-    await fs.writeFile(`${fontDir}/font-face.css`, fontFaces.join('\n\n'));
+
+    await writeFile(`${fontDir}/font-face.css`, fontFaces.join('\n\n'));
+    await writeFile('./layx/main/typography/typography.css', `\n\n\n/*<${result.family}>*/${fontFaces.join('\n')}\n/*</${result.family}>*/`, 'a');
 
     console.log(`Added ${result.family} font family successfully.`);
   } catch (error) {

@@ -28,6 +28,8 @@ async function handleFontAdd(scriptDir) {
     const fontInfoGF = await readFile(path.join(scriptDir, "/info/font_info_GF.json"));
     const fontInfoObj = JSON.parse(fontInfoGF);
 
+    console.log(`Last font info update: ${fontInfoObj.lastUpdate}`);
+
     await Promise.all(
       argsObj.values.font.map(font => processFontFamily(font, fontInfoObj))
     );

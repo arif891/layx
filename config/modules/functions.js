@@ -147,7 +147,7 @@ async function processFontFamily(fontName, fontInfoObj) {
   const isVariable = isVariableFont(result.axes);
 
   try {
-    console.log(colors.style(`Adding ${result.family} ${isVariable ? 'variable' : 'static'} font family...`, colors.fg.cyan));
+    console.log(colors.style(`Adding "${result.family}" ${isVariable ? 'variable' : 'static'} font family...`, colors.fg.cyan));
 
     // Ensure the font directory exists
     await ensureDirectoryExists(fontDir);
@@ -179,9 +179,9 @@ async function processFontFamily(fontName, fontInfoObj) {
     await writeFile(`${fontDir}/font-face.css`, fontFaces.join('\n\n'));
     await writeFile('./layx/main/typography/typography.css', `\n\n\n/*<${result.family}>*/${fontFaces.join('\n')}\n/*</${result.family}>*/`, 'a');
 
-    console.log(colors.style(`Added ${result.family} font family successfully.`, colors.fg.green));
+    console.log(colors.style(`Added "${result.family}" font family successfully.`, colors.fg.green));
   } catch (error) {
-    console.error(`Failed to add ${result.family}:`, error.message);
+    console.error(`Failed to add "${result.family}":`, error.message);
   }
 }
 

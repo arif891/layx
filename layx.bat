@@ -146,7 +146,7 @@ IF EXIST "%PROGRAM_DIR%" (
  
         REM Clean up unnecessary files
         IF EXIST "%CURRENT_DIR%%CONFIG_DIR%" (
-            ECHO %COLOR_cyan%Cleaning up unnecessary files...%COLOR_RESET%
+            ECHO %COLOR_yellow%Cleaning up unnecessary files...%COLOR_RESET%
             rmdir "%CURRENT_DIR%%CONFIG_DIR%" /S /Q
         )
         
@@ -305,4 +305,3 @@ IF "%choice%"=="1" (
 PAUSE
 
 :end
-ECHO Script completed.

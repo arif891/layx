@@ -269,6 +269,7 @@ else
         "optimage") optimize_images ;;
         "install") install ;;
         "uninstall") uninstall ;;
+        "add") "${NODE_EXE}" "${USE_DIR}${CONFIG_DIR}config.mjs" "$@" ;;
         *)
             echo -e "Available options are ${COLOR_YELLOW}\"build\"${COLOR_RESET}, ${COLOR_YELLOW}\"unbuild\"${COLOR_RESET}, ${COLOR_YELLOW}\"create\"${COLOR_RESET}, ${COLOR_YELLOW}\"add\"${COLOR_RESET}, ${COLOR_YELLOW}\"optimage\"${COLOR_RESET}, ${COLOR_YELLOW}\"install\"${COLOR_RESET} and ${COLOR_YELLOW}\"uninstall\"${COLOR_RESET}."
             if [ "${CURRENT_DIR}" != "${PROGRAM_DIR}" ]; then

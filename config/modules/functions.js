@@ -174,7 +174,7 @@ async function processFontFamily(fontName, fontInfoObj) {
       })
     );
 
-    // Optionally save the fontFaces to a CSS file
+    // Save the fontFaces to a CSS file
 
     await writeFile(`${fontDir}/font-face.css`, fontFaces.join('\n\n'));
     await writeFile('./layx/main/typography/typography.css', `\n\n\n/*<${result.family}>*/${fontFaces.join('\n')}\n/*</${result.family}>*/`, 'a');

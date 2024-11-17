@@ -32,7 +32,7 @@ ECHO LayX version 0.1.0 alpha
 
 REM Check for Node.js installation and set appropriate path
 IF NOT EXIST "%NODE_EXE%" (
-    
+
     REM Check if Node.js exists in program directory
     IF EXIST "%PROGRAM_DIR%%CONFIG_DIR%node.exe" (
         SET "NODE_EXE=%PROGRAM_DIR%%CONFIG_DIR%node.exe"
@@ -278,7 +278,7 @@ ECHO 5. Install
 ECHO 6. Uninstall
 ECHO 7. Exit
 
-SET /P choice="Enter your choice (1-8): "
+SET /P choice="Enter your choice (1-7): "
 
 IF "%choice%"=="1" (
     GOTO build 

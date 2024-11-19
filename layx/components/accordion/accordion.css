@@ -26,7 +26,7 @@ accordion, .accordion {
             margin-bottom: var(--margin-bottom, .5rem);
         }
 
-        &.active {
+        &[open] {
             grid-template-rows: max-content 1fr;
             
             .title::after {

@@ -14,11 +14,8 @@ class Accordion {
       multipleOpen: false,
       ...options
     };
-
-    // First try with tag name, then fallback to class if needed
-    const accordionsByTag = Array.from(document.getElementsByTagName(selector));
-    const accordionsByClass = Array.from(document.getElementsByClassName('accordion'));
-    this.accordions = accordionsByTag.length ? accordionsByTag : accordionsByClass;
+  
+    this.accordions = document.querySelectorAll(selector);
     
     if (!this.accordions.length) {
       console.warn(`No accordion elements found with selector: ${selector}`);

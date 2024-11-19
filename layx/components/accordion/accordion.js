@@ -73,9 +73,6 @@ class Accordion {
     content.setAttribute('role', 'tabpanel');
     content.setAttribute('id', `${id}-content`);
     content.setAttribute('aria-labelledby', `${id}-title`);
-
-    // Don't use hidden attribute since we're using grid-template-rows for animation
-    content.style.visibility = 'visible';
   }
 
   /**

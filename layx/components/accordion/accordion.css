@@ -5,6 +5,7 @@ accordion, .accordion {
     --margin-bottom: 1rem;
     --item-bg: #fff;
     --bg: rgb(245, 245, 245);
+    --transition-duration: .3s;
 
     display: block;
     padding: .5rem;
@@ -18,7 +19,7 @@ accordion, .accordion {
         border-radius: var(--border-radius, .5rem);
         background: var(--item-bg);
         outline-color: transparent;
-        transition: grid-template-rows .3s ease-out;
+        transition: grid-template-rows var(--transition-duration) ease-out;
 
         &:not(:last-of-type) {
             margin-bottom: var(--margin-bottom, .5rem);
@@ -70,6 +71,7 @@ accordion, .accordion {
         .content {
             overflow: hidden;
             padding-inline: var(--padding-x, var(--padding, .5rem));
+            transition: margin-bottom var(--transition-duration) ease-out;
 
             [open] & {
               margin-bottom: var(--padding-y, var(--padding, .5rem));
@@ -78,6 +80,7 @@ accordion, .accordion {
             :last-child {
                margin-bottom: unset;
             }
+
             p {
                 color: rgb(40, 40, 50);
                 font-size: min(calc(.9rem + .3vw), 1.2rem);

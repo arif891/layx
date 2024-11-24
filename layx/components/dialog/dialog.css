@@ -73,7 +73,7 @@ dialog {
       flex-wrap: wrap;
       gap: var(--gap, .5rem);
 
-      &.center {
+      &.middle {
         justify-content: center;
       }
 
@@ -108,7 +108,7 @@ dialog {
     top: var(--edge-offset-y);
   }
 
-  &.center {
+  &.middle {
     inset-block: 0;
     transform-origin: center;
   }
@@ -128,11 +128,11 @@ dialog {
     transform-origin: bottom center;
   }
 
-  &.left.bottom, &.left.center {
+  &.left.bottom, &.left.middle {
     transform-origin: bottom left;
   }
 
-  &.right.bottom, &.right.center {
+  &.right.bottom, &.right.middle {
     transform-origin: bottom right;
   }
 

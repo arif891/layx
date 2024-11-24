@@ -20,7 +20,7 @@ class Alert {
      * @param {AlertOptions} [options={}]
      */
     constructor(selector = 'alert', options = {}) {
-        this.defaultOptions = {
+        this.options = {
             globalWrapperSelector: '.global-alert-wrapper',
             wrapperSelector: '.alert-wrapper',
             closeBtnSelector: '.close',
@@ -32,10 +32,10 @@ class Alert {
             modern: false,
             fit: false,
             onOpen: () => { },
-            onClose: () => { }
+            onClose: () => { },
+            ...options
         };
 
-        this.options = { ...this.defaultOptions, ...options };
         this.alerts = document.querySelectorAll(selector);
         this.init();
     }

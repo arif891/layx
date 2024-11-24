@@ -136,8 +136,6 @@ class Alert {
     }
 }
 
-// Create singleton instance
-const alertInstance = new Alert();
-
-export default alertInstance;
+// Export class and create a default instance
 export { Alert };
+export default new Alert();

@@ -8,7 +8,6 @@ dialog {
   --bg-modern: linear-gradient(145deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
   --blur: 15px;
   --close-btn-color: #fff;
-  --accent-color: rgb(178, 241, 255);
   --animation-duration: .6s;
 
   position: fixed;
@@ -105,7 +104,7 @@ dialog {
     -webkit-backdrop-filter: blur(var(--blur));
   }
 
-  &:not(.center, .left, .rigth, .bottom) {
+  &:not(.bottom) {
     top: var(--edge-offset-y);
   }
 
@@ -119,7 +118,7 @@ dialog {
     transform-origin: top left;
   }
 
-  &.rigth {
+  &.right {
     inset-inline: auto var(--edge-offset-x);
     transform-origin: top right;
   }
@@ -129,13 +128,11 @@ dialog {
     transform-origin: bottom center;
   }
 
-  &.left.bottom,
-  &.left.center {
+  &.left.bottom, &.left.center {
     transform-origin: bottom left;
   }
 
-  &.rigth.bottom,
-  &.rigth.center {
+  &.right.bottom, &.right.center {
     transform-origin: bottom right;
   }
 
@@ -144,13 +141,6 @@ dialog {
     --transition: .6s;
   }
 }
-
-@starting-style {
-  dialog[open]::backdrop {
-    opacity: 0;
-  }
-}
-
 
 @keyframes dialog-show {
   0% {

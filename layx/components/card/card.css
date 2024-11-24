@@ -6,7 +6,8 @@ card, .card {
   --bg-modern: linear-gradient(145deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
   --blur: 15px;
 
-  display: block;
+  display: flex;
+  flex-direction: column;
   border-radius: var(--radius);
   background: var(--bg);
   overflow: hidden;
@@ -26,12 +27,18 @@ card, .card {
     flex-direction: row;
   }
 
+  &.r {
+    --radius: 1rem;
+  }
+
   &.modern {
     background: var(--bg-modern);
     backdrop-filter: blur(var(--blur));
   }
 
-  &.r {}
+  &.between {
+    justify-content: space-between;
+  }
 
   .header, .main, .footer {
     display: flex;

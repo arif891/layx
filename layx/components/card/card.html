@@ -19,11 +19,11 @@
             }
 
             .demo__container {
-                margin-top: 1rem;
+                padding-top: 1rem;
             }
 
             card {
-                width: 400px;
+                max-width: 375px;
             }
 
             .inner-card {
@@ -36,7 +36,7 @@
     <body>
         <container class="demo__container">
             <card>
-                <img src="../carousel/assets/2.webp" alt="">
+                <img src="../carousel/assets/2.webp" alt="" style="height: 150px; object-fit: cover; width: 100%;">
                 <div class="wrapper">
                     <div class="header">
                         <h5>Some demo header</h5>
@@ -45,9 +45,9 @@
                         <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugit mollitia illum perferendis
                             molestiae.</p>
                     </div>
-                    <div class="footer">
-                        <button class="dark wide" type="button">Demo</button>
-                        <button class="light wide" type="button">Book</button>
+                    <div class="footer horizontal grow">
+                        <button class="dark lg" type="button">Demo</button>
+                        <button class="light lg" type="button">Book</button>
                     </div>
                 </div>
             </card>

@@ -17,20 +17,20 @@
         vertical-align: -.125em;
     }
 
-    :is(&[data-theme-update=light], &[data-theme-value=light]):not(.defult) {
+    :is(&[data-theme-update=light], &[data-theme-value=light]):not(.default) {
         &::before {
             content: var(--ligth-icon);
         }
     }
 
 
-    :is(&[data-theme-update=dark], &[data-theme-value=dark]):not(.defult) {
+    :is(&[data-theme-update=dark], &[data-theme-value=dark]):not(.default) {
         &::before {
             content: var(--dark-icon);
         }
     }
 
-    :is(&[data-theme-update=auto], &[data-theme-value=auto]):not(.defult) {
+    :is(&[data-theme-update=auto], &[data-theme-value=auto]):not(.default) {
         &::before {
             content: var(--auto-icon);
         }

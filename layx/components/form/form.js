@@ -14,7 +14,7 @@ class Form {
     }
 
     handleFormSubmission(form) {
-        if (!form.classList.contains('defult')) {
+        if (!form.classList.contains('default')) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 

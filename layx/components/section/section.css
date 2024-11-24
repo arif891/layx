@@ -1,7 +1,7 @@
 section, .section {
     --padding-y: clamp(1rem, 5vh, 3rem);
 
-    &:not(.defult) {
+    &:not(.default) {
         layout {
             padding: var(--padding-y, var(--padding, 0)) var(--padding-x, var(--padding, 0));
         }

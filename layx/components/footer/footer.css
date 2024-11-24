@@ -1,7 +1,7 @@
 footer {
     --padding: 1rem;
 
-    &:not(.defult) {
+    &:not(.default) {
         padding-block: clamp(1rem, 5vh, 3rem);
         layout {
             min-height: 45vh;

@@ -1,4 +1,4 @@
-/* Defult Scrollbar Fix */
+/* default Scrollbar Fix */
 @supports selector(::-webkit-scrollbar) and (not (scrollbar-width: auto)) {
     ::-webkit-scrollbar-thumb {
         background: var(--scrollbar-color, rgba(0, 0, 0, 0.3));

@@ -312,6 +312,9 @@ select {
             margin-bottom: .25rem;
         }
 
+        &::before {
+         display: none;
+        }
     }
 
     &,&::picker(select) {
@@ -319,6 +322,7 @@ select {
     }
 
     &::picker(select) {
+        border: unset;
         padding: .25rem;
         border-radius: calc(var(--radius) + .25rem);
         background-color: rgba(var(--bg-color-rgb), .6);

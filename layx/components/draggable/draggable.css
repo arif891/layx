@@ -6,6 +6,11 @@ draggable,.draggable {
 
     .draggable-area {
         padding-block: 1rem;
+        user-select: none;
+    }
+
+    &:not(:has(.draggable-area)) {
+        user-select: none;
     }
 
     &.left {

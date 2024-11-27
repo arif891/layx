@@ -345,7 +345,7 @@ select {
         }
     }
 
-    &::after {
+    &::after, &::select-arrow {
         display: none;
     }
 

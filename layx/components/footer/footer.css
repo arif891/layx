@@ -1,3 +1,40 @@
-footer {
-  
+.footer__section {
+    padding: 1rem;
+    background-color: var(--bg);
+
+    .footer__container {
+
+        .footer__layout {
+
+            .footer__start {
+
+            }
+
+            .footer__middle {
+                row-gap: var(--gap-y);
+
+                .link__block {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: space-between;
+                    gap: .5rem;
+
+                    .link__wrapper {
+                        display: flex;
+                        flex-direction: column;
+                        gap: .25rem;
+
+                        a {
+                            text-decoration: none;
+                            color: inherit;
+                        }
+                    }
+                }
+            }
+
+            .footer__end {
+
+            }
+        }
+    }
 }

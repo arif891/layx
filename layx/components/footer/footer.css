@@ -1,5 +1,5 @@
 .footer__section {
-    padding: 1rem;
+    padding: 1.5rem 1rem;
     background-color: var(--bg);
 
     .footer__container {
@@ -7,7 +7,7 @@
         .footer__layout {
 
             .footer__start {
-
+               display: none;
             }
 
             .footer__middle {
@@ -24,7 +24,11 @@
                         flex-direction: column;
                         gap: .25rem;
 
-                        a {
+                        .link__hading {
+                           opacity: .6; 
+                        }
+
+                        .link {
                             text-decoration: none;
                             color: inherit;
                         }
@@ -33,7 +37,20 @@
             }
 
             .footer__end {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: .5rem;
 
+                .legal {
+                    display: flex;
+                    gap: .5rem;
+
+                    a {
+                        text-decoration: none;
+                        color: inherit;
+                    }
+                }
             }
         }
     }

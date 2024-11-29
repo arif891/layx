@@ -32,7 +32,7 @@
 	"Layout Edge Component": {
 		"scope": "html",
 		"prefix": "layout-edge",
-		"body": "<layout class=\"egde __layout\"></layout>"
+		"body": "<layout class=\"edge__layout\"></layout>"
 	},
 	"Navbar Component": {
 		"scope": "html",
@@ -41,7 +41,7 @@
 	},
 	"Navbar Center Component": {
 		"scope": "html",
-		"prefix": "lnavbar-center",
+		"prefix": "navbar-center",
 		"body": "<navbar class=\"__navbar\">\r    <div class=\"wrapper\">\r        <div class=\"main center\">\r            <div class=\"brand\">\r                <h5 class=\"logo-text\">Logo</h5>\r                <button class=\"toggler\"></button>\r            </div>\r            <div class=\"warp-able left\">\r                <button class=\"close\"></button>\r                <nav class=\"link-wrapper\">\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                </nav>\r                <div>\r                    <button class=\"dark\">Button</button>\r                </div>\r            </div>\r        </div>\r    </div>\r</navbar>"
 	},
 	"Accordion Component": {
@@ -94,7 +94,12 @@
 		"prefix": "icon",
 		"body": "<svg class=\"icon\">\r    <use href=\"/assets/image/svg/icons.svg#icon-id\" />\r</svg>"
 	},
-    "Demo Component": {
+    "Footer Section": {
+		"scope": "html",
+		"prefix": "footer-sec",
+		"body": "<footer class=\"footer__section\">\r    <container class=\"footer__container\">\r        <layout class=\"footer__layout gap-x gap-y-3\">\r            <div class=\"x-12 sub-x footer__start\"></div>\r            <div class=\"x-12 sub-x footer__middle\">\r                <div class=\"x-12 x-lg-4 brand\">\r                    <h3>Logo</h3>\r                    <p>Some brand text.</p>\r                </div>\r                <div class=\"x-12 x-lg-8 link__block\">\r                    <div class=\"link__wrapper\">\r                        <h5 class=\"link__hading\">Section</h5>\r                        <a class=\"link\" href=\"\">Home</a>\r                        <a class=\"link\" href=\"\">Features</a>\r                        <a class=\"link\" href=\"\">Pricing</a>\r                        <a class=\"link\" href=\"\">FAQs</a>\r                        <a class=\"link\" href=\"\">About</a>\r                    </div>\r                    <div class=\"link__wrapper\">\r                        <h5 class=\"link__hading\">Section</h5>\r                        <a class=\"link\" href=\"\">Home</a>\r                        <a class=\"link\" href=\"\">Features</a>\r                        <a class=\"link\" href=\"\">Pricing</a>\r                        <a class=\"link\" href=\"\">FAQs</a>\r                        <a class=\"link\" href=\"\">About</a>\r                    </div>\r                    <div class=\"link__wrapper\">\r                        <h5 class=\"link__hading\">Section</h5>\r                        <a class=\"link\" href=\"\">Home</a>\r                        <a class=\"link\" href=\"\">Features</a>\r                        <a class=\"link\" href=\"\">Pricing</a>\r                        <a class=\"link\" href=\"\">FAQs</a>\r                        <a class=\"link\" href=\"\">About</a>\r                    </div>\r                </div>\r            </div>\r            <div class=\"x-12 sub-x footer__end\">\r                <span>© 2024 Company, Inc</span>\r                <div class=\"legal\">\r                  <a href=\"\">Terms</a>\r                  |\r                  <a href=\"\">Privacy</a>\r                </div>\r            </div>\r        </layout>\r    </container>\r</footer>"
+	},
+	"Demo Component": {
 		"scope": "html",
 		"prefix": "demo",
 		"body": "<demo class=\" __demo\"></demo>"

@@ -1,5 +1,4 @@
-video,
-audio {
+video, audio {
     --radius: .5rem;
     --bg: rgb(245, 245, 245);
     --video-bg: rgb(215, 215, 215);
@@ -115,8 +114,7 @@ video {
 }
 
 
-audio,
-video[src$=".mp3"] {
+audio, video[src$=".mp3"] {
     &::-webkit-media-controls-enclosure {
         border-radius: var(--radius);
         padding: var(--padding-y, var(--padding)) var(--padding-x, var(--padding));

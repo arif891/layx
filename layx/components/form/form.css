@@ -216,7 +216,6 @@ input {
     &[type=range] {
 
         &.modern {
-
             --percent: calc((var(--value) - var(--min)) / (var(--max) - var(--min)) * 100);
             appearance: none;
             position: relative;
@@ -227,7 +226,7 @@ input {
 
             &.value::after {
                 counter-set: value var(--value);
-                content: counter(value);
+                content: var(--value-before,'') counter(value) var(--value-after,'');
                 pointer-events: none;
                 position: absolute;
                 inset: .5rem;

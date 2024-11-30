@@ -14,6 +14,30 @@
     --breakpoint-suwd: 32 / 9;  /* Super ultrawide */
 }
 
+
+/*
+@custom-media --sm (width >= 576px);
+@custom-media --md (width >= 768px);
+@custom-media --lg (width >= 992px);
+@custom-media --xl (width >= 1200px);
+@custom-media --xxl (width >= 1400px);
+@custom-media --xxxl (width >= 1800px);
+@custom-media --wd (aspect-ratio >= 16 / 9) and (width >= 1800px);
+@custom-media --uwd (aspect-ratio >= 21 / 9) and (width >= 2000px);
+@custom-media --suwd (aspect-ratio >= 32 / 9) and (width >= 3000px);
+
+@custom-media --no-sm (width < 576px);
+@custom-media --no-md (width < 768px);
+@custom-media --no-lg (width < 992px);
+@custom-media --no-xl (width < 1200px);
+@custom-media --no-xxl (width < 1400px);
+@custom-media --no-xxxl (width < 1800px);
+@custom-media --no-wd (aspect-ratio < 16 / 9) and (width < 1800px);
+@custom-media --no-uwd (aspect-ratio < 21 / 9) and (width < 2000px);
+@custom-media --no-suwd (aspect-ratio < 32 / 9) and (width < 3000px);
+*/
+
+
 /* (sm) Small devices (576px and up) */
 @media (width >= 576px) {
     /* Styles for small devices */

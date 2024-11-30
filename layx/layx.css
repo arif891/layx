@@ -4,14 +4,14 @@
 @import url(main/base/base.css);
 @import url(main/typography/typography.css);
 
-/* Core componets */
+/* Core components */
 @import url(main/container/container.css);
 @import url(main/layout/layout.css);
 
 /* helper */
 @import url(helpers/layout/layuot_helper.css);
 
-/* Componets */
+/* Components */
 @import url(components/button/button.css);
 @import url(components/navbar/navbar.css);
 @import url(components/section/section.css);

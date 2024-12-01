@@ -10,6 +10,10 @@
     --invalid-color: rgb(255, 81, 81);
     --color: rgb(var(--color-rgb));
     --bg-color: rgb(var(--bg-color-rgb));
+
+    &.wide {
+        --padding-y: 1.25rem; 
+    }
 } 
 
 form {

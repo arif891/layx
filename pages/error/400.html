@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,8 +14,16 @@
 
   <body>
     <div class="error-wrapper">
-      <h1>400 Bad Request</h1>
-      <p>The server could not understand the request due to malformed syntax.</p>
+      <div class="code-wrapper">
+        <span class="error-up">Error</span>
+        <h1 class="error-code">400</h1>
+        <span class="error-text">Bad Request</span>
+      </div>
+      <div class="info-wrapper">
+        <p class="error-info">The server could not understand the request due to malformed syntax.</p>
+        <a class="btn lg dark wide r error-btn" href="/">Go to homepage</a>
+      </div>
     </div>
   </body>
+
 </html>

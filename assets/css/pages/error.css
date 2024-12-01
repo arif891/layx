@@ -1,3 +1,44 @@
 .error-wrapper {
-    padding: 1.5rem;
+    padding-inline: 1rem;
+    padding-top: 20vh;
+
+    .code-wrapper {
+        width: fit-content;
+        margin-inline: auto;
+        margin-bottom: 1.5rem;
+    }
+
+    .error-up {
+        text-transform: uppercase;
+        font-size: clamp(1.25rem, 1.5vw, 2.5rem);
+    }
+
+    .error-code {
+        font-size: clamp(8.5rem, 15vw, 20rem);
+        line-height: 1;
+        font-weight: 900;
+        margin: 0;
+        mask: linear-gradient(130deg, rgba(0, 0, 0, .3),rgba(0, 0, 0, .6));
+    }
+
+    .error-text {
+        display: block;
+        text-align: right;
+        font-size: clamp(1.25rem, 1.5vw, 2.5rem);
+    }
+
+    .info-wrapper {
+        max-width: 60ch;
+        margin-inline: auto;
+    }
+
+    .error-info {
+        
+    }
+
+    .error-btn {
+        display: block;
+        width: fit-content;
+        margin-inline: auto;
+    }
 }

@@ -1,0 +1,75 @@
+# Enable rewrite engine and follow symlinks
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    Options +FollowSymLinks
+
+    # Ensure HTTPS
+    RewriteCond %{HTTPS} off [OR]
+    RewriteCond %{HTTP_HOST} ^www\. [NC]
+    RewriteCond %{HTTP_HOST} ^(?:www\.)?(.+)$ [NC]
+    RewriteRule ^ https://%1%{REQUEST_URI} [L,NE,R=301]
+
+    # Block access to hidden files and directories
+    RewriteCond %{SCRIPT_FILENAME} -d [OR]
+    RewriteCond %{SCRIPT_FILENAME} -f
+    RewriteRule "(^|/)\." - [F]
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+    # HSTS (HTTP Strict Transport Security)
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+    # Protect against clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Protect against XSS attacks
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Prevent MIME-type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Control how much referrer information should be included
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Disable Adobe Flash and PDF readers from embedding your site
+    Header always set X-Permitted-Cross-Domain-Policies "none"
+
+    # Content Security Policy
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'"
+
+    # Permissions Policy (formerly Feature-Policy)
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+    # Secure cookies
+    Header edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure;SameSite=Strict
+</IfModule>
+
+# Protect against common vulnerabilities
+<IfModule mod_autoindex.c>
+    IndexOptions +FancyIndexing
+    IndexIgnore *.php
+</IfModule>
+
+# Protect sensitive files
+<FilesMatch "(.git|.htaccess|.env|.php|.ini|.log)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Disable server signature
+ServerSignature Off
+
+# Error pages
+ErrorDocument 301 /pages/error/301.html
+ErrorDocument 302 /pages/error/302.html
+ErrorDocument 400 /pages/error/400.html
+ErrorDocument 401 /pages/error/401.html
+ErrorDocument 403 /pages/error/403.html
+ErrorDocument 404 /pages/error/404.html
+ErrorDocument 405 /pages/error/405.html
+ErrorDocument 429 /pages/error/429.html
+ErrorDocument 500 /pages/error/500.html
+ErrorDocument 502 /pages/error/502.html
+ErrorDocument 503 /pages/error/503.html
+ErrorDocument 504 /pages/error/504.html

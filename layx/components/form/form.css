@@ -1,4 +1,4 @@
-:is(form,label,input,textarea,select, option,::picker(select)) {
+:is(form,label,input,textarea,select, option,::picker(select)):not(.default) {
     --padding-x: .8rem;
     --padding-y: 1rem;
     --radius: .5rem;
@@ -16,19 +16,19 @@
     }
 } 
 
-form {
+form:not(.default) {
     padding: .5rem;
     background-color: var(--form-bg-color);
 }
 
-label {
+label:not(.default) {
     --padding-x: 1rem;
     display: inline-block;
     margin-bottom: calc(var(--margin-bottom, 1rem) / 2);
     user-select: none;
 }
 
-input,textarea,select {
+:is(input,textarea,select):not(.default) {
 
     display: block;
     min-width: 0;
@@ -81,7 +81,7 @@ input,textarea,select {
 }
 
 
-input {
+input:not(.default) {
 
     &::placeholder {
         color: var(--color, #000);
@@ -240,7 +240,6 @@ input {
 
     &[type=range] {
 
-        &.modern {
             --percent: calc((var(--value) - var(--min)) / (var(--max) - var(--min)) * 100);
             appearance: none;
             position: relative;
@@ -287,7 +286,6 @@ input {
                 opacity: 0;
             }
         }
-    }
 
     &[type=submit], &[type=button] {
         --padding-x: 1rem;
@@ -295,7 +293,7 @@ input {
     }
 }
 
-textarea {
+textarea:not(.default) {
     resize: vertical;
     field-sizing: content;
     scrollbar-width: thin;
@@ -309,7 +307,7 @@ textarea {
     }
 }
 
-select {
+select:not(.default) {
     appearance: none;
     padding-inline: var(--padding-x) calc(var(--padding-x) + 1.3lh);
     background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23818181' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right var(--padding-x) center, var(--bg-color);
@@ -427,5 +425,4 @@ select {
             margin-bottom: unset;
         }
     }
-
 }

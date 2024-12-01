@@ -77,9 +77,9 @@ class Form {
 // Usage
 new Form();
 
-const modernRangeInputs = document.querySelectorAll('input[type="range"].modern');
+const customRangeInputs = document.querySelectorAll('input[type="range"]:not(.default)');
 
-modernRangeInputs.forEach(input => {
+customRangeInputs.forEach(input => {
     // Set initial CSS custom properties
     input.style.setProperty('--value', input.value);
     input.style.setProperty('--min', input.min || '0');

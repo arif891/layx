@@ -61,8 +61,6 @@
 ServerSignature Off
 
 # Error pages
-ErrorDocument 301 /pages/error/301.html
-ErrorDocument 302 /pages/error/302.html
 ErrorDocument 400 /pages/error/400.html
 ErrorDocument 401 /pages/error/401.html
 ErrorDocument 403 /pages/error/403.html

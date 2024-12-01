@@ -38,7 +38,7 @@ class Form {
         const response = await fetch(formUrl, {
             method: 'POST',
             body: formData,
-            // Header for sevice worker and server
+            // Header for service worker and server
             headers: {
                 'X-Requested-With': 'FormSubmission'
             }

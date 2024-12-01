@@ -24,13 +24,20 @@
                 font-family: 'Red Hat Display', Tahoma, Geneva, Verdana, sans-serif;
             }
 
+            form {
+                padding: 0;
+            }
+
             .demo__container {
-                max-width: 450px;
-                margin-inline: auto;
 
                 >div {
                     display: grid;
                     margin-bottom: 1.5rem;
+                   
+                    @media (width > 500px) {
+                        max-width: 450px;
+                        margin-inline: auto;
+                    }
                 }
             }
         </style>

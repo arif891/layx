@@ -32,7 +32,7 @@
 	"Layout Edge Component": {
 		"scope": "html",
 		"prefix": "layout-edge",
-		"body": "<layout class=\"edge__layout\"></layout>"
+		"body": "<layout class=\"edge __layout\"></layout>"
 	},
 	"Navbar Component": {
 		"scope": "html",

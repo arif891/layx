@@ -2,7 +2,56 @@
 
     .auth__layout {
         height: 100dvh;
+        padding-block: var(--gap-x);
 
-        
+        .form__wrapper,.brand__space {
+            padding: clamp(1.5rem,2.5rem, 2vw);
+            background-color: rgb(245, 250, 255);
+            overflow: auto;
+            scrollbar-width: thin;
+
+            &.form__wrapper {
+
+                .social__wrapper {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: .75rem;
+                    padding: .75rem;
+                    background-color: rgba(255,255,255,.6);
+                    border-radius: .5rem;
+
+                    .social__text {
+                        font-size: 1.25rem;
+                        opacity: .6;
+                    }
+
+                    .social__button_wrapper {
+                        display: flex;
+                        justify-content: space-between;
+                        flex-grow: 1;
+                        gap: .5rem;
+
+                        .social__button {
+                            padding: .5rem;
+                            flex-grow: 1;
+                            background-color: #fff;
+
+                            .icon {
+                                height: 1.5em;
+                            }
+                        }
+                    }
+                }
+            }
+
+            &.brand__space {
+                display: none;
+
+                @media (width >=992px) {
+                    display: block;
+                }
+            }
+        }
     }
 }

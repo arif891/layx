@@ -22,7 +22,8 @@
             .passkey__wrapper {
                 display: flex;
                 align-items: center;
-                gap: .5rem;
+                justify-content: center;
+                gap: .25rem;
                 width: 100%;
                 padding: .85rem .75rem;
                 border-radius: .5rem;
@@ -35,6 +36,7 @@
 
                 .icon {
                     height: 1.75em;
+                    margin-top: -.1em;
                 }
 
                 .passkey__text {

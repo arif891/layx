@@ -1,6 +1,7 @@
 class Form {
     constructor(selector = 'form', options = {}) {
         this.forms = document.querySelectorAll(selector);
+        this.customRangeInputs = document.querySelectorAll('input[type="range"]:not(.default)');
         this.options = {
             onSuccess: options.onSuccess || this.defaultOnSuccess,
             onError: options.onError || this.defaultOnError,
@@ -11,16 +12,28 @@ class Form {
 
     init() {
         this.forms.forEach(form => this.handleFormSubmission(form));
+
+        this.customRangeInputs.forEach(input => {
+            // Set initial CSS custom properties
+            input.style.setProperty('--value', input.value);
+            input.style.setProperty('--min', input.min || '0');
+            input.style.setProperty('--max', input.max || '100');
+
+            // Update CSS custom property on input change
+            input.addEventListener('input', () => {
+                input.style.setProperty('--value', input.value);
+            });
+        });
     }
 
     handleFormSubmission(form) {
-        if (!form.classList.contains('default')) {
+        if (!form.classList.contains('no-handle')) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
                 const formData = new FormData(form);
                 const formUrl = form.action;
-               
+
                 try {
                     // Call beforeSubmit and allow it to modify formData
                     const modifiedFormData = await this.options.beforeSubmit(formData, form);
@@ -31,7 +44,7 @@ class Form {
                     this.options.onError(error, form);
                 }
             });
-        } 
+        }
     }
 
     async submitFormData(formData, formUrl) {
@@ -74,19 +87,6 @@ class Form {
     }
 }
 
-// Usage
-new Form();
 
-const customRangeInputs = document.querySelectorAll('input[type="range"]:not(.default)');
-
-customRangeInputs.forEach(input => {
-    // Set initial CSS custom properties
-    input.style.setProperty('--value', input.value);
-    input.style.setProperty('--min', input.min || '0');
-    input.style.setProperty('--max', input.max || '100');
-
-    // Update CSS custom property on input change
-    input.addEventListener('input', () => {
-        input.style.setProperty('--value', input.value);
-    });
-});
+export default new Form;
+export {Form};

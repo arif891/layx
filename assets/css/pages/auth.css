@@ -1,55 +1,108 @@
 .auth__wrapper {
+    background-color: rgb(212, 239, 255);
 
-    .auth__layout {
-        height: 100dvh;
-        padding-block: var(--gap-x);
+    .auth__container {
+        @media (width < 576px) {
+            --edge-offset-x: 0;
+        }
 
-        .form__wrapper,.brand__space {
-            padding: clamp(1.5rem,2.5rem, 2vw);
-            background-color: rgb(245, 250, 255);
-            overflow: auto;
-            scrollbar-width: thin;
+        .auth__layout {
+            height: 100dvh;
 
-            &.form__wrapper {
+            @media (width >=576px) {
+                padding-block: var(--gap-x);
+            }
 
-                .social__wrapper {
-                    display: flex;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    gap: .75rem;
-                    padding: .75rem;
-                    background-color: rgba(255,255,255,.6);
-                    border-radius: .5rem;
+            .auth__text_wrapper {
+                margin-bottom: 1rem;
+            }
 
-                    .social__text {
-                        font-size: 1.25rem;
-                        opacity: .6;
-                    }
+            .form__wrapper, .brand__space {
+                padding: clamp(1.5rem, 2.5vw, 3rem);
+                background-color: rgba(255, 255, 255, .5);
+                backdrop-filter: blur(15px);
+                overflow: auto;
+                scrollbar-width: thin;
 
-                    .social__button_wrapper {
+                &.form__wrapper {
+
+                    .social__wrapper {
                         display: flex;
-                        justify-content: space-between;
-                        flex-grow: 1;
-                        gap: .5rem;
+                        align-items: center;
+                        flex-wrap: wrap;
+                        gap: .75rem;
+                        padding: .5rem;
+                        background-color: rgba(255, 255, 255, .5);
+                        border-radius: .5rem;
 
-                        .social__button {
-                            padding: .5rem;
+                        .social__text {
+                            font-size: 1.2rem;
+                            opacity: .6;
+                            padding-left: .25rem;
+                        }
+
+                        .social__button_wrapper {
+                            display: flex;
+                            justify-content: space-between;
                             flex-grow: 1;
-                            background-color: #fff;
+                            gap: .5rem;
 
-                            .icon {
-                                height: 1.5em;
+                            .social__button {
+                                padding: .5rem;
+                                flex-grow: 1;
+                                background-color: #fff;
+
+                                .icon {
+                                    height: 1.5em;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            &.brand__space {
-                display: none;
+                .auth__form {
+                    display: flex;
+                    flex-direction: column;
 
-                @media (width >=992px) {
-                    display: block;
+                    .submit__btn {
+                        --padding-y: 1rem;
+                        margin-top: 1rem;
+                        line-height: inherit;
+                    }
+
+                    @media (width >=576px) {
+                        input, .submit__btn {
+                            --padding-y: 1.25rem;
+                        }
+                    }
+                }
+
+                .divider__wrapper {
+                    display: flex;
+                    align-items: center;
+                    opacity: .6;
+                    margin-block: 1rem;
+
+                    &::before, &::after {
+                        content: '';
+                        flex-grow: 1;
+                        height: 1px;
+                        background-color: currentColor;
+                        opacity: .1;
+                    }
+
+                    .divider {
+                        line-height: 1;
+                        padding: .5rem;
+                    }
+                }
+
+                &.brand__space {
+                    display: none;
+
+                    @media (width >=992px) {
+                        display: block;
+                    }
                 }
             }
         }

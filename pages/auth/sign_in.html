@@ -18,8 +18,30 @@
             <layout class="gap auth__layout">
                 <div class="x-12 x-sm-10 x-lg-6 x-xl-5 xs-sm-2 xs-lg-1 x-xxxl-4 form__wrapper">
                     <div class="auth__text_wrapper">
-                        <h1 class="h3">Sign in</h2>
+                        <h1 class="h3 auth__header">Sign in</h2>
                     </div>
+                    <div class="feedback__wrapper"></div>
+                    <form class="default auth__form" action="">
+                        <label for="email">Email</label>
+                        <div class="validate-wrapper" invalid="Please enter a valid email.">
+                            <input class="validate invalid" type="email" name="email" required autofocus autocomplete="email">
+                        </div>
+                        <div class="password__action_wrapper">
+                            <label for="password">Password</label>
+                            <a class="link" href="/pages/auth/forgot.html">Forgot?</a>
+                        </div>
+                        <div class="validate-wrapper" invalid="Password must be 6 character long.">
+                            <input class="validate invalid" type="password" name="password" minlength="6" required autocomplete="current-password">
+                        </div>
+                        <button class="submit__btn dark" type="submit">Sign in</button>
+                    </form>
+                    <div class="divider__wrapper">
+                        <span class="divider">or</span>
+                    </div>
+                    <button class="passkey__wrapper">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path fill="currentColor" d="M120-160v-112q0-34 17.5-62.5T184-378q62-31 126-46.5T440-440q20 0 40 1.5t40 4.5q-4 58 21 109.5t73 84.5v80H120zM760-40l-60-60v-186q-44-13-72-49.5T600-420q0-58 41-99t99-41q58 0 99 41t41 99q0 45-25.5 80T790-290l50 50-60 60 60 60-80 80zM440-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47zm300 80q17 0 28.5-11.5T780-440q0-17-11.5-28.5T740-480q-17 0-28.5 11.5T700-440q0 17 11.5 28.5T740-400z"/></svg>
+                        <span class="passkey__text">Quick sign in with Passkey</span>
+                    </button>
                     <div class="social__wrapper">
                         <span class="social__text">Continue with</span>
                         <div class="social__button_wrapper">
@@ -34,16 +56,11 @@
                             </button>
                         </div>
                     </div>
-                    <div class="divider__wrapper">
-                        <span class="divider">or</span>
+                    <div class="other__info_wrapper">
+                        <div>
+                            <span class="auth__link_text">Don't have an account?</span> <a class="auth__link" href="/pages/auth/sign_up.html">Sign up</a>
+                        </div>
                     </div>
-                    <form class="default auth__form" action="">
-                        <label for="email">Email</label>
-                        <input class="" type="email" name="email">
-                        <label for="password">Password</label>
-                        <input class="" type="password" name="password">
-                        <button class="submit__btn dark" type="submit">Sign in</button>
-                    </form>
                 </div>
                 <div class="x-lg-6 x-xl-7 x-xxxl-8 brand__space">
 

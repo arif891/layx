@@ -1,10 +1,8 @@
 .auth__wrapper {
-    background-color: rgb(212, 239, 255);
+    background-color: rgb(229 231 235);
 
     .auth__container {
-        @media (width < 576px) {
             --edge-offset-x: 0;
-        }
 
         .auth__layout {
             height: 100dvh;
@@ -14,7 +12,36 @@
             }
 
             .auth__text_wrapper {
-                margin-bottom: 1rem;
+                margin-bottom: 2rem;
+
+                .auth__header {
+                    line-height: 1;
+                }
+            }
+
+            .passkey__wrapper {
+                display: flex;
+                align-items: center;
+                gap: .5rem;
+                width: 100%;
+                padding: .85rem .75rem;
+                border-radius: .5rem;
+                margin-bottom: .5rem;
+                background-color: #fff;
+
+                @media (width >=576px) {
+                    padding: 1.15rem .75rem;
+                }
+
+                .icon {
+                    height: 1.75em;
+                }
+
+                .passkey__text {
+                    font-size: 1.2rem;
+                    line-height: 1;
+                    opacity: .7;
+                }
             }
 
             .form__wrapper, .brand__space {
@@ -37,7 +64,7 @@
 
                         .social__text {
                             font-size: 1.2rem;
-                            opacity: .6;
+                            opacity: .7;
                             padding-left: .25rem;
                         }
 
@@ -52,6 +79,10 @@
                                 flex-grow: 1;
                                 background-color: #fff;
 
+                                @media (width >=576px) {
+                                    padding: .75rem;  
+                                }
+
                                 .icon {
                                     height: 1.5em;
                                 }
@@ -64,6 +95,15 @@
                     display: flex;
                     flex-direction: column;
 
+                    .password__action_wrapper {
+                        display: flex;
+                        justify-content: space-between;
+
+                        .link {
+                            color: inherit;
+                        }
+                    }
+
                     .submit__btn {
                         --padding-y: 1rem;
                         margin-top: 1rem;
@@ -74,6 +114,25 @@
                         input, .submit__btn {
                             --padding-y: 1.25rem;
                         }
+                    }
+                }
+
+                .other__info_wrapper {
+                    margin-top: 1.5rem;
+
+                    .legal__info_wrapper {
+                        text-align: center;
+                        margin-top: 5rem;
+                    }
+
+                    .legal__text, .legal__link {
+                        font-size: .85rem;
+                        opacity: .6;
+                        color: inherit;
+                    }
+
+                    .auth__link_text, .auth__link {
+                        font-size: .95rem;
                     }
                 }
 

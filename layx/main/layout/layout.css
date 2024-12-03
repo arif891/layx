@@ -13,19 +13,19 @@ layout,.layout {
         grid-template-columns: calc(var(--edge-offset-x) - var(--gap-x, 0px)) repeat(var(--num-x, 12), 1fr) calc(var(--edge-offset-x) - var(--gap-x, 0px));
 
         @media (width >=576px) {
-            --edge-offset-x: 2.5%;
+            --edge-offset-x: 2.5% !important;
         }
 
         @media (width >=992px) {
-            --edge-offset-x: 5%;
+            --edge-offset-x: 5% !important;
         }
 
         @media (aspect-ratio >=21/9) and (width >=2000px) {
-            --edge-offset-x: 15%;
+            --edge-offset-x: 15% !important;
         }
 
         @media (aspect-ratio >=32/9) and (width >=3000px) {
-            --edge-offset-x: 25%;
+            --edge-offset-x: 25% !important;
         }
     }
 

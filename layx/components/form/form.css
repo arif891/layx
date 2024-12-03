@@ -1,4 +1,4 @@
-:is(form,label,input,textarea,select, option):not(.default) {
+:is(form,label,input,textarea,select, option, .validate-wrapper):not(.default) {
     --padding-x: .8rem;
     --padding-y: 1rem;
     --radius: .5rem;
@@ -26,6 +26,7 @@ label:not(.default) {
 :is(input,textarea,select):not(.default) {
     display: block;
     min-width: 0;
+    width: 100%;
     max-width: 100%;
     padding: var(--padding-y,0) var(--padding-x,0);
     margin: unset;
@@ -214,6 +215,7 @@ input:not(.default) {
     &[type=color] {
         --padding: calc(var(--padding-y) / 2);
         padding: var(--padding);
+        width: fit-content;
         min-block-size: calc(var(--padding-y) * 2 + 1lh);
         min-inline-size: 5rem;
 

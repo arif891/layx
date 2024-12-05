@@ -19,6 +19,13 @@
     RewriteCond %{REQUEST_FILENAME}.html -f
     RewriteRule ^([^.]+)$ $1.html [L]
 
+    # Route requests to the "pages" directory
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{DOCUMENT_ROOT}/pages/%{REQUEST_URI} -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/pages/%{REQUEST_URI} -d
+    RewriteRule ^(.*)$ pages/$1 [L]
+
     # 3. Block access to hidden files and directories (e.g., .git)
     RewriteRule ^(\.|\/\.) - [F,L]
 </IfModule>

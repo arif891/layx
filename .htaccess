@@ -14,6 +14,7 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME}.php -f
     RewriteRule ^([^.]+)$ $1.php [L]
+
     RewriteCond %{REQUEST_URI} !/$
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME}.html -f
@@ -25,6 +26,16 @@
     RewriteCond %{DOCUMENT_ROOT}/pages/%{REQUEST_URI} -f [OR]
     RewriteCond %{DOCUMENT_ROOT}/pages/%{REQUEST_URI} -d
     RewriteRule ^(.*)$ pages/$1 [L]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{DOCUMENT_ROOT}/pages/%{REQUEST_URI}.php -f
+    RewriteRule ^(.*)$ pages/$1.php [L]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{DOCUMENT_ROOT}/pages/%{REQUEST_URI}.html -f
+    RewriteRule ^(.*)$ pages/$1.html [L]
 
     # 3. Block access to hidden files and directories (e.g., .git)
     RewriteRule ^(\.|\/\.) - [F,L]

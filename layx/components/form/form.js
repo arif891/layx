@@ -73,9 +73,9 @@ class Form {
     }
 
     async defaultOnSuccess(response, form) {
+        form.reset();
         const responseText = await response.text();
         console.log('Form submission successful!', responseText);
-        form.reset();
         // You could add default success behavior here, like showing a message
     }
 

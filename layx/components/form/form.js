@@ -2,10 +2,13 @@ class Form {
     constructor(selector = 'form', options = {}) {
         this.forms = document.querySelectorAll(selector);
         this.customRangeInputs = document.querySelectorAll('input[type="range"]:not(.default)');
+        this.feedbackWrapperSelector = '.feedback-wrapper';
         this.options = {
             onSuccess: options.onSuccess || this.defaultOnSuccess,
             onError: options.onError || this.defaultOnError,
-            beforeSubmit: options.beforeSubmit || this.defaultBeforeSubmit
+            beforeSubmit: options.beforeSubmit || this.defaultBeforeSubmit,
+            headers: options.headers || { 'X-Requested-With': 'FormSubmission' },
+            ...options
         };
         this.init();
     }
@@ -33,12 +36,12 @@ class Form {
                 form.classList.add('submitting');
 
                 const formData = new FormData(form);
-                const formUrl = form.action;
-                const formName = form.name;
+                let formUrl = form.action;
+                let formName = form.name;
 
                 try {
                     // Call beforeSubmit and allow it to modify formData
-                    const modifiedFormData = await this.options.beforeSubmit(formData, form);
+                    const modifiedFormData = await this.options.beforeSubmit(formData, formUrl, formName, form);
 
                     const response = await this.submitFormData(modifiedFormData, formUrl, formName);
                     this.options.onSuccess(response, form);
@@ -59,10 +62,7 @@ class Form {
         const response = await fetch(url.toString(), {
             method: 'POST',
             body: formData,
-            // Header for service worker and server
-            headers: {
-                'X-Requested-With': 'FormSubmission'
-            }
+            headers: this.options.headers,
         });
 
         if (!response.ok) {
@@ -72,17 +72,19 @@ class Form {
         return response;
     }
 
-    defaultOnSuccess(response, form) {
-        console.log('Form submission successful!', response);
+    async defaultOnSuccess(response, form) {
+        const responseText = await response.text();
+        console.log('Form submission successful!', responseText);
+        form.reset();
         // You could add default success behavior here, like showing a message
     }
 
-    defaultOnError(error, form) {
+    async defaultOnError(error, form) {
         console.error('Form submission unsuccessful!', error);
         // You could add default error behavior here, like showing an error message
     }
 
-    defaultBeforeSubmit(formData, form) {
+    async defaultBeforeSubmit(formData, formUrl, formName, form) {
         // Log form data, including files
         for (let [key, value] of formData.entries()) {
             if (value instanceof File) {

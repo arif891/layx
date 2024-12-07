@@ -341,13 +341,12 @@ select:not(.default) {
             margin-bottom: .25rem;
         }
 
-        &::before {
+        &::before, &::checkmark {
             display: none;
         }
     }
 
-    &,
-    &::picker(select) {
+    &, &::picker(select) {
         appearance: base-select;
     }
 
@@ -375,11 +374,9 @@ select:not(.default) {
         }
     }
 
-    &::after,
-    &::select-arrow {
+    &::after, &::picker-icon {
         display: none;
     }
-
 }
 
 .validate-wrapper:is([valid], [invalid]):has(input, textarea, select) {

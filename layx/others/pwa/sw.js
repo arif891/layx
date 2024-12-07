@@ -6,7 +6,7 @@ const RUNTIME_CACHE_NEED_CLEAR = false; // Set true when runtime cached assets n
 // Cache name template
 const makeCacheName = (baseName, version) => `${baseName}-v${version}`;
 
-// Cache bukets name
+// Cache buckets name
 const OFFLINE_CACHE = makeCacheName("pwa-cache", OFFLINE_CACHE_VER);
 const STATIC_CACHE = makeCacheName("static-cache", STATIC_CACHE_VER);
 const RUNTIME_CACHE = "runtime-cache";

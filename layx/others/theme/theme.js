@@ -14,8 +14,8 @@ class Theme {
             metaThemeColor = document.createElement('meta');
             metaThemeColor.setAttribute('name', 'theme-color');
             document.head.appendChild(metaThemeColor);
+            return metaThemeColor;
         }
-        return metaThemeColor;
     }
 
     // Function to initialize theme and event listeners
@@ -87,7 +87,7 @@ class Theme {
     updateMetaThemeColor() {
         const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim();
         const fallbackColor = bgColor || (document.documentElement.getAttribute('theme') === 'dark' ? '#000' : '#fff');
-        this.metaThemeColor.setAttribute('content', fallbackColor);
+        this.metaThemeColor?.setAttribute('content', fallbackColor);
     }
 
     // Function to listen for system theme changes

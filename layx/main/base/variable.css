@@ -17,6 +17,7 @@
     --bg: rgb(245, 245, 245);
     --heading-color: #000;
     --paragraph-color: #202124;
+    --link-color: #2da5e6;
     --accent-color: #bae7ff;
     --scrollbar-color: rgba(var(--color-rgb), .3);
     --color: rgb(var(--color-rgb));
@@ -30,6 +31,7 @@
     --bg: rgb(20, 20, 20);
     --heading-color: #fff;
     --paragraph-color: #fff;
+    --link-color: #70cdff;
     --accent-color: #2da5e6;
     color-scheme: dark;
 }

@@ -84,11 +84,18 @@ small {
 }
 
 a {
+  text-decoration: none;
+  color: var(--link-color);
+  transition: .3s;
 
+  &:hover {
+    opacity: .8;
+    text-decoration: underline;
+  }
 }
 
 backdrop {
-    --backdrop-bg:rgba(var(--color-rgb),.3);
+    --backdrop-bg: rgba(var(--color-rgb),.3);
     position: fixed;
     inset: 0;
     visibility: hidden;
@@ -100,5 +107,9 @@ backdrop {
     &[open] {
         visibility: visible;
         opacity: 1;
+    }
+
+    &.modern {
+        backdrop-filter: blur(var(--blur,15px));
     }
 }

@@ -15,7 +15,7 @@ const RUNTIME_CACHE = "runtime-cache";
 const OFFLINE_FALLBACK_DOCUMENT = "pages/pwa/fallback.html";
 const OFFLINE_FALLBACK_IMAGE = "assets/image/pwa/fallback.webp";
 
-// This assets are downloded and added to chche when srvice worker install. Does not support RegExp url pattern
+// This assets are downloaded and added to cache when service worker install. Does not support RegExp url pattern
 const OFFLINE_CACHE_ASSETS = [
     "pages/pwa/offline_activity.html",
     "pages/pwa/fallback.html",
@@ -24,7 +24,7 @@ const OFFLINE_CACHE_ASSETS = [
     "pwa/caches/fallback.webp",
 ];
 
-// This assets are downloded and added to chche when use accses them. Support RegExp url pattern
+// This assets are downloaded and added to cache when use access them. Support RegExp url pattern
 const STATIC_CACHE_ASSETS = [
     "/pages/static/*",
     "/assets/static/*",
@@ -301,6 +301,6 @@ SwBroadcastChannel.onmessage = async (event) => {
             SwBroadcastChannel.postMessage({ RunSuccess: false, error: error.message });
         }
     } else {
-        console.log(SwReceivedData, 'Unabale to handale Received Data.')
+        console.log(SwReceivedData, 'Unable to handle Received Data.')
     }
 };

@@ -400,10 +400,9 @@ class BuildTool {
     }
   
     removeExportAndDefault(content) {
-      return content
-        .replace(/export\s+default\s+/g, '')
-        .replace(/export\s+/g, '')
-        .replace(/\bdefault\s+/g, '');
+      content = content.replace(/export\s+default\s+/g, '');
+      content = content.replace(/^export\s+/gm, '');
+      return content;
     }
   
     removeImportStatements(content) {

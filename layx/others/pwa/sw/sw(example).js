@@ -1,3 +1,10 @@
+/* Move this file to the root directory, update its name, and adjust module import paths accordingly */
+
+import {networkFirstStrategy, cacheFirstStrategy, staleWhileRevalidateStrategy} from "./modules/strategy.js";
+import {matchUrlPattern, getCacheNumber, storageCapacityDetail, checkAndClearCache} from "./modules/functions.js";
+import {handleFormSubmission} from "./modules/form_handler.js";
+import {handleBroadcastChannel} from "./modules/bc_handler.js";
+
 const SW_VER = 1; // Increment when service worker code logic changes
 const STATIC_CACHE_VER = 1; // Increment when static assets change
 const OFFLINE_CACHE_VER = 1; // Increment when offline assets change
@@ -146,161 +153,7 @@ self.addEventListener("fetch", (event) => {
 
 });
 
-// Generic function for network-first strategy
-async function networkFirstStrategy(request, event, cacheName = RUNTIME_CACHE) {
-
-    try {
-        const preloadResponse = await event.preloadResponse;
-        const cache = await caches.open(cacheName);
-
-        if (preloadResponse) {
-            cache.put(request, preloadResponse.clone());
-            return preloadResponse;
-        } else {
-            const response = await fetch(request);
-            cache.put(request, response.clone());
-            return response;
-        }
-    } catch (error) {
-        const cachedResponse = await caches.match(request);
-        if (cachedResponse) {
-            return cachedResponse;
-        }
-        return error;
-    }
-}
-
-// Generic function for cache-first strategy
-async function cacheFirstStrategy(request, event, cacheName = STATIC_CACHE) {
-
-    const cachedResponse = await caches.match(request);
-    const cache = await caches.open(cacheName);
-
-    if (cachedResponse) {
-        return cachedResponse;
-    }
-
-    try {
-        const preloadResponse = await event.preloadResponse;
-        if (preloadResponse) {
-            cache.put(request, preloadResponse.clone());
-            return preloadResponse;
-        } else {
-            const response = await fetch(request);
-            cache.put(request, response.clone());
-            return response;
-        }
-    } catch (error) {
-        return error;
-    }
-}
-
-
-// Generic function for stale-while-revalidate strategy
-async function staleWhileRevalidateStrategy(request, event, cacheName = RUNTIME_CACHE) {
-
-    try {
-        const cachedResponse = await caches.match(request);
-        const cache = await caches.open(cacheName);
-
-        const fetchPromise = fetch(request).then(async (networkResponse) => {
-            const preloadResponse = await event.preloadResponse;
-
-            if (preloadResponse) {
-                cache.put(request, preloadResponse.clone());
-            } else {
-                cache.put(request, networkResponse.clone());
-            }
-
-            return networkResponse;
-        });
-
-        return cachedResponse || fetchPromise;
-    } catch (error) {
-        return error;
-    }
-}
-
-async function handleFormSubmission(request) {
-    // Clone the request to read its body
-    const formData = await request.formData();
-
-    // Process the form data
-    for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-    }
-
-    // Forward the request to the network
-    return fetch(request);
-}
-
-// Funtion for match url pattern
-function matchUrlPattern(url, combinedPattern) {
-    if (combinedPattern.test(url)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-// Function to get the size of any cache
-async function getCacheNumber(cacheName) {
-    const cache = await caches.open(cacheName);
-    const keys = await cache.keys();
-    const cacheNum = keys.length;
-    return { cached: cacheNum };
-}
-
-// Function to estimate and present the percentage of storage capacity
-async function storageCapacityDetail() {
-    const { usage, quota } = await navigator.storage.estimate();
-    const storageUsedPercent = Math.round((usage / quota) * 100);
-    const storageUsed = Math.round(usage / (1024 * 1024));
-    const storageAvailable = Math.round(quota / (1024 * 1024));
-    return { storageUsedPercent, storageUsed, storageAvailable };
-}
-
-// Function to check storage usage and clear runtime cache if needed
-async function checkAndClearCache(cacheName = RUNTIME_CACHE) {
-    try {
-        const { storageUsedPercent, storageUsed, storageAvailable } = await storageCapacityDetail();
-        const storageThresholdPercent = 80; // 80%
-        const lowStorageThresholdMB = 1024 * 4; // 4 GB
-        const minimalUsedStorageMB = 1024; // 1 GB
-
-        if (
-            storageUsedPercent > storageThresholdPercent &&
-            storageAvailable < lowStorageThresholdMB &&
-            storageUsed >= minimalUsedStorageMB
-        ) {
-            await caches.delete(cacheName);
-            return { cleared: true, message: `${cacheName}  cache cleared successfully` };
-        }
-
-        return { cleared: false, message: `There's no need to clear the ${cacheName} cache at the moment. User devices currently have sufficient free space.` };
-    } catch (error) {
-        console.error('Error checking storage usage:', error);
-        throw new Error('Failed to check storage usage');
-    }
-}
-
 // Broadcast Channel for service worker communication
 const SwBroadcastChannel = new BroadcastChannel('SwBroadcastChannel');
 
-SwBroadcastChannel.onmessage = async (event) => {
-    const SwReceivedData = event.data;
-    if (SwReceivedData.runFunction) {
-        const functionName = SwReceivedData.runFunction;
-        const functionParams = SwReceivedData.params || [];
-
-        try {
-            const result = await self[functionName](...functionParams);
-
-            SwBroadcastChannel.postMessage({ RunSuccess: true, result });
-        } catch (error) {
-            SwBroadcastChannel.postMessage({ RunSuccess: false, error: error.message });
-        }
-    } else {
-        console.log(SwReceivedData, 'Unable to handle Received Data.')
-    }
-};
+SwBroadcastChannel.onmessage = handleBroadcastChannel(event);

@@ -4,7 +4,7 @@ layout,.layout {
     grid-template-rows: repeat(var(--num-y, none), 1fr);
     gap: var(--gap-y,0) var(--gap-x,0);
 
-    &:not(:has([class|="x"])) {
+    &:not([class*="num-x-"]):not(:has([class*="x-"])) {
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     }
 

@@ -26,7 +26,6 @@
             .form__wrapper, .brand__space {
                 padding: clamp(1.5rem, 2.5vw, 3rem);
                 background-color: rgba(var(--bg-color-rgb), .5);
-                backdrop-filter: blur(15px);
                 border-radius: .5rem;
                 overflow: auto;
                 scrollbar-width: thin;

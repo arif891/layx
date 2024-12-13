@@ -262,6 +262,16 @@ const options = {
       short: "c",
       multiple: true
     },
+    template: {
+        type: "string",
+        short: "t",
+        multiple: true
+    },
+    block: {
+        type: "string",
+        short: "b",
+        multiple: true
+    },
     font: {
       type: "string",
       short: "f",

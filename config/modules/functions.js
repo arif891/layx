@@ -13,6 +13,14 @@ async function handleAdd(scriptDir) {
     await handleComponentAdd(scriptDir);
   }
 
+  if (argsObj.values.template) {
+    await handleTemplateAdd(scriptDir);
+  }
+
+  if (argsObj.values.block) {
+    await handleBlockAdd(scriptDir);
+  }
+
   if (argsObj.values.font) {
     await handleFontAdd(scriptDir);
   }
@@ -21,6 +29,18 @@ async function handleAdd(scriptDir) {
 async function handleComponentAdd(scriptDir) {
   // Todo component handling logic here
   // console.log('Component:', argsObj.values.component);
+  console.log(colors.style('This feature currently in development!',colors.fg.yellow));
+}
+
+async function handleTemplateAdd(scriptDir) {
+  // Todo template handling logic here
+  // console.log('Template:', argsObj.values.template);
+  console.log(colors.style('This feature currently in development!',colors.fg.yellow));
+}
+
+async function handleBlockAdd(scriptDir) {
+  // Todo block handling logic here
+  // console.log('Block:', argsObj.values.block);
   console.log(colors.style('This feature currently in development!',colors.fg.yellow));
 }
 

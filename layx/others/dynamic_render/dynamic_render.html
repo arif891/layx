@@ -26,7 +26,7 @@
             }
         </style>
 
-        <script src="dynamic.js"></script>
+        <script src="dynamic_render.js"></script>
     </head>
 
     <body>
@@ -42,7 +42,7 @@
         <script>
             const role = 'Manager';
             
-            const dynamic = new Dynamic();
+            const dynamic = new DynamicRender();
             // Simulate delayed data loading
             async function delayValue(value, delay) {
                 return new Promise((resolve) => {

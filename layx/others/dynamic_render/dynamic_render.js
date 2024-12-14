@@ -1,4 +1,4 @@
-class Dynamic {
+class DynamicRender {
     constructor(selector = '.dynamic') {
         this.selector = selector;
         this.elements = document.querySelectorAll(selector);
@@ -104,6 +104,6 @@ class Dynamic {
     }
 
     static init(selector) {
-        return new Dynamic(selector);
+        return new DynamicRender(selector);
     }
 }

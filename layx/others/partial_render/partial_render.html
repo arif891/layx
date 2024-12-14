@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+
+    <body>
+        <div class="partial-render">
+            <h1>Partial Content</h1>
+        </div>
+        <a class="partial-link active" href="partial_render.html">partial</a>
+        <a class="partial-link" href="test.html">Test</a>
+        <a class="partial-link" href="test2.html">Test2</a>
+
+        <script type="module">
+            import { PartialRender } from './partial_render.js';
+
+            new PartialRender('.partial-render', '.partial-link', {
+                onNavigationChange: (url) => {
+                    document.querySelectorAll('.partial-link').forEach(
+                        link => {
+                            link.classList.remove('active');
+
+                            if (link.href == url) {
+                                link.classList.add('active');
+                            }
+                        }
+                    );
+                }
+            });
+        </script>
+    </body>
+
+</html>

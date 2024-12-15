@@ -97,7 +97,7 @@ class PartialRender {
             if (event.state) {
                 this.partial.innerHTML = event.state.content;
                 if (typeof this.options.onNavigationChange === 'function') {
-                    this.options.onNavigationChange(window.location.href);
+                    this.options.onNavigationChange(event.state.url || window.location.href);
                 }
                 this.initializeLinksInPartial();
             }
@@ -109,18 +109,15 @@ class PartialRender {
         event.preventDefault();
         const link = event.currentTarget;
         this.loadPartial(link.href);
-
+    
         if (this.options.handleNavigation) {
             window.history.pushState({
                 url: link.href,
                 content: this.partial.innerHTML
             }, '', link.href);
         }
-
-        if (typeof this.options.onNavigationChange === 'function') {
-            this.options.onNavigationChange(link.href);
-        }
     }
+    
 
     prefetchLinks(entries) {
         entries.forEach(entry => {

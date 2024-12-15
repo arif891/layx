@@ -16,8 +16,9 @@ form {
         padding: .5rem;
         background-color: var(--form-bg-color);
     }
+
     &:not(.no-handle) {
-      
+
         &.submitting {
             [type=submit] {
                 pointer-events: none;
@@ -294,8 +295,7 @@ input:not(.default) {
         }
     }
 
-    &[type=submit],
-    &[type=button] {
+    &[type=submit], &[type=button] {
         --padding-x: 1rem;
         cursor: pointer;
     }
@@ -326,10 +326,10 @@ select:not(.default) {
         color: var(--color);
         border-radius: var(--radius);
         font-weight: 500;
-        transition: .3s;
+        transition: background-color .15s;
 
         &:is(:focus, :hover) {
-            background-color: rgb(236, 249, 255);
+            background-color: var(--option-bg, rgb(236, 249, 255));
             outline: none;
         }
 
@@ -341,12 +341,12 @@ select:not(.default) {
             margin-bottom: .25rem;
         }
 
-        &::before, &::checkmark {
+        &::before,&::checkmark {
             display: none;
         }
     }
 
-    &, &::picker(select) {
+    &,&::picker(select) {
         appearance: base-select;
     }
 
@@ -356,22 +356,15 @@ select:not(.default) {
         border-radius: calc(var(--radius) + .25rem);
         background-color: rgba(var(--bg-color-rgb), .6);
         backdrop-filter: blur(calc(.55rem + .55vw));
+        opacity: 0;    
         transition:
-            display allow-discrete .6s,
-            opacity .6s,
-            overlay .6s allow-discrete;
-    }
-
-    &:not(:open)::picker(select) {
-        opacity: 0;
+            display allow-discrete .3s,
+            overlay .3s allow-discrete,
+            opacity .3s;
     }
 
     &:open::picker(select) {
         opacity: 1;
-
-        @starting-style {
-            opacity: 0;
-        }
     }
 
     &::after, &::picker-icon {

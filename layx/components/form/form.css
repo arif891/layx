@@ -18,13 +18,39 @@ form {
     }
 
     &:not(.no-handle) {
+        [type=submit] {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: .5rem;
+        }
 
         &.submitting {
             [type=submit] {
                 pointer-events: none;
                 cursor: progress;
+
+                &::before {
+                    content: '';
+                    display: block;
+                    height: .9lh;
+                    width: .9lh;
+                    border-radius: 50%;
+                    border: .2em solid currentColor;
+                    border-bottom-color: transparent;
+                    animation: rotation 1s infinite;
+                }
             }
         }
+    }
+}
+
+@keyframes rotation {
+    0% {
+         rotate: 0deg;
+    }
+    100% {
+        rotate: 360deg;
     }
 }
 
@@ -247,7 +273,6 @@ input:not(.default) {
     }
 
     &[type=range] {
-
         --percent: calc((var(--value) - var(--min)) / (var(--max) - var(--min)) * 100);
         appearance: none;
         position: relative;
@@ -356,7 +381,7 @@ select:not(.default) {
         border-radius: calc(var(--radius) + .25rem);
         background-color: rgba(var(--bg-color-rgb), .6);
         backdrop-filter: blur(calc(.55rem + .55vw));
-        opacity: 0;    
+        opacity: 0;
         transition:
             display allow-discrete .3s,
             overlay .3s allow-discrete,

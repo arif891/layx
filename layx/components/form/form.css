@@ -341,12 +341,12 @@ select:not(.default) {
             margin-bottom: .25rem;
         }
 
-        &::before,&::checkmark {
+        &::before, &::checkmark {
             display: none;
         }
     }
 
-    &,&::picker(select) {
+    &, &::picker(select) {
         appearance: base-select;
     }
 

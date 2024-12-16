@@ -1,15 +1,11 @@
 video, audio {
     --radius: .5rem;
-    --play-button-color: var(--bg-color);
+    --bg: rgb(245, 245, 245);
     --video-bg: rgb(215, 215, 215);
     --video-control-bg: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .5));
     --caption-bg: rgba(0, 0, 0, .6);
 
     max-width: 100%;
-
-    [theme=dark] & {
-        --video-bg: rgb(65, 65, 65);
-    }
 
     &::-webkit-media-controls {
         font: inherit;
@@ -24,7 +20,7 @@ video, audio {
     }
 
     &::-webkit-media-controls-volume-control-hover-background {
-        background-color: rgba(var(--color-rgb));
+        background-color: rgba(45, 45, 45, .5);
     }
 
     &.no-volume::-webkit-media-controls-volume-control-container {
@@ -103,7 +99,7 @@ video {
         }
 
         &.poster {
-            --bg: rgba(var(--bg-color-rgb), .7);
+            --bg: rgba(255, 255, 255, .7);
 
             &::-webkit-media-controls {
                 padding: .5rem;
@@ -126,7 +122,7 @@ audio, video[src$=".mp3"] {
     }
 
     &::-webkit-media-controls-play-button {
-        background-color: var(--play-button-color);
+        background-color: #fff;
         border-radius: 50%;
         order: -1;
     }

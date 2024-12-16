@@ -47,7 +47,7 @@
 	"Accordion Component": {
 		"scope": "html",
 		"prefix": "accordion",
-		"body": "<accordion class=\"__accordion\">\r    <div class=\"item\">\r        <button class=\"title\">Title</button>\r\r        <div class=\"content\">\r            <p>Content</p>\r        </div>\r    </div>\r    <div class=\"item\"></div>\r        <button class=\"title\">Title</button>\r\r        <div class=\"content\">\r            <p>Content</p>\r        </div>\r    </div>\r    <div class=\"item\"></div>\r        <button class=\"title\">Title</button>\r        \r        <div class=\"content\">\r            <p>Content</p>\r        </div>\r    </div>\r</accordion>"
+		"body": "<accordion class=\"__accordion\">\r    <div class=\"item\">\r        <button class=\"title\">Title</button>\r\r        <div class=\"content\">\r            <p>Content</p>\r        </div>\r    </div>\r    <div class=\"item\">\r        <button class=\"title\">Title</button>\r\r        <div class=\"content\">\r            <p>Content</p>\r        </div>\r    </div>\r    <div class=\"item\">\r        <button class=\"title\">Title</button>\r        \r        <div class=\"content\">\r            <p>Content</p>\r        </div>\r    </div>\r</accordion>"
 	},
 	"Accordion Item ": {
 		"scope": "html",

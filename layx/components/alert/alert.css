@@ -1,8 +1,8 @@
-alert,.alert {
-    --padding: 1rem;
+alert, .alert {
+    --padding-x: 1rem;
+    --padding-y: 1rem;
     --gap: 1rem;
     --radius: .5rem;
-    --bg: rgb(240, 240, 240);
     --bg-modern: linear-gradient(155deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.6));
     --blur: 10px;
     --border: none;
@@ -13,8 +13,8 @@ alert,.alert {
     gap: var(--gap, .5rem);
     font-size: min(calc(.9rem + .3vw), 1.2rem);
     padding: var(--padding-y, var(--padding, 1rem)) var(--padding-x, var(--padding, 1rem));
-    border-radius: var(--radius, .5rem);
-    background: var(--bg, rgb(240, 240, 240));
+    border-radius: var(--radius);
+    background: var(--bg, rgb(245, 245, 245));
     border: var(--border);
     opacity: 0;
     translate: 0 100%;

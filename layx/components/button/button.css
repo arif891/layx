@@ -94,8 +94,8 @@ button:not(.default),.btn {
             scale: .9;
         }
     }
-}
 
-a.btn {
-    text-decoration: none;
+    &a {
+        text-decoration: none;
+    }
 }

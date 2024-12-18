@@ -29,7 +29,7 @@
                     color: #fff;
                     animation: view_carousel_inset linear both;
                     animation-timeline: --carousel-item;
-                    
+
                     /*
                     transition: .6s;
                     clip-path: inset(20%);
@@ -37,11 +37,33 @@
                         clip-path: inset(0%);
                     }
                     */
+
+                    h3 {
+                        user-select: none;
+                    }
                 }
             }
 
             container {
                 --edge-offset-x: 0;
+            }
+
+            @keyframes view_carousel_inset {
+                entry 0% {
+                    clip-path: inset(25%);
+                }
+
+                entry 100% {
+                    clip-path: inset(0%);
+                }
+
+                exit 0% {
+                    clip-path: inset(0%);
+                }
+
+                exit 100% {
+                    clip-path: inset(25%);
+                }
             }
         </style>
 

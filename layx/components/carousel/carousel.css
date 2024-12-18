@@ -1,11 +1,16 @@
-carousel,.carousel {
+carousel, .carousel {
+    --height: 500px;
     --edge-offset: .5rem;
     display: block;
     position: relative;
+
+    &:focus {
+        outline: none;
+    }
     
     .main {
         display: flex;
-        height: var(--height, 500px);
+        height: var(--height);
         overflow: auto;
         scrollbar-width: none;
         scroll-snap-type: x mandatory;
@@ -139,20 +144,4 @@ carousel,.carousel {
             }
         }
     }
-}
-
-@keyframes view_carousel_inset {
-	entry 0%  {
-		clip-path: inset(25%);
-	}
-	entry 100%  {
-		clip-path: inset(0%);
-	}
-
-	exit 0% {
-		clip-path: inset(0%);
-	}
-	exit 100% {
-		clip-path: inset(25%);
-	}
 }

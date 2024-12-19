@@ -74,6 +74,7 @@ navbar, .navbar {
 
             .warp-able {
                 display: flex;
+                overscroll-behavior: contain;
 
                 @media (width < 992px) {
                     position: absolute;

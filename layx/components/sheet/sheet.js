@@ -2,7 +2,7 @@ class Sheet {
     constructor(selector = 'sheet', options = {}) {
         this.options = {
             dragThreshold: 0.4,
-            oppositeDirectionAllowed: 50,
+            oppositeDirectionAllowed: 0,
             togglerSelector: '[data-sheet-target]',
             draggableAreaSelector: '.draggable-area',
             closeButtonSelector: '.close',

@@ -9,7 +9,6 @@ sheet, .sheet {
   visibility: hidden;
   position: fixed;
   z-index: 4;
-  padding: var(--padding-y, var(--padding, .5rem)) var(--padding-x, var(--padding, .5rem));
   background: var(--bg, #fff);
   transition: var(--transition, .3s);
   overscroll-behavior: none;
@@ -20,6 +19,10 @@ sheet, .sheet {
 
   &:not(:has(.draggable-area)), .draggable-area {
     user-select: none;
+  }
+
+  &:not(:has(.snap)) {
+    padding: var(--padding-y, var(--padding, .5rem)) var(--padding-x, var(--padding, .5rem));
   }
 
   &.top,&.right,&.bottom,&.left {
@@ -52,8 +55,38 @@ sheet, .sheet {
     border-radius: 0 var(--radius) var(--radius) 0;
   }
 
+
+  &.top, &.bottom {
+    .snap:not(.default) {
+      padding-inline: var(--padding-x, var(--padding, .5rem));
+
+      &:first-child {
+        padding-top: var(--padding-y, var(--padding, .5rem));
+      }
+
+      &:last-child {
+        padding-bottom: var(--padding-y, var(--padding, .5rem));
+      }
+    }
+  }
+
+  &.left, &.right {
+    .snap:not(.default){
+      padding-block: var(--padding-y, var(--padding, .5rem));
+
+      &:first-child {
+        padding-left: var(--padding-x, var(--padding, .5rem));
+      }
+
+      &:last-child {
+        padding-right: var(--padding-x, var(--padding, .5rem));
+      }
+    }
+  }
+
+
   &.rounded-all {
-   border-radius: var(--radius);
+    border-radius: var(--radius);
   }
 
   &:not(.no-indicator) {
@@ -70,7 +103,7 @@ sheet, .sheet {
       width: 3.5rem;
     }
 
-    &.left::after,  &.right::after {
+    &.left::after, &.right::after {
       margin-block: auto;
       height: 3.5rem;
       width: .4rem;
@@ -89,7 +122,7 @@ sheet, .sheet {
     }
 
     &.right::after {
-      inset: 0 auto 0 var(--indicator-offset, .5rem); 
+      inset: 0 auto 0 var(--indicator-offset, .5rem);
     }
   }
 
@@ -100,6 +133,6 @@ sheet, .sheet {
   }
 
   &~.sheet-backdrop {
-    --backdrop-bg:rgba(var(--bg-color-rgb),.3);
+    --backdrop-bg: rgba(var(--bg-color-rgb), .3);
   }
 }

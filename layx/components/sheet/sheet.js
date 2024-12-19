@@ -198,7 +198,6 @@ class Sheet {
             state.currentSnap = nearestSnap;
             this.sheetStates.set(sheet, state);
             
-            // Apply snap transform with animation
             sheet.style.transform = isVertical
                 ? `translateY(${nearestSnap}px)`
                 : `translateX(${nearestSnap}px)`;

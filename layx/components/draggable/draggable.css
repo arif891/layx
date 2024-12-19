@@ -1,7 +1,10 @@
-draggable,.draggable {
+draggable, .draggable {
     --edge-offset: 5px;
     position: fixed;
     display: block;
+    top: 0;
+    left: 0;
+    z-index: 5;
     transition: var(--transition, .6s);
 
     .draggable-area {

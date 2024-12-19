@@ -1,11 +1,11 @@
 dialog {
   --edge-offset-x: .5rem;
   --edge-offset-y: .5rem;
-  --padding: 1.5rem;
+  --padding-x: 1.5rem;
+  --padding-y: 1.5rem;
   --gap: 1rem;
   --radius: .5rem;
-  --bg: rgb(245, 245, 245);
-  --bg-modern: linear-gradient(145deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
+  --bg-modern: linear-gradient(145deg, rgba(var(--bg-color-rgb, 255 255 255), 0.6), rgba(var(--bg-color-rgb, 255 255 255), 0.4));
   --blur: 15px;
   --close-btn-color: #fff;
   --animation-duration: .6s;

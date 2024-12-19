@@ -1,5 +1,7 @@
 .footer__section {
-    padding: 1.5rem 1rem;
+    --padding-x: 1rem;
+    --padding-y: 1.5rem;
+    padding: var(--padding-y) var(--padding-x);
     background-color: var(--bg);
 
     .footer__container {

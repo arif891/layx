@@ -94,8 +94,9 @@ button:not(.default),.btn {
             scale: .9;
         }
     }
+}
 
-    &a {
-        text-decoration: none;
-    }
+a.btn {
+    text-decoration: none;
+    opacity: 1;
 }

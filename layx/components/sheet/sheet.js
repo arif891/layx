@@ -209,7 +209,6 @@ class Sheet {
         const snapElements = Array.from(sheet.querySelectorAll(this.options.snapElementSelector));
         let totalSize = 0;
         
-        // First calculate total size
         snapElements.forEach(snap => {
             const snapRect = snap.getBoundingClientRect();
             totalSize += sheet.classList.contains('top') || sheet.classList.contains('bottom')
@@ -218,7 +217,6 @@ class Sheet {
         });
 
         let remainingSize = totalSize;
-        // Calculate positions in reverse order
         const positions = snapElements.map(snap => {
             const snapRect = snap.getBoundingClientRect();
             const size = sheet.classList.contains('top') || sheet.classList.contains('bottom')
@@ -227,7 +225,7 @@ class Sheet {
                 
             remainingSize -= size;
             
-            // Use consistent logic for both vertical and horizontal sheets
+          
             if (sheet.classList.contains('bottom') || sheet.classList.contains('right')) {
                 return remainingSize;
             } else if (sheet.classList.contains('top') || sheet.classList.contains('left')) {
@@ -236,7 +234,6 @@ class Sheet {
             return 0;
         });
 
-        // Add initial position (0)
         positions.unshift(0);
         
         return positions;

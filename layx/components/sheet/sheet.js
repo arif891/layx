@@ -1,17 +1,39 @@
 class Sheet {
-    constructor(selector = 'sheet', dragThreshold = .4) {
+    constructor(selector = 'sheet', options = {}) {
+        this.options = {
+            dragThreshold: 0.4,
+            oppositeDirectionAllowed: 50,
+            togglerSelector: '[data-sheet-target]',
+            draggableAreaSelector: '.draggable-area',
+            closeButtonSelector: '.close',
+            backdropClass: 'sheet-backdrop',
+            snapElementSelector: '.snap',
+            dragClose: true,
+            keyboardClose: true,
+            ...options
+        };
         this.sheets = document.querySelectorAll(selector);
-        this.dragThreshold = dragThreshold; // % of sheet size
-        this.togglers = document.querySelectorAll('[data-sheet-target]');
+        this.togglers = document.querySelectorAll(this.options.togglerSelector);
+        this.handleKeyPress = this.handleKeyPress.bind(this);
+        
+        this.sheetStates = new WeakMap();
         this.init();
     }
 
     init() {
         this.addTriggerListeners();
-        this.addDragListeners();
-
         this.sheets.forEach(sheet => {
+            this.sheetStates.set(sheet, {
+                currentSnap: 0,
+                dragStartSnap: 0,
+                currentDelta: 0
+            });
+            
             this.addCloseButtonListeners(sheet);
+            this.addBackdropListeners(sheet);
+            if (this.options.dragClose) {
+                this.addDragListeners(sheet);
+            }
         });
     }
 
@@ -21,161 +43,280 @@ class Sheet {
                 e.preventDefault();
                 const targetId = trigger.getAttribute('data-sheet-target');
                 const targetSheet = document.querySelector(targetId);
-                if (targetSheet) {
-                    this.toggleSheet(targetSheet);
-                }
+                if (targetSheet) this.toggle(targetSheet);
             });
         });
     }
 
     addCloseButtonListeners(sheet) {
-        sheet.querySelectorAll('.close').forEach(closeButton => {
-            closeButton.addEventListener('click', (e) => {
+        const closeButtons = sheet.querySelectorAll(this.options.closeButtonSelector);
+        closeButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.closeSheet(sheet);
+                this.close(sheet);
             });
         });
     }
 
-    addDragListeners() {
-        this.sheets.forEach(sheet => {
-            let startY, startX;
-            let currentY, currentX;
-            let isDragging = false;
-            const draggableArea = document.querySelector('.draggable-area') || sheet;
+    addBackdropListeners(sheet) {
+        if (sheet.classList.contains('none-modal')) return;
 
-            const onStart = (e) => {
-                if (e.type === 'touchstart') {
-                    startY = e.touches[0].clientY;
-                    startX = e.touches[0].clientX;
-                } else {
-                    startY = e.clientY;
-                    startX = e.clientX;
-                }
-                isDragging = true;
-                sheet.style.transition = 'none';
-            };
+        let backdrop = sheet.parentElement.querySelector(`.${this.options.backdropClass}`);
+        if (!backdrop) {
+            backdrop = document.createElement('backdrop');
+            backdrop.classList.add(this.options.backdropClass);
+            backdrop.addEventListener('click', () => this.close(sheet));
+            sheet.insertAdjacentElement('afterend', backdrop);
+        }
+    }
 
-            const onMove = (e) => {
-                if (!isDragging) return;
+    addDragListeners(sheet) {
+        const draggableArea = sheet.querySelector(this.options.draggableAreaSelector) || sheet;
+        let startY, startX, currentY, currentX, isDragging = false;
 
-                if (e.type === 'touchmove') {
-                    currentY = e.touches[0].clientY;
-                    currentX = e.touches[0].clientX;
-                } else {
-                    currentY = e.clientY;
-                    currentX = e.clientX;
-                }
+        const onStart = (e) => {
+            const { clientY, clientX } = e.type === 'touchstart' ? e.touches[0] : e;
+            startY = clientY;
+            startX = clientX;
+            isDragging = true;
+            sheet.style.transition = 'none';
+            
+            // Store the starting snap position
+            const state = this.sheetStates.get(sheet);
+            state.dragStartSnap = state.currentSnap;
+            this.sheetStates.set(sheet, state);
+        };
 
-                const deltaY = currentY - startY;
-                const deltaX = currentX - startX;
+        const onMove = (e) => {
+            if (!isDragging) return;
+            const { clientY, clientX } = e.type === 'touchmove' ? e.touches[0] : e;
+            currentY = clientY;
+            currentX = clientX;
+            this.updateSheetTransform(sheet, startY, startX, currentY, currentX);
+        };
 
-                if (sheet.classList.contains('top')) {
-                    sheet.style.transform = `translateY(${Math.min(0, deltaY)}px)`;
-                } else if (sheet.classList.contains('bottom')) {
-                    sheet.style.transform = `translateY(${Math.max(0, deltaY)}px)`;
-                } else if (sheet.classList.contains('left')) {
-                    sheet.style.transform = `translateX(${Math.min(0, deltaX)}px)`;
-                } else if (sheet.classList.contains('right')) {
-                    sheet.style.transform = `translateX(${Math.max(0, deltaX)}px)`;
-                }
-            };
+        const onEnd = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            sheet.style.transition = '';
+            this.handleDragEnd(sheet, startY, startX, currentY, currentX);
+        };
 
-            const onEnd = () => {
-                if (!isDragging) return;
+        this.addEventListeners(draggableArea, onStart, onMove, onEnd);
+    }
 
-                isDragging = false;
-                sheet.style.transition = '';
+    updateSheetTransform(sheet, startY, startX, currentY, currentX) {
+        const deltaY = currentY - startY;
+        const deltaX = currentX - startX;
+        
+        const state = this.sheetStates.get(sheet);
+        const startSnap = state.dragStartSnap;
+        
+        // Calculate total translation from the starting snap position
+        const totalDeltaY = this.limitOppositeDirection(sheet, startSnap + deltaY);
+        const totalDeltaX = this.limitOppositeDirection(sheet, startSnap + deltaX);
+        
+        // Update current delta in state
+        state.currentDelta = sheet.classList.contains('top') || sheet.classList.contains('bottom')
+            ? totalDeltaY
+            : totalDeltaX;
+        this.sheetStates.set(sheet, state);
+            
+        const transform = this.getTransformByPosition(sheet, totalDeltaX, totalDeltaY);
+        sheet.style.transform = transform;
+    }
 
-                const sheetRect = sheet.getBoundingClientRect();
-                const threshold = this.dragThreshold * (
-                    sheet.classList.contains('top') || sheet.classList.contains('bottom')
-                        ? sheetRect.height
-                        : sheetRect.width
-                );
+    limitOppositeDirection(sheet, delta) {
+        const limit = this.options.oppositeDirectionAllowed;
+        
+        if (sheet.classList.contains('bottom')) {
+            return Math.max(-limit, delta);
+        } else if (sheet.classList.contains('top')) {
+            return Math.min(limit, delta);
+        } else if (sheet.classList.contains('right')) {
+            return Math.max(-limit, delta);
+        } else if (sheet.classList.contains('left')) {
+            return Math.min(limit, delta);
+        }
+        
+        return delta;
+    }
 
-                const deltaY = currentY - startY;
-                const deltaX = currentX - startX;
+    getTransformByPosition(sheet, deltaX, deltaY) {
+        if (sheet.classList.contains('top') || sheet.classList.contains('bottom')) {
+            return `translateY(${deltaY}px)`;
+        } else {
+            return `translateX(${deltaX}px)`;
+        }
+        return '';
+    }
 
-                let shouldClose = false;
-
-                if (sheet.classList.contains('top')) {
-                    shouldClose = deltaY < -threshold;
-                } else if (sheet.classList.contains('bottom')) {
-                    shouldClose = deltaY > threshold;
-                } else if (sheet.classList.contains('left')) {
-                    shouldClose = deltaX < -threshold;
-                } else if (sheet.classList.contains('right')) {
-                    shouldClose = deltaX > threshold;
-                }
-
-                if (shouldClose) {
-                    this.closeSheet(sheet);
-                } else {
-                    sheet.style.transform = '';
-                }
-            };
-
-
-            const addTouchListeners = () => {
-                draggableArea.addEventListener('touchstart', onStart);
-                draggableArea.addEventListener('touchmove', onMove);
-                draggableArea.addEventListener('touchend', onEnd);
-            };
-
-            const addMouseListeners = () => {
-                draggableArea.addEventListener('mousedown', onStart);
-                window.addEventListener('mousemove', onMove);
-                window.addEventListener('mouseup', onEnd);
-            };
-
-
-            if ('ontouchstart' in window) {
-                addTouchListeners();
+    handleDragEnd(sheet, startY, startX, currentY, currentX) {
+        const snapElements = sheet.querySelectorAll(this.options.snapElementSelector);
+        
+        if (!snapElements.length) {
+            const sheetRect = sheet.getBoundingClientRect();
+            const threshold = this.options.dragThreshold * (
+                sheet.classList.contains('top') || sheet.classList.contains('bottom')
+                    ? sheetRect.height
+                    : sheetRect.width
+            );
+            
+            const deltaY = currentY - startY;
+            const deltaX = currentX - startX;
+            const shouldClose = this.shouldCloseOnDrag(sheet, deltaX, deltaY, threshold);
+            
+            if (shouldClose) {
+                this.close(sheet);
             } else {
-                addMouseListeners();
+                sheet.style.transform = '';
             }
+            return;
+        }
+
+        const state = this.sheetStates.get(sheet);
+        const currentDelta = state.currentDelta;
+        const isVertical = sheet.classList.contains('top') || sheet.classList.contains('bottom');
+
+        // Get cumulative snap positions
+        const sortedPositions = this.getSnapPositions(sheet);
+
+        // Find nearest snap position
+        const nearestSnap = sortedPositions.reduce((prev, curr) => {
+            return Math.abs(curr - currentDelta) < Math.abs(prev - currentDelta) ? curr : prev;
+        });
+
+        // Check if should close (dragged beyond last snap)
+        const shouldClose = sheet.classList.contains('bottom') || sheet.classList.contains('right')
+            ? currentDelta > Math.max(...sortedPositions)
+            : currentDelta < Math.min(...sortedPositions);
+
+        if (shouldClose) {
+            this.close(sheet);
+        } else {
+            // Update the snap position in state
+            state.currentSnap = nearestSnap;
+            this.sheetStates.set(sheet, state);
+            
+            // Apply snap transform with animation
+            sheet.style.transform = isVertical
+                ? `translateY(${nearestSnap}px)`
+                : `translateX(${nearestSnap}px)`;
+
+        }
+    }
+
+    getSnapPositions(sheet) {
+        const snapElements = Array.from(sheet.querySelectorAll(this.options.snapElementSelector));
+        let totalSize = 0;
+        
+        // First calculate total size
+        snapElements.forEach(snap => {
+            const snapRect = snap.getBoundingClientRect();
+            totalSize += sheet.classList.contains('top') || sheet.classList.contains('bottom')
+                ? snapRect.height
+                : snapRect.width;
+        });
+
+        let remainingSize = totalSize;
+        // Calculate positions in reverse order
+        const positions = snapElements.map(snap => {
+            const snapRect = snap.getBoundingClientRect();
+            const size = sheet.classList.contains('top') || sheet.classList.contains('bottom')
+                ? snapRect.height
+                : snapRect.width;
+                
+            remainingSize -= size;
+            
+            // Use consistent logic for both vertical and horizontal sheets
+            if (sheet.classList.contains('bottom') || sheet.classList.contains('right')) {
+                return remainingSize;
+            } else if (sheet.classList.contains('top') || sheet.classList.contains('left')) {
+                return -totalSize + remainingSize;
+            }
+            return 0;
+        });
+
+        // Add initial position (0)
+        positions.unshift(0);
+        
+        return positions;
+    }
+
+    findNearestSnap(currentPosition, snapPositions) {
+        return snapPositions.reduce((prev, curr) => {
+            return Math.abs(curr - currentPosition) < Math.abs(prev - currentPosition) ? curr : prev;
         });
     }
 
+    shouldCloseOnDrag(sheet, deltaX, deltaY, threshold) {
+        if (sheet.classList.contains('top')) return deltaY < -threshold;
+        if (sheet.classList.contains('bottom')) return deltaY > threshold;
+        if (sheet.classList.contains('left')) return deltaX < -threshold;
+        if (sheet.classList.contains('right')) return deltaX > threshold;
+        return false;
+    }
 
-    openSheet(sheet) {
+    addEventListeners(element, onStart, onMove, onEnd) {
+        if ('ontouchstart' in window) {
+            element.addEventListener('touchstart', onStart);
+            element.addEventListener('touchmove', onMove);
+            element.addEventListener('touchend', onEnd);
+        } else {
+            element.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+        }
+    }
+
+    open(sheet) {
         sheet.setAttribute('open', '');
         sheet.style.transform = '';
-        if (!sheet.classList.contains('none-modal')) {
-            let sheetBackdrop = sheet.parentElement.querySelector('.sheet-backdrop');
-            if (!sheetBackdrop) {
-                sheetBackdrop = document.createElement('backdrop');
-                sheetBackdrop.classList.add('sheet-backdrop');
-                sheet.insertAdjacentElement('afterend', sheetBackdrop);
-            }
-            sheetBackdrop.setAttribute('open', '');
-
-            sheetBackdrop.addEventListener('click',() => {
-              this.closeSheet(sheet);
-            })
+        const backdrop = sheet.parentElement.querySelector(`.${this.options.backdropClass}`);
+        if (backdrop && !sheet.classList.contains('none-modal')) {
+            backdrop.setAttribute('open', '');
+        }
+        if (this.options.keyboardClose) {
+        document.addEventListener('keydown', this.handleKeyPress);
         }
     }
 
-    closeSheet(sheet) {
+    close(sheet) {
         sheet.removeAttribute('open');
         sheet.style.transform = '';
-        if (!sheet.classList.contains('none-modal')) {
-            let sheetBackdrop = sheet.parentElement.querySelector('.sheet-backdrop');
-            if (sheetBackdrop) {
-                sheetBackdrop.removeAttribute('open');
-            }
+        const backdrop = sheet.parentElement.querySelector(`.${this.options.backdropClass}`);
+        if (backdrop) {
+            backdrop.removeAttribute('open');
+        }
+        if (this.options.keyboardClose) {
+            document.removeEventListener('keydown', this.handleKeyPress);
+        }
+        
+        // Reset sheet state
+        this.sheetStates.set(sheet, {
+            currentSnap: 0,
+            dragStartSnap: 0,
+            currentDelta: 0
+        });
+    }
+
+    handleKeyPress(event) {
+        if (event.key === 'Escape') {
+            this.sheets.forEach(sheet => {
+                if (sheet.hasAttribute('open')) {
+                    this.close(sheet);
+                }
+            });
         }
     }
 
-    toggleSheet(sheet) {
+    toggle(sheet) {
         if (sheet.hasAttribute('open')) {
-            this.closeSheet(sheet);
+            this.close(sheet);
         } else {
-            this.openSheet(sheet);
+            this.open(sheet);
         }
     }
-
 }
 
 export { Sheet };

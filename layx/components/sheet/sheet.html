@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="sheet.css">
 
+    <link rel="stylesheet" href="/layx/main/base/variable.css">
     <link rel="stylesheet" href="/layx/main/base/base.css">
     <link rel="stylesheet" href="/layx/main/typography/typography.css">
     <link rel="stylesheet" href="/layx/components/button/button.css">
@@ -20,18 +21,16 @@
       }
 
       sheet {
-        --padding: 1.5rem;
+        --padding-x: 0;
+        --padding-y: 0;
         --bg: rgba(255, 255, 255, .8);
-       
-        height: 450px;
-
-        &~backdrop {
-          --backdrop-bg:rgba(255, 255, 255, .3);
-        }
 
         .wrapper {
           display: flex;
           justify-content: space-between;
+        }
+
+        .wrapper-2, .wrapper-3 {
         }
       }
     </style>
@@ -40,10 +39,16 @@
   <body>
     <button data-sheet-target="#mySheet">Open Sheet</button>
 
-    <sheet id="mySheet" class="bottom">
-      <div class="wrapper">
+    <sheet id="mySheet" class="top">
+      <div class="wrapper snap" style="height: 300px;">
         <h3>Sheet Demo</h3>
         <button class="close"></button>
+      </div>
+      <div class="wrapper-2 snap" style="background-color: antiquewhite; height: 200px;">
+
+      </div>
+      <div class="wrapper-3 snap" style="background-color: aliceblue; height: 100px;">
+        
       </div>
     </sheet>
 

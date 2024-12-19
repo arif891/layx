@@ -1,7 +1,14 @@
-sheet,.sheet {
+sheet, .sheet {
+  --edge-offset-x: 0;
+  --edge-offset-y: 0;
+  --padding-x: 1rem;
+  --padding-y: 1rem;
+  --radius: 0;
+  --indicator-offset: .5rem;
+
   visibility: hidden;
   position: fixed;
-  z-index: 5;
+  z-index: 4;
   padding: var(--padding-y, var(--padding, .5rem)) var(--padding-x, var(--padding, .5rem));
   background: var(--bg, #fff);
   transition: var(--transition, .3s);
@@ -11,6 +18,10 @@ sheet,.sheet {
     visibility: visible;
   }
 
+  &:not(:has(.draggable-area)), .draggable-area {
+    user-select: none;
+  }
+
   &.top,&.right,&.bottom,&.left {
     &[open] {
       translate: 0 0;
@@ -18,23 +29,68 @@ sheet,.sheet {
   }
 
   &.top {
-    inset: 0 0 auto;
+    inset: var(--edge-offset-y, 0) var(--edge-offset-x, 0) auto;
     translate: 0 -100%;
+    border-radius: 0 0 var(--radius) var(--radius);
   }
 
   &.right {
-    inset: 0 0 0 auto;
+    inset: var(--edge-offset-y, 0) var(--edge-offset-x, 0) var(--edge-offset-y, 0) auto;
     translate: 100% 0;
+    border-radius: var(--radius) 0 0 var(--radius);
   }
 
   &.bottom {
-    inset: auto 0 0;
+    inset: auto var(--edge-offset-x, 0) var(--edge-offset-y, 0);
     translate: 0 100%;
+    border-radius: var(--radius) var(--radius) 0 0;
   }
 
   &.left {
-    inset: 0 auto 0 0;
+    inset: var(--edge-offset-y, 0) auto var(--edge-offset-y, 0) var(--edge-offset-x, 0);
     translate: -100% 0;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  &.rounded-all {
+   border-radius: var(--radius);
+  }
+
+  &:not(.no-indicator) {
+    &::after {
+      content: '';
+      position: absolute;
+      background: rgba(var(--color-rgb), .2);
+      border-radius: 5rem;
+    }
+
+    &.top::after, &.bottom::after {
+      margin-inline: auto;
+      height: .4rem;
+      width: 3.5rem;
+    }
+
+    &.left::after,  &.right::after {
+      margin-block: auto;
+      height: 3.5rem;
+      width: .4rem;
+    }
+
+    &.top::after {
+      inset: auto 0 var(--indicator-offset, .5rem);
+    }
+
+    &.bottom::after {
+      inset: var(--indicator-offset, .5rem) 0 auto;
+    }
+
+    &.left::after {
+      inset: 0 var(--indicator-offset, .5rem) 0 auto;
+    }
+
+    &.right::after {
+      inset: 0 auto 0 var(--indicator-offset, .5rem); 
+    }
   }
 
   .close {
@@ -43,28 +99,7 @@ sheet,.sheet {
     height: 1rem;
   }
 
-  &.top,&.bottom {
-    &::after {
-      content: '';
-      position: absolute;
-      margin-inline: auto;
-      height: .4rem;
-      width: 3.5rem;
-      background: rgba(0, 0, 0, .2);
-      border-radius: 5rem;
-      user-select: none;
-    }
-
-    &.top::after {
-      inset: auto 0 .5rem ;
-    }
-
-    &.bottom::after {
-      inset: .5rem 0 auto;
-    }
-  }
-
-  &~backdrop {
-    --backdrop-bd:rgba(255,255,255,.3);
+  &~.sheet-backdrop {
+    --backdrop-bg:rgba(var(--bg-color-rgb),.3);
   }
 }

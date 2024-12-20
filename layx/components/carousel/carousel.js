@@ -248,7 +248,7 @@ class Carousel {
 
         carousel.setAttribute('tabindex', '0');
 
-        const navigationMap = carousel.querySelector('.main.vertical') 
+        const navigationMap = carousel.classList.contains('vertical') 
             ? { prev: 'ArrowUp', next: 'ArrowDown' }
             : { prev: 'ArrowLeft', next: 'ArrowRight' };
 

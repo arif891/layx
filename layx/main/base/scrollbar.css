@@ -12,12 +12,20 @@
 @supports (scrollbar-width: auto) {
     :root {
         scrollbar-width: thin;
-        scrollbar-color: var(--scrollbar-color, rgba(0, 0, 0, 0.3)) var(--bg-color);
+        scrollbar-color: var(--scrollbar-color, rgba(0, 0, 0, 0.3)) var(--bg-color, #fff);
     }
 
     body {
         scrollbar-color: var(--scrollbar-color, rgba(0, 0, 0, 0.3)) transparent;
     }
+}
+
+* {
+   scrollbar-width: thin;
+}
+
+.sb-auto {
+    scrollbar-width: auto;
 }
 
 .sb-thin {
@@ -26,12 +34,4 @@
 
 .sb-none {
     scrollbar-width: none;
-}
-
-.sb-hover {
-    scrollbar-width: none;
-
-    &:hover {
-        scrollbar-width: thin;
-    }
 }

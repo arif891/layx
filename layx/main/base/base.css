@@ -73,8 +73,8 @@ code {
 kbd { 
   width: fit-content;  
   padding: 0.1875rem 0.375rem;
-  color: var(--kbd-color, #fff);
-  background-color: var(--kbd-bg-color, #252525);
+  color: var(--kbd-color, var(--bg-color));
+  background-color: var(--kbd-bg-color, var(--color));
   border-radius: 0.25rem;
 }
 

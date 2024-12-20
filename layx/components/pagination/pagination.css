@@ -1,16 +1,18 @@
-pagination,.pagination {
+pagination, .pagination {
   display: flex;
-  gap: var(--gap,.5rem);
+  justify-content: center;
+  gap: var(--gap, .5rem);
+  background-color: var(--bg);
 
   .item {
     padding: .75rem 1rem;
-    background: var(--bg, rgb(250, 250, 250));
+    background: var(--item-bg, rgba(var(--bg-color-rgb), .6));
     line-height: 1;
     font-variant-numeric: tabular-nums;
-    border-radius: .25rem;
+    border-radius: var(--radius, .25rem);
     cursor: pointer;
     user-select: none;
-    transition: .3s;
+    transition: var(--transition, .3s);
 
     a {
       text-decoration: none;
@@ -19,7 +21,7 @@ pagination,.pagination {
 
     &.active {
       pointer-events: none;
-      background: var(--bg-hover, rgb(240, 240, 240));
+      background: var(--item-active-bg, rgba(var(--bg-color-rgb), 1));
 
       a {
         color: inherit;
@@ -27,16 +29,20 @@ pagination,.pagination {
     }
 
     &.prev {
-      &::after {
-        content: '<<';
-        color: var(--color);
+      a:empty {
+        &::after {
+          content: '<<';
+          color: var(--color);
+        }
       }
     }
 
     &.next {
-      &::after {
-        content: '>>';
-        color: var(--color);
+      a:empty {
+        &::after {
+          content: '>>';
+          color: var(--color);
+        }
       }
     }
 
@@ -45,7 +51,7 @@ pagination,.pagination {
     }
 
     &:hover {
-      background: var(--bg-hover, rgb(240, 240, 240));
+      background: var(--item-hover-bg, rgba(var(--bg-color-rgb), .9));
     }
   }
 }

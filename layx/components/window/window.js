@@ -17,7 +17,7 @@ class Window {
                 const targetId = trigger.getAttribute('data-window-target');
                 const targetwindow = document.querySelector(targetId);
                 if (targetwindow) {
-                    this.togglewindow(targetwindow);
+                    this.toggle(targetwindow);
                 }
             });
         });
@@ -29,7 +29,7 @@ class Window {
                 e.preventDefault();
                 const window = closeButton.closest('window');
                 if (window) {
-                    this.closeWindow(window);
+                    this.close(window);
                 }
             });
         });
@@ -45,7 +45,7 @@ class Window {
                     window.appendChild(windowBackdrop);
                 }
                 windowBackdrop.addEventListener('click', () => {
-                    this.closeWindow(window);
+                    this.close(window);
                     console.log('test');
                     
                 });
@@ -56,7 +56,7 @@ class Window {
     }
 
 
-    openWindow(window) {
+    open(window) {
         window.setAttribute('open', '');
         let windowBackdrop = window.querySelector('backdrop');
         if (windowBackdrop) {
@@ -64,7 +64,7 @@ class Window {
         }
     }
 
-    closeWindow(window) {
+    close(window) {
         window.removeAttribute('open', '');
         if (!window.classList.contains('none-modal')) {
             let windowBackdrop = window.querySelector('backdrop');
@@ -74,11 +74,11 @@ class Window {
         }
     }
 
-    togglewindow(window) {
+    toggle(window) {
         if (window.hasAttribute('open', '')) {
-            this.closeWindow(window);
+            this.close(window);
         } else {
-            this.openWindow(window);
+            this.open(window);
         }
     }
 

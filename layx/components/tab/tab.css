@@ -4,6 +4,11 @@ tab,
     --indicator-bg: rgb(245, 245, 245);
     --indicator-radius: .5rem;
     display: block;
+    user-select: none;
+    
+    &:focus {
+        outline: none;
+    }
 
     .main {
         display: flex;
@@ -54,8 +59,7 @@ tab,
                 }
             }
 
-            &::before,
-            &::after {
+            &::before, &::after {
                 content: '';
                 position: absolute;
                 bottom: 0;

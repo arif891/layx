@@ -90,7 +90,7 @@ navbar, .navbar {
                         visibility: hidden;
                         opacity: 0;
 
-                        &[open] {
+                        [open] & {
                             visibility: visible;
                             opacity: 1;
                         }
@@ -109,7 +109,7 @@ navbar, .navbar {
                             inset: 0 auto 0 0;
                             translate: -100% 0;
 
-                            &[open] {
+                            [open] & {
                                 translate: 0 0;
                             }
                         }
@@ -118,7 +118,7 @@ navbar, .navbar {
                             inset: 0 0 0 auto;
                             translate: 100% 0;
 
-                            &[open] {
+                            [open] & {
                                 translate: 0 0;
                             }
                         }
@@ -295,8 +295,6 @@ navbar, .navbar {
             }
         }
     }
-
-
 
     @media (width >=576px) {
         --edge-offset-x: 1.5%;

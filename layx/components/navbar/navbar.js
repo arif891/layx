@@ -30,14 +30,14 @@ class Navbar {
 
     addTriggerListeners(navbar, toggler, wrapper) {
         toggler.addEventListener('click', () => {
-            this.open(navbar, wrapper);
+            this.open(navbar);
             this.addDragListeners(navbar, wrapper);
         });
     }
 
-    addCloseButtonListeners(navbar, closeButton, wrapper) {
+    addCloseButtonListeners(navbar, closeButton) {
         if (!closeButton) return;
-        closeButton.addEventListener('click', () => this.close(navbar, wrapper));
+        closeButton.addEventListener('click', () => this.close(navbar));
     }
 
     addBackdropListeners(navbar, wrapper) {
@@ -45,7 +45,7 @@ class Navbar {
         if (!wrapper.classList.contains('full') && !backdrop) {
             backdrop = document.createElement('backdrop');
             backdrop.classList.add('navbar-backdrop');
-            backdrop.addEventListener('click', () => this.close(navbar, wrapper));
+            backdrop.addEventListener('click', () => this.close(navbar));
             wrapper.insertAdjacentElement('afterend', backdrop);
         }
     }
@@ -140,7 +140,7 @@ class Navbar {
         }
 
         if (shouldClose) {
-            this.close(navbar, wrapper);
+            this.close(navbar);
         } else {
             draggableArea.style.transform = '';
         }
@@ -158,31 +158,29 @@ class Navbar {
         }
     }
 
-    open(navbar, wrapper) {
+    open(navbar) {
         let backdrop = navbar.querySelector('backdrop');
         navbar.setAttribute('open', '');
-        wrapper.setAttribute('open', '');
         document.body.style.overflow = 'hidden';
         if (backdrop) {
             backdrop.setAttribute('open', '');
         }
     }
 
-    close(navbar, wrapper) {
+    close(navbar) {
         let backdrop = navbar.querySelector('backdrop');
         navbar.removeAttribute('open');
-        wrapper.removeAttribute('open');
         document.body.style.overflow = '';
         if (backdrop) {
             backdrop.removeAttribute('open');
         }
     }
 
-    toggle(navbar, wrapper) {
+    toggle(navbar) {
         if (navbar.hasAttribute('open')) {
-            this.close(navbar, wrapper);
+            this.close(navbar);
         } else {
-            this.open(navbar, wrapper);
+            this.open(navbar);
         }
     }
 }

@@ -22,36 +22,45 @@
       sheet {
         --padding-x: 1.5rem;
         --padding-y: 1.5rem;
-        --bg: rgba(255, 255, 255, .8);
+        --bg: rgba(255, 255, 255, .6);
 
         .wrapper {
           display: flex;
           justify-content: space-between;
+        }
+
+        .other__wrapper {
+          display: grid;
+          place-items: center;
+
+          h4 {
+            opacity: .3;
+          }
         }
       }
     </style>
   </head>
 
   <body>
-    <button data-sheet-target="#mySheet">Open Sheet</button>
+    <button data-sheet-target="#demoSheet">Open Sheet</button>
 
-    <sheet id="mySheet" class="bottom">
+    <sheet id="demoSheet" class="bottom">
       <div class="wrapper snap" style="height: 30vh;">
         <h3>Sheet Demo</h3>
         <button class="close"></button>
       </div>
-      <div class="wrapper-2 snap" style="background-color: antiquewhite; height: 20vh;">
-
+      <div class="other__wrapper snap" style="background-color: rgba(215, 250, 236, 0.8); height: 20vh;">
+        <h4>Snap 2</h4>
       </div>
-      <div class="wrapper-3 snap" style="background-color: aliceblue; height: 10vh;">
-        
+      <div class="other__wrapper snap" style="background-color: rgba(212, 253, 255, 0.8); height: 10vh; padding: 0;">
+        <h4>Snap 3</h4>
       </div>
     </sheet>
 
   </body>
 
   <script type="module">
-    import {Sheet} from "./sheet.js";
+    import { Sheet } from "./sheet.js";
     new Sheet();
   </script>
 

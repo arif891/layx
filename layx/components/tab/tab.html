@@ -8,6 +8,8 @@
 
         <link rel="stylesheet" href="tab.css">
 
+        <link rel="stylesheet" href="/layx/main/base/variable.css">
+        <link rel="stylesheet" href="/layx/main/base/scrollbar.css">
         <link rel="stylesheet" href="/layx/main/base/base.css">
         <link rel="stylesheet" href="/layx/main/typography/typography.css">
         <link rel="stylesheet" href="/layx/main/container/container.css">
@@ -16,7 +18,6 @@
         <style>
             body {
                 background-color: antiquewhite;
-                font-family: "Red Hat Display", sans-serif;
                 font-weight: 500;
             }
 
@@ -60,7 +61,8 @@
         </container>
 
         <script type="module">
-         import Tab from './tab.js'
+            import { Tab } from './tab.js';
+            new Tab();
         </script>
     </body>
 

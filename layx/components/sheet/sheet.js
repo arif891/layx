@@ -13,7 +13,14 @@ class Sheet {
             ...options
         };
         this.sheets = document.querySelectorAll(selector);
-        this.togglers = document.querySelectorAll(this.options.togglerSelector);
+        // Only get togglers that target the sheets in this instance
+        this.togglers = Array.from(document.querySelectorAll(this.options.togglerSelector))
+            .filter(toggler => {
+                const targetId = toggler.getAttribute('data-sheet-target');
+                return Array.from(this.sheets).some(sheet => 
+                    sheet.id && `#${sheet.id}` === targetId
+                );
+            });
         this.handleKeyPress = this.handleKeyPress.bind(this);
         
         this.sheetStates = new WeakMap();
@@ -39,9 +46,13 @@ class Sheet {
 
     addTriggerListeners() {
         this.togglers.forEach(trigger => {
-            trigger.addEventListener('click', (e) => {
+            // Remove any existing click listeners
+            const newTrigger = trigger.cloneNode(true);
+            trigger.parentNode.replaceChild(newTrigger, trigger);
+            
+            newTrigger.addEventListener('click', (e) => {
                 e.preventDefault();
-                const targetId = trigger.getAttribute('data-sheet-target');
+                const targetId = newTrigger.getAttribute('data-sheet-target');
                 const targetSheet = document.querySelector(targetId);
                 if (targetSheet) this.toggle(targetSheet);
             });

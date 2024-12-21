@@ -34,6 +34,7 @@ class Form {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 form.classList.add('submitting');
+                form.classList.remove('error', 'success');
 
                 const formData = new FormData(form);
                 let formUrl = form.action;
@@ -46,9 +47,11 @@ class Form {
                     const response = await this.submitFormData(modifiedFormData, formUrl, formName);
                     this.options.onSuccess(response, form);
                     form.classList.remove('submitting');
+                    form.classList.add('success');
                 } catch (error) {
                     this.options.onError(error, form);
                     form.classList.remove('submitting');
+                    form.classList.add('error');
                 }
             });
         }

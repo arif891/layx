@@ -4,7 +4,7 @@
     --radius: .5rem;
     --valid-color: rgb(58, 230, 170);
     --invalid-color: rgb(255, 81, 81);
-    --form-bg-color: rgb(245, 245, 245);
+    --form-bg-color: var(--bg);
 
     &.wide {
         --padding-y: 1.25rem;
@@ -68,7 +68,6 @@ label:not(.default) {
     max-width: 100%;
     padding: var(--padding-y, 0) var(--padding-x, 0);
     margin: unset;
-    margin-bottom: var(--margin-bottom, 1rem);
     font: inherit;
     color: var(--color);
     accent-color: var(--accent-color);
@@ -77,6 +76,10 @@ label:not(.default) {
     border-radius: var(--radius);
     outline: 3px solid transparent;
     transition: .3s;
+
+    &:not(:last-child) {
+        margin-bottom: var(--margin-bottom, 1rem);
+    }
 
     &:focus-visible {
         outline: 1.5px solid var(--accent-color);
@@ -111,6 +114,9 @@ label:not(.default) {
         --radius: 10rem;
     }
 
+    &:disabled {
+        opacity: .7;
+    }
 }
 
 
@@ -154,6 +160,7 @@ input:not(.default) {
         padding: unset;
         height: 1lh;
         width: 1lh;
+        cursor: pointer;
 
         &.modern {
             display: none;
@@ -210,6 +217,7 @@ input:not(.default) {
 
     &[type=file] {
         padding: calc(var(--padding-y) * .5);
+        cursor: pointer;
 
         &::-webkit-file-upload-button {
             border: unset;
@@ -256,6 +264,7 @@ input:not(.default) {
         width: fit-content;
         min-block-size: calc(var(--padding-y) * 2 + 1lh);
         min-inline-size: 5rem;
+        cursor: pointer;
 
         &::-webkit-color-swatch-wrapper {
             padding: unset;

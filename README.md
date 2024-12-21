@@ -142,13 +142,15 @@ Key directories:
 
 To install Layx on your Windows system:
 
-1. [Download the Layx Windows setup](https://github.com/arif891/layx/releases/download/v0.1.0-alpha/layx-setup-v0.1.0-alpha_windows_x64.zip)
-2. Extract the ZIP file contents
-3. Run the following command or click `layx.bat`:
-
+1. Download the Layx setup file from our [download](https://layx.xyz/download) page.
+2. Extract the contents of the ZIP file.
+3. Open a terminal or command prompt and navigate to the extracted directory.
+4. Run the following command or click `layx.bat`:
     ```bash
     layx install
-    ```
+    ``` 
+    <strong>Note:</strong> On Linux and macOS, before installation, you need to run <code>chmod +x ./layx.sh</code> to
+            make it executable. Once installed, all commands remain the same.
 
 ## 🚀 Quick Start Guide
 

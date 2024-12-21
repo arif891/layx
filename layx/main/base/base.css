@@ -58,6 +58,17 @@ ol,ul,dl {
     margin-block: unset;
 }
 
+table {
+    th, td {
+      text-align: left;
+      padding-block: .25rem;
+
+      &:not(:first-child, :last-child) {
+        padding-inline: .75rem;
+      }
+    }
+}
+
 pre,code,kbd,samp {
     font-size: min(calc(.8rem + .15vw), 1rem);
 }

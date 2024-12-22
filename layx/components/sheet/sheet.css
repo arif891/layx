@@ -25,12 +25,6 @@ sheet, .sheet {
     padding: var(--padding-y, var(--padding, .5rem)) var(--padding-x, var(--padding, .5rem));
   }
 
-  &.top,&.right,&.bottom,&.left {
-    &[open] {
-      translate: 0 0;
-    }
-  }
-
   &.top {
     inset: var(--edge-offset-y, 0) var(--edge-offset-x, 0) auto;
     translate: 0 -100%;
@@ -55,6 +49,11 @@ sheet, .sheet {
     border-radius: 0 var(--radius) var(--radius) 0;
   }
 
+  &.top, &.right, &.bottom, &.left {
+    &[open] {
+      translate: 0 0;
+    }
+  }
 
   &.top, &.bottom {
     .snap:not(.default) {
@@ -71,7 +70,7 @@ sheet, .sheet {
   }
 
   &.left, &.right {
-    .snap:not(.default){
+    .snap:not(.default) {
       padding-block: var(--padding-y, var(--padding, .5rem));
 
       &:first-child {
@@ -84,29 +83,49 @@ sheet, .sheet {
     }
   }
 
-
   &.rounded-all {
     border-radius: var(--radius);
   }
 
   &:not(.no-indicator) {
-    &::after {
+
+    &:not(:has(.draggable-area))::after, .draggable-area::after {
       content: '';
       position: absolute;
       background: rgba(var(--color-rgb), .2);
       border-radius: 5rem;
     }
 
-    &.top::after, &.bottom::after {
-      margin-inline: auto;
-      height: .4rem;
-      width: 3.5rem;
+    &.top, &.bottom {
+
+      &::after, .draggable-area::after {
+        margin-inline: auto;
+        height: .4rem;
+        width: 3.5rem;
+      }
+
+      .draggable-area::after {
+        inset: 50% 0 auto;
+        translate: 0 -50%;
+      }
     }
 
-    &.left::after, &.right::after {
-      margin-block: auto;
-      height: 3.5rem;
-      width: .4rem;
+    &.left, &.right {
+
+      &::after, .draggable-area::after {
+        margin-block: auto;
+        height: 3.5rem;
+        width: .4rem;
+      }
+
+      .draggable-area {
+        position: relative;
+      }
+
+      .draggable-area::after {
+        inset: 0 50% 0;
+        translate: -50% 0;
+      }
     }
 
     &.top::after {
@@ -134,5 +153,12 @@ sheet, .sheet {
 
   &~.sheet-backdrop {
     --backdrop-bg: rgba(var(--bg-color-rgb), .3);
+  }
+}
+
+@media (pointer: coarse) {
+  body:has(:is(sheet, .sheet)[open]) {
+    overscroll-behavior: none;
+    overflow: hidden;
   }
 }

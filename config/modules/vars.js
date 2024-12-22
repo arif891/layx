@@ -1,6 +1,29 @@
 // Local 
 const layx = {
+    directories: {
+     base: '/',
+     
+    },
+    files: {
+  
+    },
+    main: {
 
+    },
+    components: {
+       
+    },
+    utilities: {
+
+    },
+    others: {
+
+    },
+    helpers: {
+        layout: {
+
+        }
+    }
 };
 
 const breakPoints = {
@@ -28,7 +51,8 @@ const layout = {
             xs: '.xs-${media}-${num}{grid-column-start: ${num};}',
             y: '.y-${media}-${num}{grid-row-end:span ${num}}',
             ys: '.ys-${media}-${num}{grid-row-start: ${num}}',
-        }
+        },
+        static: '\\/\\*<${class}>\\*\\/(.*?)\\/\\*<\\/${class}>\\*\\/'
     },
     helper: {
         templates: {

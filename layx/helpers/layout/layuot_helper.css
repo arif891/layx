@@ -1,3 +1,4 @@
+/*<num-x>*/
 .num-x-1 {
     --num-x: 1;
 }
@@ -45,10 +46,11 @@
 .num-x-12 {
     --num-x: 12;
 }
+/*</num-x>*/
 
 
 
-
+/*<num-y>*/
 .num-y-1 {
     --num-y: 1;
 }
@@ -72,81 +74,91 @@
 .num-y-6 {
     --num-y: 6;
 }
+/*</num-y>*/
 
 
+/*<gap>*/
+layout, .layout {
+    &.gap {
+        --gap-x: clamp(.2rem, 1vw, 1rem);
+        --gap-y: clamp(.2rem, 1vh, 1rem);
+    }
 
+    &.gap-2 {
+        --gap-x: clamp(.4rem, 2vw, 2rem);
+        --gap-y: clamp(.4rem, 2vh, 2rem);
+    }
 
-.gap {
-    --gap-x: clamp(.2rem, 1vw, 1rem);
-    --gap-y: clamp(.2rem, 1vh, 1rem);
+    &.gap-3 {
+        --gap-x: clamp(.6rem, 3vw, 3rem);
+        --gap-y: clamp(.6rem, 3vh, 3rem);
+    }
+
+    &.gap-4 {
+        --gap-x: clamp(.8rem, 4vw, 4rem);
+        --gap-y: clamp(.8rem, 4vh, 4rem);
+    }
+
+    &.gap-5 {
+        --gap-x: clamp(1rem, 5vw, 5rem);
+        --gap-y: clamp(1rem, 5vh, 5rem);
+    }
 }
+/*</gap>*/
 
-.gap-x {
-    --gap-x: clamp(.2rem, 1vw, 1rem);
+
+/*<gap-x>*/
+layout, .layout {
+    &.gap-x {
+        --gap-x: clamp(.2rem, 1vw, 1rem);
+    }
+
+    &.gap-x-2 {
+        --gap-x: clamp(.4rem, 2vw, 2rem);
+    }
+
+    &.gap-x-3 {
+        --gap-x: clamp(.6rem, 3vw, 3rem);
+    }
+
+    &.gap-x-4 {
+        --gap-x: clamp(.8rem, 4vw, 4rem);
+    }
+
+    &.gap-x-5 {
+        --gap-x: clamp(1rem, 5vw, 5rem);
+    }
 }
+/*</gap-x>*/
 
-.gap-y {
-    --gap-y: clamp(.2rem, 1vh, 1rem);
+
+/*<gap-y>*/
+layout, .layout {
+    &.gap-y {
+        --gap-y: clamp(.2rem, 1vh, 1rem);
+    }
+
+    &.gap-y-2 {
+        --gap-y: clamp(.4rem, 2vh, 2rem);
+    }
+
+    &.gap-y-3 {
+        --gap-y: clamp(.6rem, 3vh, 3rem);
+    }
+
+    &.gap-y-4 {
+        --gap-y: clamp(.8rem, 4vh, 4rem);
+    }
+
+    &.gap-y-5 {
+        --gap-y: clamp(1rem, 5vh, 5rem);
+    }
 }
-
-
-.gap-2 {
-    --gap-x: clamp(.4rem, 2vw, 2rem);
-    --gap-y: clamp(.4rem, 2vh, 2rem);
-}
-
-.gap-x-2 {
-    --gap-x: clamp(.4rem, 2vw, 2rem);
-}
-
-.gap-y-2 {
-    --gap-y: clamp(.4rem, 2vh, 2rem);
-}
-
-
-.gap-3 {
-    --gap-x: clamp(.6rem, 3vw, 3rem);
-    --gap-y: clamp(.6rem, 3vh, 3rem);
-}
-
-.gap-x-3 {
-    --gap-x: clamp(.6rem, 3vw, 3rem);
-}
-
-.gap-y-3 {
-    --gap-y: clamp(.6rem, 3vh, 3rem);
-}
-
-
-.gap-4 {
-    --gap-x: clamp(.8rem, 4vw, 4rem);
-    --gap-y: clamp(.8rem, 4vh, 4rem);
-}
-
-.gap-x-4 {
-    --gap-x: clamp(.8rem, 4vw, 4rem);
-}
-
-.gap-y-4 {
-    --gap-y: clamp(.8rem, 4vh, 4rem);
-}
-
-
-.gap-5 {
-    --gap-x: clamp(1rem, 5vw, 5rem);
-    --gap-y: clamp(1rem, 5vh, 5rem);
-}
-
-.gap-x-5 {
-    --gap-x: clamp(1rem, 5vw, 5rem);
-}
-
-.gap-y-5 {
-    --gap-y: clamp(1rem, 5vh, 5rem);
-}
+/*</gap-y>*/
 
 
 /* (sm) Small devices (landscape phones, 576px and up) */
+/*<num-x-sm>*/
 @media (width >=576px) {
     .num-x-sm-1 {
         --num-x: 1;
@@ -196,8 +208,10 @@
         --num-x: 12;
     }
 }
+/*</num-x-sm>*/
 
 
+/*<num-y-sm>*/
 @media (width >=576px) {
     .num-y-sm-1 {
         --num-y: 1;
@@ -223,11 +237,12 @@
         --num-y: 6;
     }
 }
-
+/*</num-y-sm>*/
 
 
 
 /* (md) Medium devices (tablets, 768px and up) */
+/*<num-x-md>*/
 @media (width >=768px) {
     .num-x-md-1 {
         --num-x: 1;
@@ -277,8 +292,10 @@
         --num-x: 12;
     }
 }
+/*</num-x-md>*/
 
 
+/*<num-y-md>*/
 @media (width >=768px) {
     .num-y-md-1 {
         --num-y: 1;
@@ -304,11 +321,12 @@
         --num-y: 6;
     }
 }
-
+/*</num-y-md>*/
 
 
 
 /* (lg) Large devices (desktops, 992px and up) */
+/*<num-x-lg>*/
 @media (width >=992px) {
     .num-x-lg-1 {
         --num-x: 1;
@@ -358,8 +376,10 @@
         --num-x: 12;
     }
 }
+/*</num-x-lg>*/
 
 
+/*<num-y-lg>*/
 @media (width >=992px) {
     .num-y-lg-1 {
         --num-y: 1;
@@ -385,11 +405,12 @@
         --num-y: 6;
     }
 }
-
+/*</num-y-lg>*/
 
 
 
 /* (xl) X-Large devices (large desktops, 1200px and up) */
+/*<num-x-xl>*/
 @media (width >=1200px) {
     .num-x-xl-1 {
         --num-x: 1;
@@ -439,8 +460,9 @@
         --num-x: 12;
     }
 }
+/*</num-x-xl>*/
 
-
+/*<num-y-xl>*/
 @media (width >=1200px) {
     .num-y-xl-1 {
         --num-y: 1;
@@ -466,11 +488,12 @@
         --num-y: 6;
     }
 }
-
+/*</num-y-xl>*/
 
 
 
 /* (xxl) XX-Large devices (larger desktops, 1400px and up) */
+/*<num-x-xxl>*/
 @media (width >=1400px) {
     .num-x-xxl-1 {
         --num-x: 1;
@@ -520,8 +543,10 @@
         --num-x: 12;
     }
 }
+/*</num-x-xxl>*/
 
 
+/*<num-y-xxl>*/
 @media (width >=1400px) {
     .num-y-xxl-1 {
         --num-y: 1;
@@ -547,11 +572,12 @@
         --num-y: 6;
     }
 }
-
+/*</num-y-xxl>*/
 
 
 
 /* (xxxl) XXX-Large devices (Extra larger desktops, 1800px and up) */
+/*<num-x-xxxl>*/
 @media (width >=1800px) {
     .num-x-xxxl-1 {
         --num-x: 1;
@@ -601,8 +627,10 @@
         --num-x: 12;
     }
 }
+/*</num-x-xxxl>*/
 
 
+/*<num-y-xxxl>*/
 @media (width >=1800px) {
     .num-y-xxxl-1 {
         --num-y: 1;
@@ -628,11 +656,12 @@
         --num-y: 6;
     }
 }
-
+/*</num-y-xxxl>*/
 
 
 
 /* Wide screens */
+/*<num-x-wd>*/
 @media (aspect-ratio >=16 / 9) and (width >=1800px) {
     .num-x-wd-1 {
         --num-x: 1;
@@ -682,8 +711,10 @@
         --num-x: 12;
     }
 }
+/*</num-x-wd>*/
 
 
+/*<num-y-wd>*/
 @media (aspect-ratio >=16 / 9) and (width >=1800px) {
     .num-y-wd-1 {
         --num-y: 1;
@@ -709,11 +740,12 @@
         --num-y: 6;
     }
 }
-
+/*</num-y-wd>*/
 
 
 
 /* Ultrawide screens */
+/*<num-x-uwd>*/
 @media (aspect-ratio >=21 / 9) and (width >=2000px) {
     .num-x-uwd-1 {
         --num-x: 1;
@@ -763,8 +795,10 @@
         --num-x: 12;
     }
 }
+/*</num-x-uwd>*/
 
 
+/*<num-y-uwd>*/
 @media (aspect-ratio >=21 / 9) and (width >=2000px) {
     .num-y-uwd-1 {
         --num-y: 1;
@@ -790,11 +824,12 @@
         --num-y: 6;
     }
 }
-
+/*</num-y-uwd>*/
 
 
 
 /* Super ultrawide screens */
+/*<num-x-suwd>*/
 @media (aspect-ratio >=32 / 9) and (width >=3000px) {
     .num-x-suwd-1 {
         --num-x: 1;
@@ -844,8 +879,10 @@
         --num-x: 12;
     }
 }
+/*</num-x-suwd>*/
 
 
+/*<num-y-suwd>*/
 @media (aspect-ratio >=32 / 9) and (width >=3000px) {
     .num-y-suwd-1 {
         --num-y: 1;
@@ -871,3 +908,4 @@
         --num-y: 6;
     }
 }
+/*<num-y-suwd>*/

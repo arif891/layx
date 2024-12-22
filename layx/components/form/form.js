@@ -2,8 +2,8 @@ class Form {
     constructor(selector = 'form', options = {}) {
         this.forms = document.querySelectorAll(selector);
         this.customRangeInputs = document.querySelectorAll('input[type="range"]:not(.default)');
-        this.feedbackWrapperSelector = '.feedback-wrapper';
         this.options = {
+            feedbackWrapperSelector: '.feedback-wrapper',
             onSuccess: options.onSuccess || this.defaultOnSuccess,
             onError: options.onError || this.defaultOnError,
             beforeSubmit: options.beforeSubmit || this.defaultBeforeSubmit,

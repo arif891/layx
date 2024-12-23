@@ -2,7 +2,9 @@
 
 ![Layx Social Preview](.github/layx_social_preview.png)
 
-Layx is a powerful and extensible layout framework designed for modern web development. It combines advanced layout capabilities with high customizability, making it ideal for both small and large-scale projects. With its modular architecture, Layx offers the flexibility you need to create responsive, scalable, and maintainable web applications. 
+Layx is a powerful and extensible CSS framework designed for modern web development. It combines advanced layout capabilities with high customizability, making it ideal for both small and large-scale projects. With its modular architecture, Layx offers the flexibility you need to create responsive, scalable, and maintainable web applications.
+
+ **Main Point:** "Don't write common code ever and ever, write unique code, build unique things."
 
 > **Note:** Layx is currently in the development stage and available for testing. We welcome your feedback and contributions!
 
@@ -33,6 +35,7 @@ Layx is a powerful and extensible layout framework designed for modern web devel
 - 🖼️ **Image Optimization:** Boost performance with the integrated image optimizer.
 - 💻 **Command-Line Interface (CLI):** Efficiently manage your projects with our intuitive CLI.
 - 🚀 **No Runtime Needed:** Enjoy optimal performance without any runtime dependencies.
+- 🌐 **File-Based Routing:** File-based routing supported in Apache and similar servers like LightSpeed (common in Cpanel hosting).
 
 ## 🧠 Approach
 
@@ -90,40 +93,41 @@ root
     │   ├───css
     │   │   │   base.css
     │   │   └───pages
+    │   │
     │   ├───font
     │   ├───images
     │   │   ├───home
     │   │   └───svg
+    │   │
     │   ├───js
     │   │   │   base.js
     │   │   └───pages
+    │   │
     │   └───media
     │       ├───audio
     │       └───video
     │
     ├───config
-    │   │   config.css
-    │   │   config.html
     │   │   config.mjs
-    │   │   node.exe
-    │   │   webp.exe
+    │   │   node
+    │   │   webp
     │   └───preference
     │           snippets.json
     │
     ├───layx
     │   │   layx.css
     │   │   layx.js
+    │   │ 
     │   ├───assets
     │   │   ├───css
     │   │   │   └───pages
     │   │   └───js
+    │   │  
     │   ├───components
-    │   │   components.css
     │   ├───main
     │   │   main.css
     │   ├───others
     │   └───utilities
-    │       │   utilities.css
     │
     └───pages
 ```

@@ -1,24 +1,25 @@
-navbar, .navbar {
+navbar,
+.navbar {
     /* Base Variables */
     --transition: .3s;
     --radius: none;
     --blur: none;
-    
+
     /* Layout Variables */
     --edge-offset-x: .75rem;
     --gap: 1rem;
     --padding-x: .75rem;
     --padding-y: .75rem;
-    
+
     /* Link Variables */
     --link-gap: 0;
     --link-padding-x: .5rem;
     --link-padding-y: .5rem;
-    
+
     /* Colors and Backgrounds */
     --bg: var(--bg-color, #fff);
     --warp-area-bg: var(--bg-color, #fff);
-    
+
     /* Dock Settings */
     --dock-top-offset: 20px;
     --dock-middle-padding: 7.5vw;
@@ -90,13 +91,15 @@ navbar, .navbar {
                 background: unset;
                 line-height: 1;
 
-                &:not(.text, .default) {
-                    height: clamp(25px, 100%, 30px);
-                    aspect-ratio: 1;
-                    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2833, 37, 41, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center;
+                &:not(.default) {
+                    &:empty {
+                        height: clamp(25px, 100%, 30px);
+                        aspect-ratio: 1;
+                        background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2833, 37, 41, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center;
 
-                    [theme=dark] & {
-                        background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28245, 245, 245, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center;
+                        [theme=dark] & {
+                            background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28245, 245, 245, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center;
+                        }
                     }
                 }
 
@@ -258,6 +261,7 @@ navbar, .navbar {
 
         .close {
             margin-left: auto;
+
             @media (width >=992px) {
                 display: none;
             }
@@ -271,7 +275,7 @@ navbar, .navbar {
         z-index: 5;
 
         @media (width < 992px) {
-             &[open]:not(.left, .right, .top, .bottom, .full) {
+            &[open]:not(.left, .right, .top, .bottom, .full) {
                 .brand {
                     background: var(--bg);
                     z-index: 5;
@@ -293,7 +297,7 @@ navbar, .navbar {
                     .brand {
                         translate: 0 var(--dock-top-offset);
                     }
-                } 
+                }
 
                 &:not(.left, .right, .top, .bottom, .full) {
                     .warp-area {
@@ -324,7 +328,7 @@ navbar, .navbar {
             translate: 0 -100% !important;
 
             .brand {
-             translate: 0 0 !important;
+                translate: 0 0 !important;
             }
         }
     }

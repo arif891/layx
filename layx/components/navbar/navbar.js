@@ -2,10 +2,9 @@ class Navbar {
     constructor(selector = 'navbar', options = {}) {
         this.options = {
             dragThreshold: .4,
-            wrapperSelector: '.warp-able',
             togglerSelector: '.toggler',
             closeButtonSelector: '.close',
-            draggableAreaSelector: '.warp-able',
+            draggableAreaSelector: '.warp-area',
             updateScrollState: true,
             scrollDistance: window.innerHeight * 0.2,
             scrollThresholdMultiplier: 3,
@@ -17,21 +16,21 @@ class Navbar {
 
     init() {
         this.navbars.forEach(navbar => {
-            const wrapper = navbar.querySelector(this.options.wrapperSelector);
+            const draggableArea = navbar.querySelector(this.options.draggableAreaSelector);
             const toggler = navbar.querySelector(this.options.togglerSelector);
             const closeButton = navbar.querySelector(this.options.closeButtonSelector);
 
-            this.addTriggerListeners(navbar, toggler, wrapper);
-            this.addCloseButtonListeners(navbar, closeButton, wrapper);
-            this.addBackdropListeners(navbar, wrapper);
+            this.addTriggerListeners(navbar, toggler, draggableArea);
+            this.addCloseButtonListeners(navbar, closeButton, draggableArea);
+            this.addBackdropListeners(navbar, draggableArea);
             this.updateScrollState(navbar);
         });
     }
 
-    addTriggerListeners(navbar, toggler, wrapper) {
+    addTriggerListeners(navbar, toggler, draggableArea) {
         toggler.addEventListener('click', () => {
-            this.open(navbar);
-            this.addDragListeners(navbar, wrapper);
+            this.toggle(navbar);
+            this.addDragListeners(navbar, draggableArea);
         });
     }
 
@@ -40,19 +39,17 @@ class Navbar {
         closeButton.addEventListener('click', () => this.close(navbar));
     }
 
-    addBackdropListeners(navbar, wrapper) {
-        let backdrop = navbar.querySelector('backdrop');
-        if (!wrapper.classList.contains('full') && !backdrop) {
+    addBackdropListeners(navbar) {
+        let backdrop = navbar.querySelector('.navbar-backdrop');
+        if (!navbar.classList.contains('full') && !backdrop) {
             backdrop = document.createElement('backdrop');
             backdrop.classList.add('navbar-backdrop');
             backdrop.addEventListener('click', () => this.close(navbar));
-            wrapper.insertAdjacentElement('afterend', backdrop);
+            navbar.appendChild(backdrop);
         }
     }
 
     updateScrollState(navbar) {
-        if (!navbar.classList.contains('update-scroll-state')) return;
-
         let previousScrollPosition = 0;
         const scrollDistance = this.options.scrollDistance;
         const scrollThreshold = scrollDistance * this.options.scrollThresholdMultiplier;
@@ -70,8 +67,7 @@ class Navbar {
         window.addEventListener('scroll', handleScroll, { passive: true });
     }
 
-    addDragListeners(navbar, wrapper) {
-        const draggableArea = navbar.querySelector(this.options.draggableAreaSelector);
+    addDragListeners(navbar, draggableArea) {
         let startY, startX, currentY, currentX, isDragging = false;
 
         const onStart = (e) => {
@@ -87,7 +83,7 @@ class Navbar {
             const { clientY, clientX } = e.type === 'touchmove' ? e.touches[0] : e;
             currentY = clientY;
             currentX = clientX;
-            this.updateDraggableAreaTransform(draggableArea, startY, startX, currentY, currentX);
+            this.updateDraggableAreaTransform(navbar, draggableArea, startY, startX, currentY, currentX);
         };
 
         const onEnd = () => {
@@ -95,31 +91,31 @@ class Navbar {
             isDragging = false;
             draggableArea.style.transition = '';
             draggableArea.style.transform = '';
-            this.handleDragEnd(draggableArea, startY, startX, currentY, currentX, navbar, wrapper);
+            this.handleDragEnd(navbar, draggableArea, startY, startX, currentY, currentX);
         };
 
         this.addEventListeners(draggableArea, onStart, onMove, onEnd);
     }
 
-    updateDraggableAreaTransform(draggableArea, startY, startX, currentY, currentX) {
+    updateDraggableAreaTransform(navbar, draggableArea, startY, startX, currentY, currentX) {
         const deltaY = currentY - startY;
         const deltaX = currentX - startX;
 
-        if (draggableArea.classList.contains('top')) {
+        if (navbar.classList.contains('top')) {
             draggableArea.style.transform = `translateY(${Math.min(0, deltaY)}px)`;
-        } else if (draggableArea.classList.contains('bottom')) {
+        } else if (navbar.classList.contains('bottom')) {
             draggableArea.style.transform = `translateY(${Math.max(0, deltaY)}px)`;
-        } else if (draggableArea.classList.contains('left')) {
+        } else if (navbar.classList.contains('left')) {
             draggableArea.style.transform = `translateX(${Math.min(0, deltaX)}px)`;
-        } else if (draggableArea.classList.contains('right')) {
+        } else if (navbar.classList.contains('right')) {
             draggableArea.style.transform = `translateX(${Math.max(0, deltaX)}px)`;
         }
     }
 
-    handleDragEnd(draggableArea, startY, startX, currentY, currentX, navbar, wrapper) {
+    handleDragEnd(navbar, draggableArea, startY, startX, currentY, currentX) {
         const sheetRect = draggableArea.getBoundingClientRect();
         const threshold = this.options.dragThreshold * (
-            draggableArea.classList.contains('top') || draggableArea.classList.contains('bottom')
+            navbar.classList.contains('top') || navbar.classList.contains('bottom')
                 ? sheetRect.height
                 : sheetRect.width
         );
@@ -129,13 +125,13 @@ class Navbar {
 
         let shouldClose = false;
 
-        if (draggableArea.classList.contains('top')) {
+        if (navbar.classList.contains('top')) {
             shouldClose = deltaY < -threshold;
-        } else if (draggableArea.classList.contains('bottom')) {
+        } else if (navbar.classList.contains('bottom')) {
             shouldClose = deltaY > threshold;
-        } else if (draggableArea.classList.contains('left')) {
+        } else if (navbar.classList.contains('left')) {
             shouldClose = deltaX < -threshold;
-        } else if (draggableArea.classList.contains('right')) {
+        } else if (navbar.classList.contains('right')) {
             shouldClose = deltaX > threshold;
         }
 
@@ -159,18 +155,16 @@ class Navbar {
     }
 
     open(navbar) {
-        let backdrop = navbar.querySelector('backdrop');
+        let backdrop = navbar.querySelector('.navbar-backdrop');
         navbar.setAttribute('open', '');
-        document.body.style.overflow = 'hidden';
         if (backdrop) {
             backdrop.setAttribute('open', '');
         }
     }
 
     close(navbar) {
-        let backdrop = navbar.querySelector('backdrop');
+        let backdrop = navbar.querySelector('.navbar-backdrop');
         navbar.removeAttribute('open');
-        document.body.style.overflow = '';
         if (backdrop) {
             backdrop.removeAttribute('open');
         }

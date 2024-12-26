@@ -8,6 +8,7 @@
 
         <link rel="stylesheet" href="navbar.css">
 
+        <link rel="stylesheet" href="/layx/main/base/variable.css">
         <link rel="stylesheet" href="/layx/main/base/base.css">
         <link rel="stylesheet" href="/layx/main/typography/typography.css">
         <link rel="stylesheet" href="/layx/components/button/button.css">
@@ -25,17 +26,15 @@
                 padding-block: 10rem;
                 font-family: "Red Hat Display", sans-serif;
                 background-color: antiquewhite;
-                overscroll-behavior: none;
             }
 
             .main-navbar {
-                --navbar-bg: rgba(255, 255, 255, 0.5);
-                --radius: .5rem;
-                --blur: 10px;
+             --bg: rgba(var(--bg-color-rgb), .6);
+             --radius: .5rem;
             }
 
             .other-navbar {
-                --navbar-bg: rgba(255, 255, 255, .6);
+                background-color: rgba(var(--bg-color-rgb), .5);
                 margin-bottom: 1rem;
             }
 
@@ -51,42 +50,37 @@
     <body>
         <header>
 
-            <navbar class="fixed main-navbar update-scroll-state">
-                <div class="wrapper">
-                    <div class="main modern center move">
-                        <div class="brand">
-                            <h5 class="logo-text">LayX</h5>
-                            <button class="toggler"></button>
+            <navbar class="fixed center left dock main-navbar">
+                <div class="main">
+                    <div class="brand">
+                        <h5 class="logo-text">LayX</h5>
+                        <button class="toggler"></button>
+                    </div>
+                    <div class="warp-area">
+                        <div>
+                            <nav class="link-wrapper">
+                                <a href="" class="link">Home</a>
+                                <a href="" class="link">About</a>
+                                <a href="" class="link">Demo</a>
+                                <a href="" class="link">Contact</a>
+                                <a href="" class="link">FAQs</a>
+                                <a href="" class="link">Test</a>
+                            </nav>
                         </div>
-                        <div class="warp-able left">
-                            <button class="close"></button>
-                            <div>
-                                <nav class="link-wrapper">
-                                    <a href="" class="link">Home</a>
-                                    <a href="" class="link">About</a>
-                                    <a href="" class="link">Demo</a>
-                                    <a href="" class="link">Contact</a>
-                                    <a href="" class="link">FAQs</a>
-                                    <a href="" class="link">Test</a>
-                                </nav>
-                            </div>
-                            <div>
-                                <button class="dark">Button</button>
-                            </div>
+                        <div>
+                            <button class="dark">Button</button>
                         </div>
                     </div>
                 </div>
             </navbar>
 
-            <navbar class="other-navbar">
-                <div class="wrapper">
+            <navbar class="right other-navbar">
                     <div class="main">
                         <div class="brand">
                             <h5 class="logo-text">Logo</h5>
                             <button class="toggler"></button>
                         </div>
-                        <div class="warp-able right">
-                            <button class="close"></button>
+                        <div class="warp-area">
                             <nav class="link-wrapper">
                                 <a href="" class="link">link</a>
                                 <a href="" class="link">link</a>
@@ -100,17 +94,15 @@
                             </div>
                         </div>
                     </div>
-                </div>
             </navbar>
 
-            <navbar class="other-navbar">
-                <div class="wrapper">
+            <navbar class="end full other-navbar">
                     <div class="main">
                         <div class="brand">
                             <h5 class="logo-text">Logo</h5>
                             <button class="toggler"></button>
                         </div>
-                        <div class="warp-able end left">
+                        <div class="warp-area">
                             <button class="close"></button>
                             <nav class="link-wrapper">
                                 <a href="" class="link">link</a>
@@ -125,17 +117,15 @@
                             </div>
                         </div>
                     </div>
-                </div>
             </navbar>
 
-            <navbar class="other-navbar">
-                <div class="wrapper">
-                    <div class="main center">
+            <navbar class="center bottom other-navbar">
+                    <div class="main">
                         <div class="brand">
                             <h5 class="logo-text">Logo</h5>
                             <button class="toggler"></button>
                         </div>
-                        <div class="warp-able full">
+                        <div class="warp-area">
                             <button class="close"></button>
                             <nav class="link-wrapper">
                                 <a href="" class="link">link</a>
@@ -150,7 +140,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
             </navbar>
 
         </header>

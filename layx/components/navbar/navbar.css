@@ -1,5 +1,4 @@
-navbar,
-.navbar {
+navbar, .navbar {
     /* Base Variables */
     --transition: .3s;
     --radius: none;
@@ -22,7 +21,7 @@ navbar,
 
     /* Dock Settings */
     --dock-top-offset: 20px;
-    --dock-middle-padding: 7.5vw;
+    --dock-gap: 7.5vw;
 
     /* Root Level Styles */
     display: flex;
@@ -55,14 +54,9 @@ navbar,
             padding-block: var(--padding-y);
 
             .dock.center & {
+                --gap: var(--dock-gap);
                 padding-inline: var(--padding-x);
                 border-radius: var(--radius);
-
-                .warp-area {
-                    > :first-child {
-                        padding-inline: var(--dock-middle-padding);
-                    }
-                }
             }
         }
 

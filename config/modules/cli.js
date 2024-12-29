@@ -165,7 +165,7 @@ class CommandLineInterface {
 export default CommandLineInterface;
 
 // Example usage
-async function main() {
+async function example() {
     const cli = new CommandLineInterface();
 
     try {
@@ -228,3 +228,5 @@ async function main() {
     }
 
 }
+
+example();

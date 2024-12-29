@@ -228,5 +228,3 @@ async function example() {
     }
 
 }
-
-example();

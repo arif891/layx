@@ -68,8 +68,13 @@ class Theme {
 
     // Function to toggle between light and dark themes
     toggleTheme() {
-        const currentTheme = this.getStoredTheme() === 'light' ? 'dark' : 'light';
-        this.setTheme(currentTheme);
+        const storedTheme = this.getStoredTheme();
+        const currentTheme = storedTheme === 'auto' 
+            ? this.getSystemTheme() 
+            : storedTheme;
+            
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        this.setTheme(newTheme);
     }
 
     // Function to update attributes on the buttons/elements

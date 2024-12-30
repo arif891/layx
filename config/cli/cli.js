@@ -2,14 +2,16 @@ import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
 
 class CommandLineInterface {
+
     constructor(options = {}) {
-        this.rl = readline.createInterface({ input, output });
         this.defaultOptions = {
             trim: true,
             retryOnError: true,
             showDefaultValue: true,
             ...options
         };
+
+        this.rl = null;
 
         const colors = {
             // Basic formatting
@@ -75,6 +77,13 @@ class CommandLineInterface {
         this.bg = colors.bg;
     }
 
+    getInterface() {
+        if (!this.rl) {
+            this.rl = readline.createInterface({ input, output });
+        }
+        return this.rl;
+    }
+
     // Move style method here
     style(text, ...styles) {
         const combined = styles.join('');
@@ -106,7 +115,7 @@ class CommandLineInterface {
                     prompt += ` (default: ${options.default})`;
                 }
 
-                const answer = await this.rl.question(`${prompt} `);
+                const answer = await this.getInterface().question(`${prompt} `);
                 const processedAnswer = options.trim ? answer.trim() : answer;
 
                 // Return default value if answer is empty and default exists
@@ -236,7 +245,10 @@ class CommandLineInterface {
     }
 
     close() {
-        this.rl.close();
+        if (this.rl) {
+            this.rl.close();
+            this.rl = null;
+        }
     }
 }
 

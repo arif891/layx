@@ -43,6 +43,7 @@ async function processFiles() {
                 writeFile(config.baseOutput, `/* User base ${type} code */\n${baseContent}`),
                 writeFile(config.base, minify(final + baseContent, type))
             ]);
+            console.log(`Processed LayX base ${type}`);
 
             await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir);
 

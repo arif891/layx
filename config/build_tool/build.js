@@ -25,7 +25,7 @@ async function build(isRebuild = false) {
     await processFiles();
 
     if (!isRebuild) {
-      await processHtmlFiles(layx.directories.pages);
+      await processHtmlFiles('./');
     }
 
     await genBuildInfo(true);

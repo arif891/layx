@@ -81,4 +81,3 @@ async function writeFile(filePath, content, flag = 'w') {
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     return await fs.writeFile(filePath, content, { flag });
 }
-

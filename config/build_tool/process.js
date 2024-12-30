@@ -9,26 +9,26 @@ async function processFiles() {
     const types = ['css', 'js'];
 
     for (const type of types) {
+        const config = {
+            css: {
+                source: layx.files.layxCss,
+                base: layx.files.baseCss,
+                output: layx.files.layxCssOut,
+                baseOutput: layx.files.baseCssOut,
+                pageFilesDir: layx.directories.pagesCss,
+                pageFilesOutDir: layx.directories.pagesCssOut
+            },
+            js: {
+                source: layx.files.layxJs,
+                base: layx.files.baseJs,
+                output: layx.files.layxJsOut,
+                baseOutput: layx.files.baseJsOut,
+                pageFilesDir: layx.directories.pagesJs,
+                pageFilesOutDir: layx.directories.pagesJsOut
+            }
+        }[type];
+        
         try {
-            const config = {
-                css: {
-                    source: layx.files.layxCss,
-                    base: layx.files.baseCss,
-                    output: layx.files.layxCssOut,
-                    baseOutput: layx.files.baseCssOut,
-                    pageFilesDir: layx.directories.pagesCss,
-                    pageFilesOutDir: layx.directories.pagesCssOut
-                },
-                js: {
-                    source: layx.files.layxJs,
-                    base: layx.files.baseJs,
-                    output: layx.files.layxJsOut,
-                    baseOutput: layx.files.baseJsOut,
-                    pageFilesDir: layx.directories.pagesJs,
-                    pageFilesOutDir: layx.directories.pagesJsOut
-                }
-            }[type];
-
             const [sourceContent, baseContent] = await Promise.all([
                 readFile(config.source),
                 readFile(config.base).catch(() => '')

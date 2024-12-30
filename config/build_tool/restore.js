@@ -1,22 +1,52 @@
-async function restoreFile(sourcePath, destinationPath, fileType) {
+import path from 'node:path';
+import { readFile, writeFile, getFilesWithExtension } from '../util/functions.js'
+import { layx } from '../core/vars.js'
+
+export {restoreFiles};
+
+async function restoreFiles() {
+  const types = ['css', 'js'];
+
+  for (const type of types) {
+    const config = {
+      css: {
+        from: layx.files.baseCssOut,
+        to: layx.files.baseCss,
+        fromPageFilesDir: layx.directories.pagesCssOut,
+        toPageFilesDir: layx.directories.pagesCss
+      },
+      js: {
+        from: layx.files.baseJsOut,
+        to: layx.files.baseJs,
+        fromPageFilesDir: layx.directories.pagesJsOut,
+        toPageFilesDir: layx.directories.pagesJs
+      }
+    }[type];
+
+
     try {
-      const content = await readFile(sourcePath);
-      await writeFile(destinationPath, content);
-      console.log(`Restored ${fileType.toUpperCase()} file: ${path.basename(destinationPath)}`);
+      const content = await readFile(config.from);
+      await writeFile(config.to, content);
+      console.log(`Restored user base ${type} file.`);
+
+      await restorePages(type, config.fromPageFilesDir, config.toPageFilesDir);
     } catch (error) {
-      console.error(`Error restoring ${fileType.toUpperCase()} file:`, error.message);
+      console.error(`Error restoring ${type} file:`, error.message);
     }
   }
+}
 
-  async function restorePages(fileType) {
-    const pagesDir = fileType === 'css' ? this.directories.pagesCssOut : this.directories.pagesJsOut;
-    const destDir = fileType === 'css' ? this.directories.pagesCss : this.directories.pagesJs;
+async function restorePages(type, fromDir, toDir) {
 
-    const pageFiles = await this.getFilesWithExtension(pagesDir, fileType);
+  const Files = await getFilesWithExtension(fromDir, type);
 
-    for (const file of pageFiles) {
-      const sourcePath = path.join(pagesDir, file);
-      const destPath = path.join(destDir, file);
-      await this.restoreFile(sourcePath, destPath, fileType);
-    }
+  for (const file of Files) {
+    const sourcePath = path.join(pagesDir, file);
+    const destPath = path.join(destDir, file);
+    await this.restoreFile(sourcePath, destPath, type);
+
+    const content = await readFile(file);
+    await writeFile(path.join(toDir, file), content);
+    console.log(`Restored ${file} file.`);
   }
+}

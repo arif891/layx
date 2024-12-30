@@ -1,7 +1,8 @@
 import CommandLineInterface from '../cli/cli.js';
 import { processFiles } from './process.js';
 import { processHtmlFiles } from './process_html.js';
-import { genBuildInfo, getBuildInfo } from './functions.js'
+import { genBuildInfo, getBuildInfo } from './functions.js';
+import { layx } from "../core/vars.js";
 
 
 const cli = new CommandLineInterface;
@@ -24,7 +25,7 @@ async function build(isRebuild = false) {
     await processFiles();
 
     if (!isRebuild) {
-      await processHtmlFiles(directories.pages);
+      await processHtmlFiles(layx.directories.pages);
     }
 
     await genBuildInfo(true);

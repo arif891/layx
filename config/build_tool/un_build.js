@@ -1,7 +1,7 @@
 import CommandLineInterface from '../cli/cli.js';
 import { processHtmlFiles } from './process_html.js';
 import { genBuildInfo, getBuildInfo } from './functions.js'
-import { processFiles } from './process.js';
+import { restoreFiles } from './restore.js';
 
 const cli = new CommandLineInterface;
 const { fg, bg } = cli;

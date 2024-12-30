@@ -58,12 +58,7 @@ async function processHtmlFiles(startPath, mode = 'comment') {
     }
 
     try {
-
-      const indexPath = path.join(this.directories.current, 'index.html');
-      if (await fs.stat(indexPath).catch(() => false)) {
-        await processFile(indexPath);
-      }
-
+      
       for await (const filePath of findHtmlFiles(startPath)) {
         await processFile(filePath);
       }

@@ -1,3 +1,8 @@
+import path from 'node:path';
+
+
+export {processHtmlFiles};
+
 async function processHtmlFiles(startPath, mode = 'comment') {
     async function* findHtmlFiles(dir) {
       const entries = await fs.readdir(dir, { withFileTypes: true });

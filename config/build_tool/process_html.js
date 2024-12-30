@@ -1,4 +1,5 @@
 import path from 'node:path';
+import fs from "node:fs/promises";
 
 
 export {processHtmlFiles};
@@ -58,7 +59,7 @@ async function processHtmlFiles(startPath, mode = 'comment') {
     }
 
     try {
-      
+
       for await (const filePath of findHtmlFiles(startPath)) {
         await processFile(filePath);
       }

@@ -72,5 +72,3 @@ async function processHtmlFiles(startPath, mode = 'comment') {
       throw error;
     }
   }
-
-  export {processHtmlFiles}

@@ -1,8 +1,8 @@
 // js code
-import { colors } from './modules/vars.js';
-import { downloadFile, handleAdd } from './modules/functions.js'
+import { colors } from './core/vars.js';
+import { downloadFile, handleAdd } from './core/functions.js'
 
-import BuildTool from './modules/buildTool.js'
+import BuildTool from './build_tool/build_tool.js'
 
 const scriptDir = import.meta.dirname;
 

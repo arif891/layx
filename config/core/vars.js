@@ -1,17 +1,41 @@
 // Local 
 const layx = {
     directories: {
-     base: '/',
-     
+        base: './',
+        config: 'config/',
+        info: 'info/',
+        syntax: 'config/syntax/',
+        assets: 'assets/',
+        css: 'assets/css/',
+        js: 'assets/js/',
+        images: 'assets/image/',
+        layx: 'layx/',
+        layxAssets: 'layx/assets/',
+        layxCss: 'layx/assets/css/',
+        layxJs: 'layx/assets/js/',
+        pages: 'pages/',
+        pagesCss: 'assets/css/pages/',
+        pagesJs: 'assets/js/pages/',
+        pagesCssOut: 'layx/assets/css/pages/',
+        pagesJsOut: 'layx/assets/js/pages/'
     },
     files: {
-  
+        baseCss:  'assets/css/base.css',
+        baseJs: 'assets/js/base.js',
+        baseCssOut: 'layx/assets/css/user_base.css',
+        baseJsOut:  'layx/assets/js/user_base.js',
+        layxCss:  'layx/layx.css',
+        layxJs: 'layx/layx.js',
+        layxCssOut: 'layx/assets/css/base.css',
+        layxJsOut:  'layx/assets/js/base.js',
+        buildInfo: 'layx/assets/build_info.json',
+        fontInfo: 'config/info/font_info_GF.js'
     },
     main: {
 
     },
     components: {
-       
+
     },
     utilities: {
 
@@ -66,107 +90,4 @@ const layout = {
     }
 };
 
-const colors = {
-    // Basic formatting
-    format: {
-        reset: "\x1b[0m",
-        bold: "\x1b[1m",
-        dim: "\x1b[2m",
-        italic: "\x1b[3m",
-        underscore: "\x1b[4m",
-        blink: "\x1b[5m",
-        reverse: "\x1b[7m",
-        hidden: "\x1b[8m",
-        strikethrough: "\x1b[9m"
-    },
-
-    // Foreground colors (standard)
-    fg: {
-        black: "\x1b[30m",
-        red: "\x1b[31m",
-        green: "\x1b[32m",
-        yellow: "\x1b[33m",
-        blue: "\x1b[34m",
-        magenta: "\x1b[35m",
-        cyan: "\x1b[36m",
-        white: "\x1b[37m",
-        // Bright variants
-        brightBlack: "\x1b[90m",
-        brightRed: "\x1b[91m",
-        brightGreen: "\x1b[92m",
-        brightYellow: "\x1b[93m",
-        brightBlue: "\x1b[94m",
-        brightMagenta: "\x1b[95m",
-        brightCyan: "\x1b[96m",
-        brightWhite: "\x1b[97m",
-    },
-
-    // Background colors (standard)
-    bg: {
-        black: "\x1b[40m",
-        red: "\x1b[41m",
-        green: "\x1b[42m",
-        yellow: "\x1b[43m",
-        blue: "\x1b[44m",
-        magenta: "\x1b[45m",
-        cyan: "\x1b[46m",
-        white: "\x1b[47m",
-        // Bright variants
-        brightBlack: "\x1b[100m",
-        brightRed: "\x1b[101m",
-        brightGreen: "\x1b[102m",
-        brightYellow: "\x1b[103m",
-        brightBlue: "\x1b[104m",
-        brightMagenta: "\x1b[105m",
-        brightCyan: "\x1b[106m",
-        brightWhite: "\x1b[107m",
-    },
-
-    // Utility functions
-    style: (text, ...styles) => {
-        const combined = styles.join('');
-        return `${combined}${text}${colors.format.reset}`;
-    },
-
-    // RGB support (0-255 for each channel)
-    rgb: {
-        fg: (r, g, b) => `\x1b[38;2;${r};${g};${b}m`,
-        bg: (r, g, b) => `\x1b[48;2;${r};${g};${b}m`
-    }
-};
-
-// Example usage:
-// console.log(colors.style('Hello', colors.fg.red, colors.bg.white));
-// console.log(colors.style('RGB Text', colors.rgb.fg(255, 128, 0)));
-
-import { parseArgs } from 'util';
-
-
-const currentDir = process.cwd();
-
-const options = {
-    component: {
-        type: "string",
-        short: "c",
-        multiple: true
-    },
-    template: {
-        type: "string",
-        short: "t",
-        multiple: true
-    },
-    block: {
-        type: "string",
-        short: "b",
-        multiple: true
-    },
-    font: {
-        type: "string",
-        short: "f",
-        multiple: true
-    },
-};
-
-const argsObj = parseArgs({ options, strict: false });
-
-export { breakPoints, layout, colors, currentDir, argsObj }
+export {layx, breakPoints, layout}

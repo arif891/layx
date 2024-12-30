@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { readFile, writeFile, minify, getFilesWithExtension } from '../util/functions.js'
 import { layx } from '../core/vars.js'
 

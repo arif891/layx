@@ -1,9 +1,28 @@
 import path from 'node:path';
-import { readFile, writeFile, minify, getFilesWithExtension,  getFilesContent } from '../util/functions.js'
-import { layx } from '../core/vars.js'
+import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getContentByTag } from '../util/functions.js'
+import { layx, breakPoints, layout } from '../core/vars.js'
 
 
 export { processFiles };
+
+const dirConfig = {
+    css: {
+        source: layx.files.layxCss,
+        base: layx.files.baseCss,
+        output: layx.files.layxCssOut,
+        baseOutput: layx.files.baseCssOut,
+        pageFilesDir: layx.directories.pagesCss,
+        pageFilesOutDir: layx.directories.pagesCssOut
+    },
+    js: {
+        source: layx.files.layxJs,
+        base: layx.files.baseJs,
+        output: layx.files.layxJsOut,
+        baseOutput: layx.files.baseJsOut,
+        pageFilesDir: layx.directories.pagesJs,
+        pageFilesOutDir: layx.directories.pagesJsOut
+    }
+}
 
 const optimizableFiles = [
     {
@@ -11,14 +30,16 @@ const optimizableFiles = [
         optimize: {
             include: ['base', 'gap'],
             class: ['x', 'xs', 'y'],
-            media: true
+            media: true,
+            templates: layout.templates,
         }
     },
     {
         url: 'helpers/layout/layout_helper.css',
         optimize: {
             class: ['num-x'],
-            media: true
+            media: true,
+            templates: layout.helper.templates
         }
     }
 ];
@@ -27,24 +48,7 @@ async function processFiles(optimize) {
     const types = ['css', 'js'];
 
     for (const type of types) {
-        const config = {
-            css: {
-                source: layx.files.layxCss,
-                base: layx.files.baseCss,
-                output: layx.files.layxCssOut,
-                baseOutput: layx.files.baseCssOut,
-                pageFilesDir: layx.directories.pagesCss,
-                pageFilesOutDir: layx.directories.pagesCssOut
-            },
-            js: {
-                source: layx.files.layxJs,
-                base: layx.files.baseJs,
-                output: layx.files.layxJsOut,
-                baseOutput: layx.files.baseJsOut,
-                pageFilesDir: layx.directories.pagesJs,
-                pageFilesOutDir: layx.directories.pagesJsOut
-            }
-        }[type];
+        const config = dirConfig[type];
 
         try {
             const [sourceContent, baseContent] = await Promise.all([
@@ -99,8 +103,7 @@ async function processImports(content, filePath, type, optimize) {
                 const optimizableFile = optimizableFiles.find(file => file.url === url);
                 if (optimizableFile) {
                     console.log(`Optimizing file: ${url}`);
-                   await processOptimizableFile(url, importedFilePath);
-                   return ''
+                    return await processOptimizableFile(url, importedFilePath);
                 }
             }
             return await readFile(importedFilePath);
@@ -115,11 +118,30 @@ async function processImports(content, filePath, type, optimize) {
 
 
 async function processOptimizableFile(url, importedFilePath) {
-    const content = await readFile(importedFilePath);
-    const htmlContent = await getFilesContent(layx.directories.base,'html', true);
-    console.log(htmlContent);
-}
+    const info = optimizableFiles.find(file => file.url === url)?.optimize;
 
+    const content = await readFile(importedFilePath);
+    const htmlContent = await getFilesContent(layx.directories.base, 'html', true);
+
+    let includeContent = [];
+    let classContent = [];
+
+    info.include?.forEach(tag => {
+        const inc = getContentByTag(content, tag);
+        includeContent.push(inc);
+    });
+
+    info.class.forEach(selector => {
+      
+    })
+
+    if (info.media) {
+        info.class.forEach(selector => {
+           
+        })
+    }
+
+}
 
 
 

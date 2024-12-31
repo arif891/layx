@@ -63,8 +63,6 @@ const breakPoints = {
 };
 
 const layout = {
-    base: 'layout,.layout{display:grid;grid-template-columns:repeat(var(--num-x,12),1fr);grid-template-rows:repeat(var(--num-y,none),1fr);gap:var(--gap-y,0) var(--gap-x,0);&:not([class*="num-x-"]):not(:has([class*="x-"])){grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}&.edge{--edge-offset-x:.75rem;grid-template-columns:calc(var(--edge-offset-x) - var(--gap-x,0)) repeat(var(--num-x,12),1fr) calc(var(--edge-offset-x) - var(--gap-x,0));@media (width>=576px){--edge-offset-x:2.5%!important}@media (width>=992px){--edge-offset-x:5%!important}@media (aspect-ratio>=21/9) and (width>=2000px){--edge-offset-x:15%!important}@media (aspect-ratio>=32/9) and (width>=3000px){--edge-offset-x:25%!important}}.sub,.sub-x,.sub-y{display:grid}.sub{grid-template-columns:subgrid;grid-template-rows:subgrid}.sub-x{grid-template-columns:subgrid}.sub-y{grid-template-rows:subgrid}}',
-    gap: 'layout,.layout{&.gap-x,&.gap{--gap-x:clamp(.2rem,1vw,1rem)}&.gap-x-2,&.gap-2{--gap-x:clamp(.4rem,2vw,2rem)}&.gap-x-3,&.gap-3{--gap-x:clamp(.6rem,3vw,3rem)}&.gap-x-4,&.gap-4{--gap-x:clamp(.8rem,4vw,4rem)}&.gap-x-5,&.gap-5{--gap-x:clamp(1rem,5vw,5rem)}&.gap-y,&.gap{--gap-y:clamp(.2rem,1vh,1rem)}&.gap-y-2,&.gap-2{--gap-y:clamp(.4rem,2vh,2rem)}&.gap-y-3,&.gap-3{--gap-y:clamp(.6rem,3vh,3rem)}&.gap-y-4,&.gap-4{--gap-y:clamp(.8rem,4vh,4rem)}&.gap-y-5,&.gap-5{--gap-y:clamp(1rem,5vh,5rem)}}',
     templates: {
         x: '.x-${num}{grid-column-end: span ${num};}',
         xs: '.xs-${num}{grid-column-start: ${num};}',

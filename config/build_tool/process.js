@@ -102,7 +102,6 @@ async function processImports(content, filePath, type, optimize) {
             if (type === 'css' && optimize) {
                 const optimizableFile = optimizableFiles.find(file => file.url === url);
                 if (optimizableFile) {
-                    console.log(`Optimizing file: ${url}`);
                     return await processOptimizableFile(url, importedFilePath);
                 }
             }
@@ -170,8 +169,6 @@ async function processOptimizableFile(url, importedFilePath) {
             });
         });
     }
-
-    console.log(finalContent.join('\n'));
     
     return finalContent.join('\n');
 }

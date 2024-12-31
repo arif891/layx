@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { readFile, writeFile } from '../../util/functions.js';
 import { CommandLineInterface } from '../../cli/cli.js';
+import { downloadFile } from '../download/download.js';
 import { layx } from '../../core/vars.js';
 
 export {fontAdd};
@@ -38,9 +39,6 @@ async function processFontFamily(fontName, fontInfoObj) {
 
     try {
         console.log(cli.style(`Adding "${result.family}" ${isVariable ? 'variable' : 'static'} font family...`, fg.cyan));
-
-        // Ensure the font directory exists
-        await ensureDirectoryExists(fontDir);
 
         // Generate font-face declarations for all variants
         const fontFaces = Object.keys(result.files).map(variant =>
@@ -159,14 +157,4 @@ function createFontFaceDeclaration(fontInfo, variant) {
   font-display: swap;
   src: url(/assets/font/${formattedFamilyName}/${formattedFamilyName}_${variant}_${fontInfo.version}.woff2) format('woff2');
   }`;
-}
-
-async function ensureDirectoryExists(dirPath) {
-    try {
-        await fs.mkdir(dirPath, { recursive: true });
-    } catch (error) {
-        if (error.code !== 'EEXIST') {
-            throw error;
-        }
-    }
 }

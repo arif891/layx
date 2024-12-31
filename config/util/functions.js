@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import { breakPoints } from "../core/vars.js";
 
 
-export { getFilesContent,  getCssContentBlock, getFilesWithExtension, minify, extractClasses, readFile, writeFile };
+export { getFilesContent, ensureDirectoryExists,  getCssContentBlock, getFilesWithExtension, minify, extractClasses, readFile, writeFile };
 
 async function getFilesWithExtension(directory, extension) {
     const files = await fs.readdir(directory);
@@ -32,6 +32,16 @@ function getCssContentBlock(content, tag) {
     return [...content.matchAll(regex)]
         .map(match => match[1])
         .join('');
+}
+
+async function ensureDirectoryExists(dirPath) {
+    try {
+        await fs.mkdir(dirPath, { recursive: true });
+    } catch (error) {
+        if (error.code !== 'EEXIST') {
+            throw error;
+        }
+    }
 }
 
 function minify(content, Type = 'css') {

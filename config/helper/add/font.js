@@ -1,11 +1,11 @@
 import path from 'node:path';
-import  CommandLineInterface from '../../cli/cli.js';
-import { readFile, writeFile } from '../../util/functions.js';
+import CommandLineInterface from '../../cli/cli.js';
+import { ensureDirectoryExists, readFile, writeFile } from '../../util/functions.js';
 import { downloadFile } from '../download/download.js';
 import { argsObj } from './handle_add.js';
 import { layx } from '../../core/vars.js';
 
-export {fontAdd};
+export { fontAdd };
 
 const cli = new CommandLineInterface();
 const { fg, bg } = cli;
@@ -40,6 +40,9 @@ async function processFontFamily(fontName, fontInfoObj) {
 
     try {
         console.log(cli.style(`Adding "${result.family}" ${isVariable ? 'variable' : 'static'} font family...`, fg.cyan));
+
+        // Ensure the font directory exists
+        await ensureDirectoryExists(fontDir);
 
         // Generate font-face declarations for all variants
         const fontFaces = Object.keys(result.files).map(variant =>

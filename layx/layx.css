@@ -9,7 +9,7 @@
 @import url(main/layout/layout.css);
 
 /* helper */
-@import url(helpers/layout/layuot_helper.css);
+@import url(helpers/layout/layout_helper.css);
 
 /* Components */
 @import url(components/button/button.css);

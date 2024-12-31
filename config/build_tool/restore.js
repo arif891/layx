@@ -30,14 +30,14 @@ async function restoreFiles() {
       await writeFile(config.to, content);
       console.log(`Restored user base ${type} file.`);
 
-      await restorePages(type, config.fromPageFilesDir, config.toPageFilesDir);
+      await restorePageFiles(type, config.fromPageFilesDir, config.toPageFilesDir);
     } catch (error) {
       console.error(`Error restoring ${type} file:`, error.message);
     }
   }
 }
 
-async function restorePages(type, fromDir, toDir) {
+async function restorePageFiles(type, fromDir, toDir) {
 
   const Files = await getFilesWithExtension(fromDir, type);
 

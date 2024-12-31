@@ -1,1 +1,1 @@
-/* Here you can write your page specic js code. */
+/* Here you can write your page specific js code. */

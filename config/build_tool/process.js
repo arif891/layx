@@ -37,7 +37,7 @@ const optimizableFiles = [
     {
         url: 'helpers/layout/layout_helper.css',
         optimize: {
-            class: ['num-x'],
+            class: ['num-x', 'num-y'],
             media: true,
             templates: layout.helper.templates
         }

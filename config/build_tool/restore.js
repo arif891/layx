@@ -4,25 +4,26 @@ import { layx } from '../core/vars.js'
 
 export {restoreFiles};
 
+const dirConfig = {
+  css: {
+    from: layx.files.baseCssOut,
+    to: layx.files.baseCss,
+    fromPageFilesDir: layx.directories.pagesCssOut,
+    toPageFilesDir: layx.directories.pagesCss
+  },
+  js: {
+    from: layx.files.baseJsOut,
+    to: layx.files.baseJs,
+    fromPageFilesDir: layx.directories.pagesJsOut,
+    toPageFilesDir: layx.directories.pagesJs
+  }
+}
+
 async function restoreFiles() {
   const types = ['css', 'js'];
 
   for (const type of types) {
-    const config = {
-      css: {
-        from: layx.files.baseCssOut,
-        to: layx.files.baseCss,
-        fromPageFilesDir: layx.directories.pagesCssOut,
-        toPageFilesDir: layx.directories.pagesCss
-      },
-      js: {
-        from: layx.files.baseJsOut,
-        to: layx.files.baseJs,
-        fromPageFilesDir: layx.directories.pagesJsOut,
-        toPageFilesDir: layx.directories.pagesJs
-      }
-    }[type];
-
+    const config = dirConfig[type];
 
     try {
       const content = await readFile(config.from);

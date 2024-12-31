@@ -3,11 +3,7 @@ import fs from "node:fs/promises";
 import { breakPoints } from "../core/vars.js";
 
 
-export { wrapMedia, getFilesContent, getContentByTag, getFilesWithExtension, minify, extractClasses, readFile, writeFile };
-
-function wrapMedia(media, content) {
-    return `@media ${media} {${content}}`
-}
+export { getFilesContent, getContentByTag, getFilesWithExtension, minify, extractClasses, readFile, writeFile };
 
 async function getFilesWithExtension(directory, extension) {
     const files = await fs.readdir(directory);

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile, writeFile, minify, getFilesWithExtension } from '../util/functions.js'
+import { readFile, writeFile, minify, getFilesWithExtension,  getFilesContent } from '../util/functions.js'
 import { layx } from '../core/vars.js'
 
 
@@ -99,8 +99,8 @@ async function processImports(content, filePath, type, optimize) {
                 const optimizableFile = optimizableFiles.find(file => file.url === url);
                 if (optimizableFile) {
                     console.log(`Optimizing file: ${url}`);
-                    // For now just skip the file, later we can add optimization logic
-                    return '';
+
+                   return await processOptimizableFile(url, importedFilePath);
                 }
             }
             return await readFile(importedFilePath);
@@ -112,6 +112,16 @@ async function processImports(content, filePath, type, optimize) {
 
     return [content, ...importedContents].join('\n');
 }
+
+
+async function processOptimizableFile(url, importedFilePath) {
+    const content = await readFile(importedFilePath);
+    const htmlContent = await getFilesContent(layx.directories.base,'html', true);
+    console.log(htmlContent);
+}
+
+
+
 
 function extractImportUrls(content, type) {
     const regex = type === 'css'

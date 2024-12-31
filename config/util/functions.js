@@ -71,11 +71,13 @@ function extractClasses(html, startClass, type = 'class') {
     const escapedStartClass = startClass.replace(/[-_]/g, '\\$&');
     const patterns = {
         class: {
-            regex: new RegExp(`class="([^"]*?\\b${escapedStartClass}\\d+\\b[^"]*?)"`, 'g'),
-            process: match => match[1].split(/\s+/).filter(className => className.startsWith(startClass))
+            // Match only startClass followed by numbers, not including breakpoint classes
+            regex: new RegExp(`\\b${escapedStartClass}-(\\d+)\\b(?!-${breakPoints.join('|')})`, 'g'),
+            process: match => [match[0]]
         },
         media: {
-            regex: new RegExp(`\\b${escapedStartClass}(\\w+)-\\d+\\b`, 'g'),
+            // Match classes with breakpoints like x-lg-12
+            regex: new RegExp(`\\b${escapedStartClass}-(${breakPoints.join('|')})-(\\d+)\\b`, 'g'),
             process: match => [match[1]]
         }
     };
@@ -93,7 +95,7 @@ function extractClasses(html, startClass, type = 'class') {
     }
 
     const sortFunctions = {
-        class: (a, b) => parseInt(a.split(/[-_]/).pop()) - parseInt(b.split(/[-_]/).pop()),
+        class: (a, b) => parseInt(a.split('-')[1]) - parseInt(b.split('-')[1]),
         media: (a, b) => breakPoints.indexOf(a) - breakPoints.indexOf(b)
     };
 

@@ -1,6 +1,6 @@
 import path from 'node:path';
+import  CommandLineInterface from '../../cli/cli.js';
 import { readFile, writeFile } from '../../util/functions.js';
-import { CommandLineInterface } from '../../cli/cli.js';
 import { downloadFile } from '../download/download.js';
 import { layx } from '../../core/vars.js';
 

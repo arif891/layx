@@ -9,6 +9,7 @@ const layx = {
         css: 'assets/css/',
         js: 'assets/js/',
         images: 'assets/image/',
+        font: 'assets/font/',
         layx: 'layx/',
         layxAssets: 'layx/assets/',
         layxCss: 'layx/assets/css/',

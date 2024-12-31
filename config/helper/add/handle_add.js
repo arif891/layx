@@ -1,4 +1,10 @@
 import { parseArgs } from 'util';
+import { componentAdd } from './component.js';
+import { templateAdd } from './template.js';
+import { blockAdd } from './block.js';
+import { fontAdd } from './font.js';
+
+export { handleAdd };
 
 const options = {
   component: {
@@ -32,20 +38,18 @@ async function handleAdd(scriptDir) {
     }
   
     if (argsObj.values.component) {
-      await handleComponentAdd(scriptDir);
+      await componentAdd(scriptDir);
     }
   
     if (argsObj.values.template) {
-      await handleTemplateAdd(scriptDir);
+      await templateAdd(scriptDir);
     }
   
     if (argsObj.values.block) {
-      await handleBlockAdd(scriptDir);
+      await blockAdd(scriptDir);
     }
   
     if (argsObj.values.font) {
-      await handleFontAdd(scriptDir);
+      await fontAdd(scriptDir);
     }
   }
-
-  export { handleAdd };

@@ -1,4 +1,7 @@
-async function handleFontAdd(scriptDir) {
+
+export {fontAdd};
+
+async function fontAdd(scriptDir) {
     try {
         const fontInfoGF = await readFile(path.join(scriptDir, "/info/font_info_GF.json"));
         const fontInfoObj = JSON.parse(fontInfoGF);

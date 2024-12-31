@@ -99,8 +99,8 @@ async function processImports(content, filePath, type, optimize) {
                 const optimizableFile = optimizableFiles.find(file => file.url === url);
                 if (optimizableFile) {
                     console.log(`Optimizing file: ${url}`);
-
-                   return await processOptimizableFile(url, importedFilePath);
+                   await processOptimizableFile(url, importedFilePath);
+                   return ''
                 }
             }
             return await readFile(importedFilePath);

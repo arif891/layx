@@ -1,18 +1,25 @@
+import path from 'node:path';
+import { readFile, writeFile } from '../../util/functions.js';
+import { CommandLineInterface } from '../../cli/cli.js';
+import { layx } from '../../core/vars.js';
 
 export {fontAdd};
+
+const cli = new CommandLineInterface();
+const { fg, bg } = cli;
 
 async function fontAdd(scriptDir) {
     try {
         const fontInfoGF = await readFile(path.join(scriptDir, "/info/font_info_GF.json"));
         const fontInfoObj = JSON.parse(fontInfoGF);
 
-        console.log(colors.style(`Last font info update: ${fontInfoObj.lastUpdate}`, colors.fg.yellow));
+        console.log(cli.style(`Last font info update: ${fontInfoObj.lastUpdate}`, fg.yellow));
 
         await Promise.all(
             argsObj.values.font.map(font => processFontFamily(font, fontInfoObj))
         );
     } catch (error) {
-        console.error(colors.style(`Error processing fonts: ${error.message}`, colors.fg.red));
+        console.error(cli.style(`Error processing fonts: ${error.message}`, fg.red));
     }
 }
 
@@ -30,7 +37,7 @@ async function processFontFamily(fontName, fontInfoObj) {
     const isVariable = isVariableFont(result.axes);
 
     try {
-        console.log(colors.style(`Adding "${result.family}" ${isVariable ? 'variable' : 'static'} font family...`, colors.fg.cyan));
+        console.log(cli.style(`Adding "${result.family}" ${isVariable ? 'variable' : 'static'} font family...`, fg.cyan));
 
         // Ensure the font directory exists
         await ensureDirectoryExists(fontDir);
@@ -41,11 +48,11 @@ async function processFontFamily(fontName, fontInfoObj) {
         );
 
         if (isVariable) {
-            console.log(colors.style(`It is a variable font and available axes: ${result.axes.map(axis =>
+            console.log(cli.style(`It is a variable font and available axes: ${result.axes.map(axis =>
                 `${axis.tag} (${axis.start}-${axis.end}).`
-            ).join(', ')}`, colors.fg.yellow));
+            ).join(', ')}`, fg.yellow));
         } else {
-            console.log(colors.style(`Available variants: ${result.variants.join(', ')}.`, colors.fg.yellow));
+            console.log(cli.style(`Available variants: ${result.variants.join(', ')}.`, fg.yellow));
         }
 
         // Download all font files in parallel
@@ -62,7 +69,7 @@ async function processFontFamily(fontName, fontInfoObj) {
         await writeFile(`${fontDir}/font-face.css`, fontFaces.join('\n\n'));
         await writeFile('/layx/main/typography/typography.css', `\n\n\n/*<${result.family}>*/${fontFaces.join('\n')}\n/*</${result.family}>*/`, 'a');
 
-        console.log(colors.style(`Added "${result.family}" font family successfully.`, colors.fg.green));
+        console.log(cli.style(`Added "${result.family}" font family successfully.`, fg.green));
     } catch (error) {
         console.error(`Failed to add "${result.family}". Error:`, error.message);
     }

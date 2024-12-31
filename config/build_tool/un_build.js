@@ -3,7 +3,7 @@ import { processHtmlFiles } from './process_html.js';
 import { genBuildInfo, getBuildInfo } from './functions.js'
 import { restoreFiles } from './restore.js';
 
-const cli = new CommandLineInterface;
+const cli = new CommandLineInterface();
 const { fg, bg } = cli;
 
 export { unbuild };

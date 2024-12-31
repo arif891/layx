@@ -5,7 +5,7 @@ import { genBuildInfo, getBuildInfo } from './functions.js';
 import { unbuild } from './un_build.js';
 
 
-const cli = new CommandLineInterface;
+const cli = new CommandLineInterface();
 const { fg, bg } = cli;
 
 export {build};

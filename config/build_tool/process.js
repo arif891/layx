@@ -158,7 +158,7 @@ async function processOptimizableFile(url, importedFilePath) {
                 if (!mediaQuery) return;
 
                 const classNums = extractClasses(htmlContent, `${selector}-${mediaKey}`, 'number');
-                const template = info.templates.media?.[selector];
+                const template = info.templates.media?.[selector.replace('-','')];
 
                 if (template && classNums.length) {
                     const styles = classNums.map(num => 

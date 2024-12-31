@@ -5,7 +5,7 @@ import { layx } from '../core/vars.js'
 
 export { processFiles };
 
-async function processFiles() {
+async function processFiles(optimize) {
     const types = ['css', 'js'];
 
     for (const type of types) {
@@ -34,7 +34,7 @@ async function processFiles() {
                 readFile(config.base).catch(() => '')
             ]);
 
-            const processed = await processImports(sourceContent, config.source, type);
+            const processed = await processImports(sourceContent, config.source, type, optimize);
             const filtered = removeImportStatements(processed);
             const final = type === 'js' ? removeExportAndDefault(filtered) : filtered;
 
@@ -69,11 +69,12 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir) {
     }
 }
 
-async function processImports(content, filePath, type) {
+async function processImports(content, filePath, type, optimize) {
+
     const importUrls = extractImportUrls(content, type);
     const importedContents = await Promise.all(importUrls.map(async (url) => {
         const importedFilePath = path.resolve(path.dirname(filePath), url);
-
+               
         try {
             return await readFile(importedFilePath);
         } catch (error) {

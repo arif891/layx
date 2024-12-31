@@ -10,7 +10,7 @@ const { fg, bg } = cli;
 
 export {build};
 
-async function build(isRebuild = false) {
+async function build(isRebuild = false, optimize = true) {
   console.log(cli.style('Starting build process...', fg.cyan));
   try {
     if (!isRebuild) {
@@ -22,7 +22,7 @@ async function build(isRebuild = false) {
       }
     }
 
-    await processFiles();
+    await processFiles(optimize);
 
     if (!isRebuild) {
       await processHtmlFiles('./');

@@ -27,7 +27,7 @@ async function processFiles(optimize) {
                 pageFilesOutDir: layx.directories.pagesJsOut
             }
         }[type];
-        
+
         try {
             const [sourceContent, baseContent] = await Promise.all([
                 readFile(config.source),
@@ -70,12 +70,38 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir) {
 }
 
 async function processImports(content, filePath, type, optimize) {
+    const optimizableFiles = [
+        {
+            url: 'main/layout/layout.css',
+            optimize: {
+                include: ['base', 'gap'],
+                class: ['x', 'xs', 'y'],
+                media: true
+            }
+        },
+        {
+            url: 'helpers/layout/layout_helper.css',
+            optimize: {
+                class: ['num-x'],
+                media: true
+            }
+        }
+    ];
 
     const importUrls = extractImportUrls(content, type);
+
     const importedContents = await Promise.all(importUrls.map(async (url) => {
         const importedFilePath = path.resolve(path.dirname(filePath), url);
-               
+
         try {
+            if (type === 'css' && optimize) {
+                const optimizableFile = optimizableFiles.find(file => file.url === url);
+                if (optimizableFile) {
+                    console.log(`Optimizing file: ${url}`);
+                    // For now just skip the file, later we can add optimization logic
+                    return '';
+                }
+            }
             return await readFile(importedFilePath);
         } catch (error) {
             console.error(`Cannot read file ${importedFilePath}. Error: ${error.message}`);

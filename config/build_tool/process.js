@@ -137,7 +137,7 @@ async function processOptimizableFile(url, importedFilePath) {
     if (info.class?.length) {
         info.class.forEach(selector => {
             const classNums = extractClasses(htmlContent, selector, 'number');
-            const template = info.templates[selector];
+            const template = info.templates[selector.replace('-','')];
             
             console.log('sel', selector, 'classnum',classNums, 'tem', template);
 

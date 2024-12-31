@@ -14,14 +14,14 @@ async function getFilesWithExtension(directory, extension) {
     return files.filter(file => path.extname(file) === `.${extension}`);
 }
 
-async function getFilesContent(directory, extension, subDir = false) {
+async function getFilesContent(directory, extension, subDir = false, exclude = ['layx']) {
     const entries = await fs.readdir(directory, { withFileTypes: true });
     let content = '';
 
     for (const entry of entries) {
         const fullPath = path.join(directory, entry.name);
         
-        if (entry.isDirectory() && subDir) {
+        if (entry.isDirectory() && subDir && !exclude.includes(entry)) {
             content += await getFilesContent(fullPath, extension, subDir);
         } else if (entry.isFile() && path.extname(entry.name) === `.${extension}`) {
             content += await readFile(fullPath) + '\n';

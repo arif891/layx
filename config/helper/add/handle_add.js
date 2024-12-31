@@ -4,7 +4,7 @@ import { templateAdd } from './template.js';
 import { blockAdd } from './block.js';
 import { fontAdd } from './font.js';
 
-export { handleAdd };
+export { handleAdd, argsObj };
 
 const options = {
   component: {

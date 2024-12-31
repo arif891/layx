@@ -69,7 +69,7 @@ async function processFontFamily(fontName, fontInfoObj) {
         // Save the fontFaces to a CSS file
 
         await writeFile(`${fontDir}/font-face.css`, fontFaces.join('\n\n'));
-        await writeFile('/layx/main/typography/typography.css', `\n\n\n/*<${result.family}>*/${fontFaces.join('\n')}\n/*</${result.family}>*/`, 'a');
+        await writeFile('layx/main/typography/typography.css', `\n\n\n/*<${result.family}>*/${fontFaces.join('\n')}\n/*</${result.family}>*/`, 'a');
 
         console.log(cli.style(`Added "${result.family}" font family successfully.`, fg.green));
     } catch (error) {

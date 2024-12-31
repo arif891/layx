@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getContentByTag } from '../util/functions.js'
+import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getContentByTag, extractClasses } from '../util/functions.js'
 import { layx, breakPoints, layout } from '../core/vars.js'
 
 
@@ -29,7 +29,20 @@ const optimizableFiles = [
         url: 'main/layout/layout.css',
         optimize: {
             include: ['base', 'gap'],
-            class: ['x', 'xs', 'y'],
+            class: {
+                x: {
+                    selector: 'x'
+                },
+                xs: {
+                    selector: 'xs'
+                },
+                y: {
+                    selector: 'y'
+                },
+                ys: {
+                    selector: 'x'
+                },
+            },
             media: true,
             templates: layout.templates,
         }
@@ -126,20 +139,24 @@ async function processOptimizableFile(url, importedFilePath) {
     let includeContent = [];
     let classContent = [];
 
-    info.include?.forEach(tag => {
-        const inc = getContentByTag(content, tag);
-        includeContent.push(inc);
-    });
+    console.log(extractClasses(htmlContent, 'x'));
+    
+    // info.include?.forEach(tag => {
+    //     const inc = getContentByTag(content, tag);
+    //     includeContent.push(inc);
+    // });
 
-    info.class.forEach(selector => {
-      
-    })
+    // info.class.forEach(selector => {
+    //     let content;
 
-    if (info.media) {
-        info.class.forEach(selector => {
-           
-        })
-    }
+
+    // })
+
+    // if (info.media) {
+    //     info.class.forEach(selector => {
+
+    //     })
+    // }
 
 }
 

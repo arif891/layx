@@ -139,8 +139,41 @@ async function processOptimizableFile(url, importedFilePath) {
     let includeContent = [];
     let classContent = [];
 
-    console.log(extractClasses(htmlContent, 'x'));
-    
+    const tem = `
+    <!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LayX Document</title>
+
+    <link rel="stylesheet" href="/layx/layx.css">
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/pages/home.css">
+
+    <!--Font file should be preloaded-->
+    <link rel="preload" href="/assets/font/Red_Hat_Display_variable.woff2" as="font" crossorigin>
+
+  </head>
+
+  <body>
+
+    <div class= "x-1 x-5 x-10 x-lg-2 x-lg-6 x-lg-11"></div>
+    <div class= ""></div>
+
+    <script src="/layx/layx.js" type="module"></script>
+
+    <script src="/assets/js/base.js"></script>
+    <script src="/assets/js/pages/home.js"></script>
+  </body>
+
+</html>
+    `
+
+    console.log(extractClasses(tem, 'x'));
+
     // info.include?.forEach(tag => {
     //     const inc = getContentByTag(content, tag);
     //     includeContent.push(inc);

@@ -5,6 +5,24 @@ import { layx } from '../core/vars.js'
 
 export { processFiles };
 
+const optimizableFiles = [
+    {
+        url: 'main/layout/layout.css',
+        optimize: {
+            include: ['base', 'gap'],
+            class: ['x', 'xs', 'y'],
+            media: true
+        }
+    },
+    {
+        url: 'helpers/layout/layout_helper.css',
+        optimize: {
+            class: ['num-x'],
+            media: true
+        }
+    }
+];
+
 async function processFiles(optimize) {
     const types = ['css', 'js'];
 
@@ -70,23 +88,6 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir) {
 }
 
 async function processImports(content, filePath, type, optimize) {
-    const optimizableFiles = [
-        {
-            url: 'main/layout/layout.css',
-            optimize: {
-                include: ['base', 'gap'],
-                class: ['x', 'xs', 'y'],
-                media: true
-            }
-        },
-        {
-            url: 'helpers/layout/layout_helper.css',
-            optimize: {
-                class: ['num-x'],
-                media: true
-            }
-        }
-    ];
 
     const importUrls = extractImportUrls(content, type);
 

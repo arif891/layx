@@ -14,7 +14,7 @@ async function unbuild(isRebuild = false) {
   try {
     if (!isRebuild) {
       const buildInfo = await getBuildInfo();
-      if (!buildInfo.build) {
+      if (!buildInfo?.build) {
         console.log(cli.style('This project does not build yet!', fg.yellow));
         return
       }

@@ -140,7 +140,7 @@ async function processOptimizableFile(url, importedFilePath) {
     let classContent = [];
 
 
-    console.log(extractClasses(htmlContent, 'x', 'number'));
+    console.log(htmlContent);
 
     // info.include?.forEach(tag => {
     //     const inc = getContentByTag(content, tag);

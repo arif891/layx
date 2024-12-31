@@ -14,7 +14,7 @@ async function getFilesWithExtension(directory, extension) {
     return files.filter(file => path.extname(file) === `.${extension}`);
 }
 
-async function getFilesContent(directory, extension, subDir = false, exclude = ['layx']) {
+async function getFilesContent(directory, extension, subDir = false, exclude = ['layx', 'pages']) {
     const entries = await fs.readdir(directory, { withFileTypes: true });
     let content = '';
 

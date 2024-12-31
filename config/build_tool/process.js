@@ -138,8 +138,6 @@ async function processOptimizableFile(url, importedFilePath) {
         info.class.forEach(selector => {
             const classNums = extractClasses(htmlContent, selector, 'number');
             const template = info.templates[selector.replace('-','')];
-            
-            console.log('sel', selector, 'classnum',classNums, 'tem', template);
 
             if (template && classNums.length) {
                 const styles = classNums.map(num => 
@@ -172,6 +170,8 @@ async function processOptimizableFile(url, importedFilePath) {
             });
         });
     }
+
+    console.log(finalContent.join('\n'));
     
     return finalContent.join('\n');
 }

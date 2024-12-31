@@ -171,6 +171,8 @@ async function processOptimizableFile(url, importedFilePath) {
         });
     }
 
+    console.log(finalContent.join('\n'));
+    
     return finalContent.join('\n');
 }
 

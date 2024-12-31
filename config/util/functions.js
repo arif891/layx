@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import { breakPoints } from "../core/vars.js";
 
 
-export { getFilesContent, getContentByTag, getFilesWithExtension, minify, extractClasses, readFile, writeFile };
+export { getFilesContent,  getCssContentBlock, getFilesWithExtension, minify, extractClasses, readFile, writeFile };
 
 async function getFilesWithExtension(directory, extension) {
     const files = await fs.readdir(directory);
@@ -27,16 +27,11 @@ async function getFilesContent(directory, extension, subDir = false, exclude = [
     return content;
 }
 
-function getContentByTag(content, tag) {
-    const regex = new RegExp(`<${tag}[^>]*>(.*?)<\\/${tag}>`, 'gs');
-    let matches = [];
-    
-    let match;
-    while ((match = regex.exec(content)) !== null) {
-        matches.push(match[1]);
-    }
-    
-    return matches.join('');
+function getCssContentBlock(content, tag) {
+    const regex = new RegExp(`/\\*<${tag}>\\*/(.*?)\\/\\*<\\/${tag}>\\*/`, 'gs');
+    return [...content.matchAll(regex)]
+        .map(match => match[1])
+        .join('');
 }
 
 function minify(content, Type = 'css') {

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getContentByTag, extractClasses } from '../util/functions.js'
+import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getCssContentBlock, extractClasses } from '../util/functions.js'
 import { layx, breakPoints, layout } from '../core/vars.js'
 
 
@@ -128,7 +128,7 @@ async function processOptimizableFile(url, importedFilePath) {
     // Handle includes
     if (info.include?.length) {
         info.include.forEach(tag => {
-            const includedContent = getContentByTag(content, tag);
+            const includedContent = getCssContentBlock(content, tag);
             if (includedContent) finalContent.push(includedContent);
         });
     }

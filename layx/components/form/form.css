@@ -2,9 +2,8 @@
     --padding-x: .8rem;
     --padding-y: 1rem;
     --radius: .5rem;
-    --valid-color: rgb(58, 230, 170);
-    --invalid-color: rgb(255, 81, 81);
-    --form-bg-color: var(--bg);
+    --valid-color: #3ae6aa;
+    --invalid-color: #ff5151;
 
     &.wide {
         --padding-y: 1.25rem;
@@ -14,7 +13,7 @@
 form {
     &:not(.default) {
         padding: .5rem;
-        background-color: var(--form-bg-color);
+        background-color: var(--bg);
     }
 
     &:not(.no-handle) {

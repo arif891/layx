@@ -1,5 +1,6 @@
 // Local 
 const layx = {
+
     directories: {
         base: './',
         config: 'config/',
@@ -20,34 +21,82 @@ const layx = {
         pagesCssOut: 'layx/assets/css/pages/',
         pagesJsOut: 'layx/assets/js/pages/'
     },
+
     files: {
-        baseCss:  'assets/css/base.css',
+        baseCss: 'assets/css/base.css',
         baseJs: 'assets/js/base.js',
         baseCssOut: 'layx/assets/css/user_base.css',
-        baseJsOut:  'layx/assets/js/user_base.js',
-        layxCss:  'layx/layx.css',
+        baseJsOut: 'layx/assets/js/user_base.js',
+        layxCss: 'layx/layx.css',
         layxJs: 'layx/layx.js',
         layxCssOut: 'layx/assets/css/base.css',
-        layxJsOut:  'layx/assets/js/base.js',
+        layxJsOut: 'layx/assets/js/base.js',
         buildInfo: 'layx/assets/build_info.json',
         fontInfo: 'config/info/font_info_GF.js'
     },
+
     main: {
-
+        base: {},
+        container: {},
+        layout: {},
+        typography: {}
     },
+
     components: {
-
+        accordion: {},
+        alert: {},
+        breadcrumb: {},
+        button: {},
+        card: {},
+        carousel: {},
+        chart: {},
+        dialog: {},
+        draggable: {},
+        footer: {},
+        form: {},
+        media: {},
+        navbar: {},
+        pagination: {},
+        popover: {},
+        section: {},
+        sheet: {},
+        tab: {},
+        tooltip: {},
+        window: {}
     },
+
     utilities: {
-
+        border: {},
+        color: {},
+        display: {},
+        flex: {},
+        grid: {},
+        height: {},
+        margin: {},
+        opacity: {},
+        padding: {},
+        position: {},
+        shadow: {},
+        width: {},
+        z_index: {}
     },
+
     others: {
-
+        ai: {},
+        background: {},
+        dynamic_render: {},
+        icon: {},
+        partial_render: {},
+        pwa: {},
+        scroll_driven_animation: {},
+        smooth_scroll: {},
+        syntax_highlighter: {},
+        theme: {},
+        view_transition: {}
     },
-    helpers: {
-        layout: {
 
-        }
+    helpers: {
+        layout: {}, 
     }
 };
 
@@ -89,4 +138,4 @@ const layout = {
     }
 };
 
-export {layx, breakPoints, layout}
+export { layx, breakPoints, layout }

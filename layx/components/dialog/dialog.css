@@ -5,7 +5,6 @@ dialog {
   --padding-y: 1.5rem;
   --gap: 1rem;
   --radius: .5rem;
-  --close-btn-color: #fff;
   --animation-duration: .6s;
 
   position: fixed;

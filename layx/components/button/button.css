@@ -1,10 +1,7 @@
-button:not(.default),.btn {
+button:not(.default), .btn {
     --padding-x: 1rem;
     --padding-y: .6rem;
     --radius: .35rem;
-
-    --dark-rgb:0,0,0;
-    --light-rgb:255,255,255;
 
     display: inline-block;
     padding: var(--padding-y, var(--padding, .5rem)) var(--padding-x, var(--padding, .5rem));
@@ -42,7 +39,7 @@ button:not(.default),.btn {
     }
 
     &.wide {
-        --padding-y: .8rem; 
+        --padding-y: .8rem;
     }
 
     &.lg {
@@ -52,7 +49,7 @@ button:not(.default),.btn {
         --font-size: 1.1rem;
 
         &.wide {
-            --padding-y: 1rem; 
+            --padding-y: 1rem;
         }
     }
 
@@ -63,7 +60,7 @@ button:not(.default),.btn {
         --font-size: 1.2rem;
 
         &.wide {
-            --padding-y: 1.2rem; 
+            --padding-y: 1.2rem;
         }
     }
 
@@ -72,23 +69,29 @@ button:not(.default),.btn {
     }
 
     &.dark {
-        --color: rgb(var(--bg-color-rgb,var(--light-rgb)));
-        --bg: rgb(var(--color-rgb,var(--dark-rgb)));
+        --color: rgb(var(--bg-color-rgb));
+        --bg: rgb(var(--color-rgb));
     }
 
     &.light {
-        --color: rgb(var(--color-rgb,var(--dark-rgb)));
-        --bg: rgb(var(--bg-color-rgb,var(--light-rgb)));
+        --color: rgb(var(--color-rgb));
+        --bg: rgb(var(--bg-color-rgb));
     }
 
     &.close {
-        height: 1em;
-        width: fit-content;
-        aspect-ratio: 1;
-        padding: 0;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23888'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: center;
+        &:empty {
+            height: 1em;
+            width: fit-content;
+            aspect-ratio: 1;
+            padding: 0;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23888'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: center;
+
+            [theme=dark] & {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23eee'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+            }
+        }
     }
 
     &.as {

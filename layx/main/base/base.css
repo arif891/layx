@@ -21,6 +21,7 @@ body {
     font-size: var(--font-size);
     font-weight: var(--font-weight);
     line-height: var(--line-height);
+    accent-color: var(--accent-color);
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
 }
@@ -116,13 +117,10 @@ backdrop {
     z-index: 2;
     background: var(--backdrop-bg, rgba(0,0,0,.3));
     transition: var(--backdrop-transition, .3s);
+    backdrop-filter: blur(var(--blur));
 
     &[open] {
         visibility: visible;
         opacity: 1;
-    }
-
-    &.modern {
-        backdrop-filter: blur(var(--blur,15px));
     }
 }

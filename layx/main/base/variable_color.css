@@ -1,0 +1,38 @@
+/* Other color variables (light theme) */
+:root, [theme=light] {
+    /* Colors */
+    --brand-color: #2DD4BF;
+    --primary-color: #3B82F6;
+    --secondary-color: #94A3B8;
+
+    /* Surface Colors */
+    --surface-primary: #F8FAFC;
+    --surface-secondary: #F1F5F9;
+    --surface-tertiary: #E2E8F0;
+
+    /* States */
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --danger-color: #EF4444;
+    --info-color: #0EA5E9;
+}
+
+
+/* Other color variables (dark theme) */
+[theme=dark] {
+    /* Colors */
+    --brand-color: #5EEAD4;
+    --primary-color: #60A5FA;
+    --secondary-color: #64748B;
+
+    /* Surface Colors */
+    --surface-primary: #0F172A;
+    --surface-secondary: #1E293B;
+    --surface-tertiary: #334155;
+
+    /* States */
+    --success-color: #34D399;
+    --warning-color: #FBBF24;
+    --danger-color: #F87171;
+    --info-color: #38BDF8;
+}

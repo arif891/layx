@@ -1,17 +1,24 @@
+/* Important variables */
 :root {
+    /* Typography */
     --font-family: 'Red Hat Display', sans-serif;
     --font-size: initial;
     --font-weight: 500;
     --line-height: initial;
+
+    /* Spacing and Sizing */
     --base-space: .5rem;
     --base-radius: .5rem;
     --base-vpu: calc(.1vh + .1vw);
-    --base-transition-duration: .6s;
-    --base-animation-duration: .6s;
+
+    /* Animation and Transitions */
+    --base-transition-duration: .3s;
+    --base-animation-duration: .3s;
 }
 
 
-:root,[theme=light] {
+/* Important color variables (light theme) */
+:root, [theme=light] {
     --color-rgb: 0, 0, 0;
     --bg-color-rgb: 255, 255, 255;
     --bg: rgb(250, 250, 250);
@@ -19,12 +26,15 @@
     --paragraph-color: #202124;
     --link-color: #2da5e6;
     --accent-color: #bae7ff;
+    
     --scrollbar-color: rgba(var(--color-rgb), .3);
     --color: rgb(var(--color-rgb));
     --bg-color: rgb(var(--bg-color-rgb));
+
     color-scheme: light;
 }
 
+/* Important color variables (dark theme) */
 [theme=dark] {
     --color-rgb: 255, 255, 255;
     --bg-color-rgb: 0, 0, 0;
@@ -33,5 +43,6 @@
     --paragraph-color: #fff;
     --link-color: #70cdff;
     --accent-color: #2da5e6;
+
     color-scheme: dark;
 }

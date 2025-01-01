@@ -5,8 +5,6 @@ dialog {
   --padding-y: 1.5rem;
   --gap: 1rem;
   --radius: .5rem;
-  --bg-modern: linear-gradient(145deg, rgba(var(--bg-color-rgb, 255 255 255), 0.6), rgba(var(--bg-color-rgb, 255 255 255), 0.4));
-  --blur: 15px;
   --close-btn-color: #fff;
   --animation-duration: .6s;
 
@@ -16,9 +14,10 @@ dialog {
   padding: var(--padding-y, var(--padding, .5rem)) var(--padding-x, var(--padding, .5rem));
   width: min(calc(100% - var(--edge-offset-x, .5rem) * 2), clamp(500px, 30vw, 600px));
   border: var(--border, unset);
-  border-radius: var(--radius, .5rem);
+  border-radius: var(--radius);
   z-index: 5;
-  background: var(--bg, rgb(245, 245, 245));
+  background: var(--bg , rgb(245, 245, 245));
+  backdrop-filter: blur(var(--blur));
   transform-origin: center top;
   animation: dialog-hide var(--animation-duration);
 
@@ -97,13 +96,6 @@ dialog {
     }
   }
 
-
-  &.modern {
-    background: var(--bg-modern, var(--bg));
-    backdrop-filter: blur(var(--blur));
-    -webkit-backdrop-filter: blur(var(--blur));
-  }
-
   &:not(.bottom) {
     top: var(--edge-offset-y);
   }
@@ -136,11 +128,17 @@ dialog {
     transform-origin: bottom right;
   }
 
-  &~backdrop {
-    --backdrop-bg: rgba(255, 255, 255, .3);
-    --transition: .6s;
+  &.modern {
+    --bg: linear-gradient(145deg, rgba(var(--bg-color-rgb), .6), rgba(var(--bg-color-rgb), .4));
+    --blur: 15px;
+
+    &~backdrop {
+      --backdrop-bg: rgba(var(--bg-color-rgb), .3);
+      --transition: .6s;
+    }
   }
 }
+
 
 @keyframes dialog-show {
   0% {
@@ -187,25 +185,5 @@ dialog {
 
   100% {
     opacity: 0;
-  }
-}
-
-@keyframes dialog-side-grow {
-  0% {
-    scale: 1 0;
-  }
-
-  100% {
-    scale: 1 1;
-  }
-}
-
-@keyframes dialog-side-shrink {
-  0% {
-    scale: 1 1;
-  }
-
-  100% {
-    scale: 1 0;
   }
 }

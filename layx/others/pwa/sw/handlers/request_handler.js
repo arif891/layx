@@ -101,10 +101,10 @@ export class RequestHandler {
 
     async getFallback(request) {
         if (request.destination === 'image') {
-            return this.cache.get('/assets/images/offline.svg', 'offline');
+            return this.cache.get(this.config.fallback.image, 'offline');
         }
         if (request.destination === 'document') {
-            return this.cache.get('/offline.html', 'offline');
+            return this.cache.get(this.config.fallback.document, 'offline');
         }
         return new Response('Resource unavailable offline', { status: 503 });
     }

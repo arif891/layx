@@ -1,0 +1,75 @@
+{
+    "start_url": "/",
+    "scope": "/",
+    "orientation": "any",
+    "launch_handler": {
+        "client_mode": [
+            "auto"
+        ]
+    },
+    "screenshots": [
+        {
+            "src": "assets/image/pwa/screenshots/home.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "platform": "wide",
+            "label": "Homescreen of PWA"
+        }
+    ],
+    "protocol_handlers": [
+        {
+            "protocol": "mailto",
+            "url": "/compose?to=%s"
+        }
+    ],
+    "file_handlers": [
+        {
+            "action": "/open-file",
+            "accept": {
+                "application/pdf": [
+                    ".pdf"
+                ]
+            }
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "New Document",
+            "short_name": "New",
+            "description": "Create a new document",
+            "url": "/new",
+            "icons": [
+                {
+                    "src": "assets/icons/new-document.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ],
+    "related_applications": [
+        {
+            "platform": "play",
+            "url": "https://play.google.com/store/apps/details?id=com.example.pwa",
+            "id": "com.example.pwa"
+        }
+    ],
+    "share_target": {
+        "action": "/share-target",
+        "method": "POST",
+        "enctype": "multipart/form-data",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url",
+            "files": [
+                {
+                    "name": "media",
+                    "accept": [
+                        "image/*",
+                        "video/*"
+                    ]
+                }
+            ]
+        }
+    }
+}

@@ -80,8 +80,7 @@ export class CacheManager {
     }
 
     async get(request, cacheName) {
-        const cache = await caches.open(cacheName);
-        const response = await cache.match(request);
+        const response = await caches.match(request);
 
         if (response) {
             // Check if cached response is still valid
@@ -89,7 +88,7 @@ export class CacheManager {
             if (this.isResponseValid(response, cacheConfig)) {
                 return response;
             }
-            await cache.delete(request);
+            await caches.delete(request);
         }
 
         return null;

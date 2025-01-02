@@ -12,11 +12,32 @@ export class RequestHandler {
 
     async handleAsset(event) {
         const request = event.request;
-        const isStatic = this.isStaticAsset(request.url);
         
-        return isStatic ? 
-            this.cacheFirst(event) : 
-            this.networkFirst(event);
+        if (this.isStaticAsset(request)) {
+            return this.handleStaticAsset(event);
+        }
+
+        return this.networkFirst(event);
+    }
+
+    async handleStaticAsset(event) {
+        const cached = await this.cache.get(event.request, 'static');
+        if (cached) {
+            this.logger.debug('Serving from static cache:', event.request.url);
+            return cached;
+        }
+
+        try {
+            const response = await this.fetchWithTimeout(event);
+            if (response.ok) {
+                this.logger.debug('Caching static asset:', event.request.url);
+                await this.cache.put(event.request, response.clone(), 'static');
+            }
+            return response;
+        } catch (error) {
+            this.logger.error('Static asset fetch failed:', error);
+            return this.getFallback(event.request);
+        }
     }
 
     async networkFirst(event) {
@@ -88,10 +109,18 @@ export class RequestHandler {
         return new Response('Resource unavailable offline', { status: 503 });
     }
 
-    isStaticAsset(url) {
-        return this.config.caches.static.urls.some(pattern => {
+    isStaticAsset(request) {
+        const config = this.config.caches.static;
+        
+        // Check if URL matches static patterns
+        const urlMatches = config.urls.some(pattern => {
             const regex = new RegExp(pattern.replace('*', '.*'));
-            return regex.test(url);
+            return regex.test(request.url);
         });
+
+        // Check if resource type is included
+        const typeMatches = config.types.includes(request.destination);
+
+        return urlMatches || typeMatches;
     }
 }

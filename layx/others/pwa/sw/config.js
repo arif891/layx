@@ -29,7 +29,12 @@ export const CONFIG = {
             maxItems: 100,
             priority: 'speed',
             preload: true,
-            compression: true
+            compression: true,
+            exclude: {
+                urls: ['/api/*', '/dynamic/*'],
+                types: ['video', 'audio'],
+                patterns: [/\.(php|aspx)$/]
+            }
         },
         runtime: {
             enabled: true,

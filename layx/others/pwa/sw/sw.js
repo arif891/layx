@@ -1,6 +1,9 @@
 import { CacheManager } from './modules/cache/cache_manager.js';
 import { RequestHandler } from './handlers/request_handler.js';
 import { FormHandler } from './handlers/form_handler.js';
+import { PushHandler } from './handlers/push_handler.js';
+import { SyncHandler } from './handlers/sync_handler.js';
+import { MessageHandler } from './handlers/message_handler.js';
 import { Logger } from './utils/logger.js';
 import { CONFIG } from './config.js';
 
@@ -10,6 +13,9 @@ class ServiceWorkerApp {
         this.cache = new CacheManager(CONFIG.caches, this.logger);
         this.requestHandler = new RequestHandler(this.cache, CONFIG, this.logger);
         this.formHandler = new FormHandler(this.logger);
+        this.pushHandler = new PushHandler(this.logger);
+        this.syncHandler = new SyncHandler(this.formHandler, this.logger);
+        this.messageHandler = new MessageHandler(this.cache, CONFIG, this.logger);
         this.version = CONFIG.version;
         
         this.init();
@@ -20,7 +26,7 @@ class ServiceWorkerApp {
         self.addEventListener('install', e => this.handleInstall(e));
         self.addEventListener('activate', e => this.handleActivate(e));
         self.addEventListener('fetch', e => this.handleFetch(e));
-        self.addEventListener('message', e => this.handleMessage(e));
+        self.addEventListener('message', e => this.messageHandler.handle(e));
         self.addEventListener('push', e => this.handlePush(e));
         self.addEventListener('sync', e => this.handleSync(e));
 
@@ -41,11 +47,49 @@ class ServiceWorkerApp {
         this.logger.log('Activating Service Worker...');
         event.waitUntil(
             Promise.all([
+                this.checkVersionChanges(),
                 this.cache.cleanup(),
                 self.clients.claim(),
                 this.enableNavigationPreload()
             ])
         );
+    }
+
+    async checkVersionChanges() {
+        const lastVersion = await this.getLastVersion();
+        const currentVersion = CONFIG.version;
+
+        if (lastVersion !== currentVersion) {
+            this.logger.log(`Service Worker version changed: ${lastVersion} -> ${currentVersion}`);
+            await this.handleVersionChange(lastVersion, currentVersion);
+        }
+    }
+
+    async getLastVersion() {
+        try {
+            return await localStorage.getItem('sw-version') || '0.0.0';
+        } catch {
+            return '0.0.0';
+        }
+    }
+
+    async handleVersionChange(oldVersion, newVersion) {
+        try {
+            // Store new version
+            await localStorage.setItem('sw-version', newVersion);
+            
+            // Notify clients about version change
+            const clients = await self.clients.matchAll();
+            clients.forEach(client => {
+                client.postMessage({
+                    type: 'VERSION_CHANGE',
+                    oldVersion,
+                    newVersion
+                });
+            });
+        } catch (error) {
+            this.logger.error('Version change handling failed:', error);
+        }
     }
 
     async handleFetch(event) {
@@ -65,44 +109,12 @@ class ServiceWorkerApp {
         return this.requestHandler.handleAsset(event);
     }
 
-    async handleMessage(event) {
-        const { type, payload } = event.data;
-        
-        switch (type) {
-            case 'CACHE_CLEANUP':
-                await this.cache.cleanup();
-                break;
-            case 'CACHE_UPDATE':
-                await this.cache.update(payload);
-                break;
-            case 'CONFIG_UPDATE':
-                this.updateConfig(payload);
-                break;
-            default:
-                this.logger.warn(`Unknown message type: ${type}`);
-        }
-    }
-
     handlePush(event) {
-        if (!event.data) return;
-
-        const data = event.data.json();
-        this.logger.log('Push notification received:', data);
-        
-        event.waitUntil(
-            self.registration.showNotification(data.title, {
-                body: data.body,
-                icon: data.icon,
-                badge: data.badge,
-                data: data
-            })
-        );
+        event.waitUntil(this.pushHandler.handle(event));
     }
 
     handleSync(event) {
-        if (event.tag === 'form-sync') {
-            event.waitUntil(this.formHandler.syncPendingForms());
-        }
+        event.waitUntil(this.syncHandler.handle(event));
     }
 
     isApiRequest(request) {
@@ -119,7 +131,7 @@ class ServiceWorkerApp {
     setupBroadcastChannel() {
         const channel = new BroadcastChannel('sw-messages');
         channel.onmessage = event => {
-            this.handleMessage(event);
+            this.messageHandler.handle(event);
         };
     }
 

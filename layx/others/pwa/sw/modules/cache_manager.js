@@ -83,7 +83,9 @@ export class CacheManager {
                 version,
                 timestamp: Date.now()
             }));
+
             await this.versionDB.putBulk('versions', versionEntries);
+           
         } catch (error) {
             this.logger.error('Failed to store cache versions:', error);
         }

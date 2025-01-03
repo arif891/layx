@@ -74,6 +74,17 @@ export class IndexedDBUtil {
         });
     }
 
+    async putBulk(storeName, items) {
+        const store = await this.transaction(storeName, 'readwrite');
+        return Promise.all(items.map(item => {
+            return new Promise((resolve, reject) => {
+                const request = store.put(item);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }));
+    }
+
     async get(storeName, key) {
         const store = await this.transaction(storeName);
         return new Promise((resolve, reject) => {

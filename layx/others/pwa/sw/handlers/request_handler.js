@@ -12,75 +12,89 @@ export class RequestHandler {
 
     async handleAsset(event) {
         const request = event.request;
-        event.respondWith((async () => {
-            try {
-                if (this.isStaticAsset(request)) {
-                    return await this.cacheFirst(event);
-                }
-                if (this.isExcluded(request, this.config.caches.runtime)) {
-                    return await this.fetch(event);
-                }
-                return await this.networkFirst(event);
-            } catch (error) {
-                this.logger.error('Asset handling failed:', error);
-                return await this.getFallback(request);
+
+        try {
+            if (this.isStaticAsset(request)) {
+                return this.cacheFirst(event);
             }
-        })());
+            if (this.isExcluded(request, this.config.caches.runtime)) {
+                return this.fetch(event);
+            }
+
+            return this.networkFirst(event);
+
+        } catch (error) {
+            try {
+                return this.getFallback(request);
+            } catch (error) {
+                throw error;
+            }
+        }
     }
 
     async networkFirst(event) {
+        let headers = new Headers(event.request.headers);
+        const cached = await this.cache.get(event.request);
+
+        if (cached) {
+            const metadata = this.cache.getResponseMetadata(cached);
+            if (metadata?.timestamp) {
+                headers.set('If-Modified-Since', new Date(metadata.timestamp).toUTCString());
+            }
+        }
+
         try {
-            const response = await this.fetch(event);
-            if (response && response.ok) {
+            const response = await fetch(new Request(event.request.url, {
+                method: event.request.method,
+                headers: headers,
+                mode: event.request.mode,
+                credentials: event.request.credentials,
+                redirect: event.request.redirect
+            }));
+
+            if (response.status === 304 && cached) {
+                this.logger.debug('Resource not modified, using cached version');
+                return cached;
+            }
+
+            if (response.ok) {
                 await this.cache.put(event.request, response.clone(), 'runtime');
             }
             return response;
         } catch (error) {
-            this.logger.warn('Network request failed, falling back to cache');
-            const cached = await this.cache.get(event.request, 'runtime');
+            this.logger.error('Network request failed:', error);
             if (cached) return cached;
             throw error;
         }
     }
 
-    async cacheFirst(event) {
-        try {
-            const cached = await this.cache.get(event.request, 'static');
-            if (cached) {
-                this.logger.debug('Serving from cache:', event.request.url);
-                // Start revalidation in background
+    async cacheFirst(event, revalidate = false) {
+        const cached = await this.cache.get(event.request);
+        if (cached) {
+            if (revalidate) {
                 this.revalidate(event.request, cached.clone());
-                return cached;
             }
+            return cached;
+        }
 
+        try {
             const response = await this.fetch(event);
-            if (response && response.ok) {
-                this.logger.debug('Caching new response:', event.request.url);
+            if (response.ok) {
                 await this.cache.put(event.request, response.clone(), 'static');
             }
             return response;
         } catch (error) {
-            this.logger.error('Cache-first strategy failed:', error);
+            this.logger.error('Cache-first fetch failed:', error);
             throw error;
         }
     }
 
     async fetch(event) {
         try {
-            let response;
-            if (event.preloadResponse) {
-                response = await event.preloadResponse;
-                if (response) {
-                    this.logger.debug('Using preloaded response');
-                    return response;
-                }
-            }
-            
-            response = await fetch(event.request);
-            if (!response) {
-                throw new Error('Fetch returned empty response');
-            }
-            return response;
+            return await Promise.race([
+                event.preloadResponse,
+                fetch(event.request)
+            ]);
         } catch (error) {
             this.logger.error('Fetch failed:', error);
             throw error;
@@ -144,23 +158,18 @@ export class RequestHandler {
     }
 
     isExcluded(request, config) {
-        if (!config?.exclude) return false;
-        const { urls = [], types = [], patterns = [] } = config.exclude;
+        if (!config.exclude) return false;
 
-        // Check excluded URLs
-        if (urls.some(url => request.url.includes(url))) {
-            return true;
-        }
+        // Check if URL matches static patterns
+        const urlMatches = config.urls.some(pattern => {
+            const regex = new RegExp(pattern.replace('*', '.*'));
+            return regex.test(request.url);
+        });
 
-        // Check excluded types
-        if (types.includes(request.destination)) {
-            return true;
-        }
+        // Check if resource type is included
+        const typeMatches = config.types.includes(request.destination);
 
-        // Check excluded patterns
-        if (patterns.some(pattern => pattern.test(request.url))) {
-            return true;
-        }
+        if (urlMatches || typeMatches) return true;
 
         return false;
     }

@@ -55,26 +55,20 @@ class ServiceWorkerApp {
 
 
     async handleFetch(event) {
-        try {
-            const request = event.request;
+        const request = event.request;
 
-            // Handle API requests
-            if (this.isApiRequest(request)) {
-                event.respondWith(this.requestHandler.handleApi(event));
-                return;
-            }
-
-            // Handle form submissions
-            if (request.method === 'POST' && request.headers.get('X-Requested-With') === 'FormSubmission') {
-                event.respondWith(this.formHandler.handle(event));
-                return;
-            }
-
-            // Handle asset requests
-            this.requestHandler.handleAsset(event);
-        } catch (error) {
-            this.logger.error('Fetch handling failed:', error);
+        // Handle API requests
+        if (this.isApiRequest(request)) {
+            return this.requestHandler.handleApi(event);
         }
+
+        // Handle form submissions
+        if (request.method === 'POST' && request.headers.get('X-Requested-With') === 'FormSubmission') {
+            return this.formHandler.handle(event);
+        }
+
+        // Handle asset requests
+        return this.requestHandler.handleAsset(event);
     }
 
     handlePush(event) {

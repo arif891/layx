@@ -12,80 +12,75 @@ export class RequestHandler {
 
     async handleAsset(event) {
         const request = event.request;
-
-        try {
-            if (this.isStaticAsset(request)) {
-                return this.cacheFirst(event);
-            }
-            if (this.isExcluded(request, this.config.caches.runtime)) {
-                return this.fetch(event);
-            }
-
-            return this.networkFirst(event);
-
-        } catch (error) {
+        event.respondWith((async () => {
             try {
-                return this.getFallback(request);
+                if (this.isStaticAsset(request)) {
+                    return await this.cacheFirst(event);
+                }
+                if (this.isExcluded(request, this.config.caches.runtime)) {
+                    return await this.fetch(event);
+                }
+                return await this.networkFirst(event);
             } catch (error) {
-                throw error;
+                this.logger.error('Asset handling failed:', error);
+                return await this.getFallback(request);
             }
-        }
+        })());
     }
 
     async networkFirst(event) {
         try {
             const response = await this.fetch(event);
-            await this.cache.put(event.request, response.clone(), 'runtime');
+            if (response && response.ok) {
+                await this.cache.put(event.request, response.clone(), 'runtime');
+            }
             return response;
         } catch (error) {
-            this.logger.error('Network request failed:', error);
-            const cached = await this.cache.get(event.request);
-            if (cached) { return cached };
+            this.logger.warn('Network request failed, falling back to cache');
+            const cached = await this.cache.get(event.request, 'runtime');
+            if (cached) return cached;
             throw error;
         }
     }
 
     async cacheFirst(event) {
-        const cached = await this.cache.get(event.request);
-        if (cached) return cached;
-
         try {
-            const response = await this.fetch(event);
-            await this.cache.put(event.request, response.clone(), 'static');
-            return response;
-        } catch (error) {
-            this.logger.error('Cache-first fetch failed:', error);
-            throw error;
-        }
-    }
-
-    async cacheFirst(event, revalidate = false) {
-        const cached = await this.cache.get(event.request);
-        if (cached) {
-            if (revalidate) {
+            const cached = await this.cache.get(event.request, 'static');
+            if (cached) {
+                this.logger.debug('Serving from cache:', event.request.url);
+                // Start revalidation in background
                 this.revalidate(event.request, cached.clone());
+                return cached;
             }
-            return cached;
-        }
 
-        try {
             const response = await this.fetch(event);
-            if (response.ok) {
+            if (response && response.ok) {
+                this.logger.debug('Caching new response:', event.request.url);
                 await this.cache.put(event.request, response.clone(), 'static');
             }
             return response;
         } catch (error) {
-            this.logger.error('Cache-first fetch failed:', error);
+            this.logger.error('Cache-first strategy failed:', error);
             throw error;
         }
     }
 
     async fetch(event) {
         try {
-            return await Promise.race([
-                event.preloadResponse,
-                fetch(event.request)
-            ]);
+            let response;
+            if (event.preloadResponse) {
+                response = await event.preloadResponse;
+                if (response) {
+                    this.logger.debug('Using preloaded response');
+                    return response;
+                }
+            }
+            
+            response = await fetch(event.request);
+            if (!response) {
+                throw new Error('Fetch returned empty response');
+            }
+            return response;
         } catch (error) {
             this.logger.error('Fetch failed:', error);
             throw error;

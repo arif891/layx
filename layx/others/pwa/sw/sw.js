@@ -16,7 +16,6 @@ class ServiceWorkerApp {
         this.pushHandler = new PushHandler(this.logger);
         this.syncHandler = new SyncHandler(this.formHandler, this.logger);
         this.messageHandler = new MessageHandler(this.cache, CONFIG, this.logger);
-        this.version = CONFIG.version;
         
         this.init();
     }
@@ -26,7 +25,7 @@ class ServiceWorkerApp {
         self.addEventListener('install', e => this.handleInstall(e));
         self.addEventListener('activate', e => this.handleActivate(e));
         self.addEventListener('fetch', e => this.handleFetch(e));
-        self.addEventListener('message', e => this.messageHandler.handle(e));
+        self.addEventListener('message', e => this.handleMassage(e));
         self.addEventListener('push', e => this.handlePush(e));
         self.addEventListener('sync', e => this.handleSync(e));
 
@@ -78,6 +77,10 @@ class ServiceWorkerApp {
 
     handleSync(event) {
         event.waitUntil(this.syncHandler.handle(event));
+    }
+
+    handleMassage(event) {
+        this.messageHandler.handle(event);
     }
 
     isApiRequest(request) {

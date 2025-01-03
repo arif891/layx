@@ -85,18 +85,7 @@ export const CONFIG = {
     },
 
     performance: {
-        requestTimeout: 10000,
-        maxConcurrentRequests: 6,
-        preload: {
-            enabled: true,
-            routes: ['/'],
-            resources: ['style', 'script', 'font']
-        },
-        optimization: {
-            compression: true,
-            minification: true,
-            imageOptimization: true
-        }
+       
     },
 
     notifications: {
@@ -116,16 +105,3 @@ export const CONFIG = {
         }
     },
 };
-
-// Optional: Add configuration validation
-if (process.env.NODE_ENV === 'development') {
-    validateConfig(CONFIG);
-}
-
-function validateConfig(config) {
-    // Add your validation logic here
-    const required = ['version', 'caches', 'api'];
-    required.forEach(key => {
-        if (!config[key]) throw new Error(`Missing required config key: ${key}`);
-    });
-}

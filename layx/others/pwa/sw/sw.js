@@ -47,7 +47,6 @@ class ServiceWorkerApp {
         this.logger.log('Activating Service Worker...');
         event.waitUntil(
             Promise.all([
-                this.checkVersionChanges(),
                 this.cache.cleanup(),
                 self.clients.claim(),
                 this.enableNavigationPreload()
@@ -55,42 +54,6 @@ class ServiceWorkerApp {
         );
     }
 
-    async checkVersionChanges() {
-        const lastVersion = await this.getLastVersion();
-        const currentVersion = CONFIG.version;
-
-        if (lastVersion !== currentVersion) {
-            this.logger.log(`Service Worker version changed: ${lastVersion} -> ${currentVersion}`);
-            await this.handleVersionChange(lastVersion, currentVersion);
-        }
-    }
-
-    async getLastVersion() {
-        try {
-            return await localStorage.getItem('sw-version') || '0.0.0';
-        } catch {
-            return '0.0.0';
-        }
-    }
-
-    async handleVersionChange(oldVersion, newVersion) {
-        try {
-            // Store new version
-            await localStorage.setItem('sw-version', newVersion);
-            
-            // Notify clients about version change
-            const clients = await self.clients.matchAll();
-            clients.forEach(client => {
-                client.postMessage({
-                    type: 'VERSION_CHANGE',
-                    oldVersion,
-                    newVersion
-                });
-            });
-        } catch (error) {
-            this.logger.error('Version change handling failed:', error);
-        }
-    }
 
     async handleFetch(event) {
         const request = event.request;
@@ -135,10 +98,6 @@ class ServiceWorkerApp {
         };
     }
 
-    updateConfig(newConfig) {
-        Object.assign(CONFIG, newConfig);
-        this.logger.debug('Config updated:', CONFIG);
-    }
 }
 
 // Initialize Service Worker with error handling

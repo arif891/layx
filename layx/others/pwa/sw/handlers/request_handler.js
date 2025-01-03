@@ -32,7 +32,6 @@ export class RequestHandler {
         }
     }
 
-
     async networkFirst(event) {
         try {
             const response = await this.fetch(event);
@@ -60,16 +59,62 @@ export class RequestHandler {
         }
     }
 
+    async cacheFirst(event, revalidate = false) {
+        const cached = await this.cache.get(event.request);
+        if (cached) {
+            if (revalidate) {
+                this.revalidate(event.request, cached.clone());
+            }
+            return cached;
+        }
+
+        try {
+            const response = await this.fetch(event);
+            if (response.ok) {
+                await this.cache.put(event.request, response.clone(), 'static');
+            }
+            return response;
+        } catch (error) {
+            this.logger.error('Cache-first fetch failed:', error);
+            throw error;
+        }
+    }
+
     async fetch(event) {
         try {
-            const response = await Promise.race([
+            return await Promise.race([
                 event.preloadResponse,
-                fetch(event.request, { signal: controller.signal })
+                fetch(event.request)
             ]);
-            return response;
         } catch (error) {
             this.logger.error('Fetch failed:', error);
             throw error;
+        }
+    }
+
+    async revalidate(request, cachedResponse) {
+        const headers = new Headers(request.headers);
+        const metadata = this.cache.getResponseMetadata(cachedResponse);
+        
+        if (metadata?.timestamp) {
+            headers.set('If-Modified-Since', new Date(metadata.timestamp).toUTCString());
+        }
+
+        try {
+            const response = await fetch(new Request(request.url, {
+                method: request.method,
+                headers: headers,
+                mode: request.mode,
+                credentials: request.credentials,
+                redirect: request.redirect
+            }));
+
+            if (response.ok && response.status !== 304) {
+                await this.cache.put(request, response, 'static');
+                this.logger.debug('Background revalidation updated cache');
+            }
+        } catch (error) {
+            this.logger.error('Background revalidation failed:', error);
         }
     }
 

@@ -1,8 +1,23 @@
+import { IndexedDBUtil } from '../utils/indexedDB.js';
+
 export class CacheManager {
     constructor(config, logger) {
         this.config = config;
         this.logger = logger;
-        this.versionKey = 'sw-cache-versions';
+        this.versionDB = new IndexedDBUtil('sw-cache-store', 1)
+            .addStore('versions', { 
+                keyPath: 'name',
+                indexes: [{ name: 'timestamp', keyPath: 'timestamp' }]
+            });
+        this.init();
+    }
+
+    async init() {
+        try {
+            await this.versionDB.connect();
+        } catch (error) {
+            this.logger.error('Failed to initialize version store:', error);
+        }
     }
 
     async precache() {
@@ -44,8 +59,11 @@ export class CacheManager {
 
     async getStoredVersions() {
         try {
-            const data = await localStorage.getItem(this.versionKey);
-            return data ? JSON.parse(data) : {};
+            const data = await this.versionDB.getAll('versions');
+            return data.reduce((acc, { name, version }) => {
+                acc[name] = version;
+                return acc;
+            }, {});
         } catch {
             return {};
         }
@@ -60,7 +78,12 @@ export class CacheManager {
 
     async storeVersions(versions) {
         try {
-            await localStorage.setItem(this.versionKey, JSON.stringify(versions));
+            const versionEntries = Object.entries(versions).map(([name, version]) => ({
+                name,
+                version,
+                timestamp: Date.now()
+            }));
+            await this.versionDB.putBulk('versions', versionEntries);
         } catch (error) {
             this.logger.error('Failed to store cache versions:', error);
         }

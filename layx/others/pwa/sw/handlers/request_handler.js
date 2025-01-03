@@ -1,3 +1,5 @@
+import { urlMatchesPattern, testPattern, createHeadersWithTimestamp, createRequest } from '../utils/functions.js';
+
 export class RequestHandler {
     constructor(cacheManager, config, logger) {
         this.cache = cacheManager;
@@ -15,72 +17,49 @@ export class RequestHandler {
 
         try {
             if (this.isStaticAsset(request)) {
-                return this.cacheFirst(event);
+                return await this.cacheFirst(event);
             }
             if (this.isExcluded(request, this.config.caches.runtime)) {
-                return this.fetch(event);
+                return await this.fetch(event);
             }
-
-            return this.networkFirst(event);
-
+            return await this.networkFirst(event);
         } catch (error) {
-            try {
-                return this.getFallback(request);
-            } catch (error) {
-                throw error;
-            }
+            this.logger.error('Asset handling failed:', error);
+            return await this.getFallback(request);
         }
     }
 
     async networkFirst(event) {
-        let headers = new Headers(event.request.headers);
-        const cached = await this.cache.get(event.request);
-
-        if (cached) {
-            const metadata = this.cache.getResponseMetadata(cached);
-            if (metadata?.timestamp) {
-                headers.set('If-Modified-Since', new Date(metadata.timestamp).toUTCString());
-            }
-        }
-
         try {
-            const response = await fetch(new Request(event.request.url, {
-                method: event.request.method,
-                headers: headers,
-                mode: event.request.mode,
-                credentials: event.request.credentials,
-                redirect: event.request.redirect
-            }));
-
-            if (response.status === 304 && cached) {
-                this.logger.debug('Resource not modified, using cached version');
-                return cached;
-            }
-
+            const response = await this.fetch(event);
             if (response.ok) {
-                await this.cache.put(event.request, response.clone(), 'runtime');
+                event.waitUntil(
+                    this.cache.put(event.request, response.clone(), 'runtime')
+                );
             }
             return response;
         } catch (error) {
-            this.logger.error('Network request failed:', error);
+            this.logger.warn('Network request failed, falling back to cache');
+            const cached = await this.cache.get(event.request, 'runtime');
             if (cached) return cached;
             throw error;
         }
     }
 
-    async cacheFirst(event, revalidate = false) {
-        const cached = await this.cache.get(event.request);
+    async cacheFirst(event) {
+        const cached = await this.cache.get(event.request, 'static');
         if (cached) {
-            if (revalidate) {
-                this.revalidate(event.request, cached.clone());
-            }
+            // Start revalidation in background
+            event.waitUntil(this.revalidate(event.request, cached.clone()));
             return cached;
         }
 
         try {
-            const response = await fetch(event);
+            const response = await this.fetch(event);
             if (response.ok) {
-                await this.cache.put(event.request, response.clone(), 'static');
+                event.waitUntil(
+                    this.cache.put(event.request, response.clone(), 'static')
+                );
             }
             return response;
         } catch (error) {
@@ -91,10 +70,19 @@ export class RequestHandler {
 
     async fetch(event) {
         try {
-            return await Promise.race([
-                event.preloadResponse,
-                fetch(event.request)
-            ]);
+            // Handle preload response
+            const preloadResponse = await event.preloadResponse;
+            if (preloadResponse) {
+                this.logger.debug('Using preloaded response');
+                return preloadResponse;
+            }
+
+            // Fall back to normal fetch
+            const response = await fetch(event.request);
+            if (!response) {
+                throw new Error('Fetch returned empty response');
+            }
+            return response;
         } catch (error) {
             this.logger.error('Fetch failed:', error);
             throw error;
@@ -102,22 +90,12 @@ export class RequestHandler {
     }
 
     async revalidate(request, cachedResponse) {
-        const headers = new Headers(request.headers);
-        const metadata = this.cache.getResponseMetadata(cachedResponse);
-        
-        if (metadata?.timestamp) {
-            headers.set('If-Modified-Since', new Date(metadata.timestamp).toUTCString());
-        }
-
         try {
-            const response = await fetch(new Request(request.url, {
-                method: request.method,
-                headers: headers,
-                mode: request.mode,
-                credentials: request.credentials,
-                redirect: request.redirect
-            }));
-
+            const metadata = this.cache.getResponseMetadata(cachedResponse);
+            const headers = createHeadersWithTimestamp(request.headers, metadata?.timestamp);
+            const newRequest = createRequest(request, headers);
+            
+            const response = await fetch(newRequest);
             if (response.ok && response.status !== 304) {
                 await this.cache.put(request, response, 'static');
                 this.logger.debug('Background revalidation updated cache');
@@ -143,34 +121,25 @@ export class RequestHandler {
     }
 
     isStaticAsset(request) {
-        const urls = [...this.config.caches.static.urls, ...this.config.caches.offline.urls];
+        const staticUrls = this.config.caches.static?.urls || [];
+        const offlineUrls = this.config.caches.offline?.urls || [];
+        const urls = [...staticUrls, ...offlineUrls];
+        const types = this.config.caches.static?.types || [];
 
-        // Check if URL matches static patterns
-        const urlMatches = urls.some(pattern => {
-            const regex = new RegExp(pattern.replace('*', '.*'));
-            return regex.test(request.url);
-        });
-
-        // Check if resource type is included
-        const typeMatches = this.config.caches.static.types.includes(request.destination);
+        const urlMatches = urls.some(pattern => urlMatchesPattern(request.url, pattern));
+        const typeMatches = types.includes(request.destination);
 
         return urlMatches || typeMatches;
     }
 
     isExcluded(request, config) {
-        if (!config.exclude) return false;
+        if (!config?.exclude) return false;
+        const { urls = [], types = [], patterns = [] } = config.exclude;
 
-        // Check if URL matches static patterns
-        const urlMatches = config.urls.some(pattern => {
-            const regex = new RegExp(pattern.replace('*', '.*'));
-            return regex.test(request.url);
-        });
-
-        // Check if resource type is included
-        const typeMatches = config.types.includes(request.destination);
-
-        if (urlMatches || typeMatches) return true;
-
-        return false;
+        return (
+            urls.some(pattern => urlMatchesPattern(request.url, pattern)) ||
+            types.includes(request.destination) ||
+            patterns.some(pattern => testPattern(pattern, request.url))
+        );
     }
 }

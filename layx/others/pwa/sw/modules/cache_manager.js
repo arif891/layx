@@ -1,13 +1,22 @@
 import { IndexedDBUtil } from '../utils/indexedDB.js';
+import { 
+    getMetadataFromResponse, 
+    getResponseSize, 
+    enhanceResponseWithMetadata 
+} from '../utils/functions.js';
 
 export class CacheManager {
     constructor(config, logger) {
         this.config = config;
         this.logger = logger;
+        this.caches = new Map();
         this.versionDB = new IndexedDBUtil('sw-cache-store', 1)
             .addStore('versions', { 
                 keyPath: 'name',
-                indexes: [{ name: 'timestamp', keyPath: 'timestamp' }]
+                indexes: [
+                    { name: 'timestamp', keyPath: 'timestamp' },
+                    { name: 'version', keyPath: 'version' }
+                ]
             });
         this.init();
     }
@@ -15,46 +24,97 @@ export class CacheManager {
     async init() {
         try {
             await this.versionDB.connect();
+            await this.initializeCaches();
         } catch (error) {
-            this.logger.error('Failed to initialize version store:', error);
+            this.logger.error('Failed to initialize CacheManager:', error);
+        }
+    }
+
+    async initializeCaches() {
+        for (const [name, config] of Object.entries(this.config)) {
+            if (!config.name || !config.version) continue;
+            
+            const cacheName = this.getVersionedCacheName(name);
+            this.caches.set(name, await caches.open(cacheName));
+            
+            this.logger.debug(`Initialized cache: ${cacheName}`);
         }
     }
 
     async precache() {
-        const { offline: offlineCache } = this.config;
-        const cache = await caches.open(offlineCache.name);
-        cache.addAll(offlineCache.urls);
+        const { offline } = this.config;
+        if (!offline?.urls?.length) return;
+
+        try {
+            const cache = await caches.open('offline');
+            if (!cache) return;
+
+            const results = await Promise.allSettled(
+                offline.urls.map(async url => {
+                    try {
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        await cache.put(url, response);
+                        this.logger.debug(`Precached: ${url}`);
+                    } catch (error) {
+                        this.logger.error(`Failed to precache ${url}:`, error);
+                    }
+                })
+            );
+
+            const failed = results.filter(r => r.status === 'rejected').length;
+            if (failed > 0) {
+                this.logger.warn(`Failed to precache ${failed} resources`);
+            }
+        } catch (error) {
+            this.logger.error('Precache failed:', error);
+        }
     }
 
+
     async cleanup() {
-        const keys = await caches.keys();
-        const storedVersions = await this.getStoredVersions();
-        const currentVersions = this.getCurrentVersions();
-        
-        for (const [cacheName, version] of Object.entries(currentVersions)) {
-            if (storedVersions[cacheName] !== version) {
-                // Version changed, delete old cache
-                const oldCacheName = `${cacheName}-v${storedVersions[cacheName]}`;
-                if (keys.includes(oldCacheName)) {
-                    await caches.delete(oldCacheName);
-                    this.logger.debug(`Deleted outdated cache: ${oldCacheName}`);
+        try {
+            const keys = await caches.keys();
+            const storedVersions = await this.getStoredVersions();
+            const currentVersions = this.getCurrentVersions();
+            const deletions = [];
+
+            // Delete outdated version caches
+            for (const [name, version] of Object.entries(currentVersions)) {
+                const oldVersion = storedVersions[name];
+                if (oldVersion && oldVersion !== version) {
+                    const oldCacheName = `${name}-v${oldVersion}`;
+                    if (keys.includes(oldCacheName)) {
+                        deletions.push(
+                            caches.delete(oldCacheName)
+                                .then(() => this.logger.debug(`Deleted outdated cache: ${oldCacheName}`))
+                        );
+                    }
                 }
             }
+
+            // Delete unrecognized caches
+            const validNames = new Set(
+                Object.entries(this.config)
+                    .map(([name, cfg]) => `${cfg.name}-v${cfg.version}`)
+            );
+
+            keys.forEach(key => {
+                if (!validNames.has(key)) {
+                    deletions.push(
+                        caches.delete(key)
+                            .then(() => this.logger.debug(`Deleted unrecognized cache: ${key}`))
+                    );
+                }
+            });
+
+            await Promise.all(deletions);
+            await this.storeVersions(currentVersions);
+            await this.initializeCaches(); // Reinitialize caches after cleanup
+
+        } catch (error) {
+            this.logger.error('Cache cleanup failed:', error);
         }
-
-        // Delete any unrecognized caches
-        const validCacheNames = Object.keys(this.config).map(key => 
-            this.getVersionedCacheName(key)
-        );
-
-        await Promise.all(
-            keys
-                .filter(key => !validCacheNames.includes(key))
-                .map(key => caches.delete(key))
-        );
-
-        // Store new versions
-        await this.storeVersions(currentVersions);
     }
 
     async getStoredVersions() {
@@ -78,14 +138,21 @@ export class CacheManager {
 
     async storeVersions(versions) {
         try {
-            const versionEntries = Object.entries(versions).map(([name, version]) => ({
+            const timestamp = Date.now();
+            const entries = Object.entries(versions).map(([name, version]) => ({
                 name,
                 version,
-                timestamp: Date.now()
+                timestamp
             }));
 
-            await this.versionDB.putBulk('versions', versionEntries);
-           
+            // Store one by one if bulk operation fails
+            try {
+                await this.versionDB.putBulk('versions', entries);
+            } catch {
+                await Promise.all(
+                    entries.map(entry => this.versionDB.put('versions', entry))
+                );
+            }
         } catch (error) {
             this.logger.error('Failed to store cache versions:', error);
         }
@@ -115,19 +182,12 @@ export class CacheManager {
         
         const metadata = {
             timestamp: Date.now(),
-            size: this.getResponseSize(response),
+            size: getResponseSize(response),
             url: request.url,
             type: request.destination
         };
 
-        const enhancedResponse = new Response(response.body, {
-            ...response,
-            headers: new Headers({
-                ...Object.fromEntries(response.headers),
-                'sw-cache-metadata': JSON.stringify(metadata)
-            })
-        });
-
+        const enhancedResponse = enhanceResponseWithMetadata(response, metadata);
         await cache.put(request, enhancedResponse);
         this.logger.debug(`Cached ${request.url} in ${cacheName}`);
     }
@@ -196,12 +256,7 @@ export class CacheManager {
     }
 
     getResponseMetadata(response) {
-        try {
-            const metadata = response.headers.get('sw-cache-metadata');
-            return metadata ? JSON.parse(metadata) : null;
-        } catch {
-            return null;
-        }
+        return getMetadataFromResponse(response);
     }
 
     getResponseSize(response) {

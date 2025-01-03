@@ -6,6 +6,8 @@
     "productivity",
     "utilities"
   ],
+  "start_url": "/",
+  "scope": "/",
   "id": "com.example.pwa",
   "version": "1.0.0",
   "theme_color": "#fff",

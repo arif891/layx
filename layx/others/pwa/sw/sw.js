@@ -58,14 +58,14 @@ class ServiceWorkerApp {
     async handleFetch(event) {
         const request = event.request;
 
-        // Handle form submissions
-        if (request.method === 'POST' && request.headers.get('X-Requested-With') === 'FormSubmission') {
-            return this.formHandler.handle(event);
-        }
-
         // Handle API requests
         if (this.isApiRequest(request)) {
             return this.requestHandler.handleApi(event);
+        }
+
+        // Handle form submissions
+        if (request.method === 'POST' && request.headers.get('X-Requested-With') === 'FormSubmission') {
+            return this.formHandler.handle(event);
         }
 
         // Handle asset requests

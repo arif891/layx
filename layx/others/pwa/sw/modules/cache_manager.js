@@ -6,22 +6,9 @@ export class CacheManager {
     }
 
     async precache() {
-        // Only precache offline files
         const { offline: offlineCache } = this.config;
-        await this.precacheUrls(offlineCache.name, offlineCache.urls);
-    }
-
-    async precacheUrls(cacheName, urls) {
-        const cache = await caches.open(cacheName);
-        await Promise.all(
-            urls.map(async url => {
-                try {
-                    await cache.add(url);
-                } catch (error) {
-                    this.logger.error(`Failed to cache ${url}:`, error);
-                }
-            })
-        );
+        const cache = await caches.open(offlineCache.name);
+        cache.addAll(offlineCache.urls);
     }
 
     async cleanup() {
@@ -97,11 +84,6 @@ export class CacheManager {
     async put(request, response, cacheName) {
         const cache = await caches.open(this.getVersionedCacheName(cacheName));
         const cacheConfig = this.getCacheConfig(cacheName);
-
-        // Don't cache excluded resources for static cache
-        if (cacheName === 'static' && this.isExcluded(request, cacheConfig)) {
-            return;
-        }
 
         // Check cache limits before storing
         await this.enforceLimit(cache, cacheConfig);

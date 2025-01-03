@@ -24,8 +24,8 @@ export const CONFIG = {
             name: 'static-cache',
             version: 1,
             urls: ['/pages/static/*', '/assets/static/*'],
-            types: ['image', 'font', 'style', 'script'],
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            types: ['image', 'font'],
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             maxItems: 100,
             priority: 'speed',
             preload: true,
@@ -41,13 +41,12 @@ export const CONFIG = {
             name: 'runtime-cache',
             version: 1,
             exclude: {
-                urls: ['/form/*', '/api/analytics'],
-                types: ['video', 'audio'],
-                patterns: [/\/private\/.*/]
+                urls: ['/form/*'],
+                types: ['video', 'audio']
             },
             maxItems: 200,
             maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-            maxSize: 50 * 1024 * 1024, // 50MB
+            maxSize: 500 * 1024 * 1024, // 500MB
             priority: 'balance',
             cleanupStrategy: 'lru' // 'lru' | 'fifo' | 'size'
         }

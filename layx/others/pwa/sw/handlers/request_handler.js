@@ -78,7 +78,7 @@ export class RequestHandler {
         }
 
         try {
-            const response = await this.fetch(event);
+            const response = await fetch(event);
             if (response.ok) {
                 await this.cache.put(event.request, response.clone(), 'static');
             }

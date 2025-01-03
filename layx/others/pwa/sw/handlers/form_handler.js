@@ -1,35 +1,23 @@
+import { IndexedDBUtil } from '../utils/indexedDB.js';
+
 export class FormHandler {
     constructor(logger) {
         this.logger = logger;
-        this.dbName = 'form-store';
-        this.storeName = 'pending-forms';
-        this.dbVersion = 1;
-        this.db = null;
-        this.initDb();
+        this.db = new IndexedDBUtil('form-store', 1)
+            .addStore('pending-forms', { 
+                keyPath: 'id',
+                indexes: [
+                    { name: 'timestamp', keyPath: 'timestamp' }
+                ]
+            });
+        this.init();
     }
 
-    async initDb() {
+    async init() {
         try {
-            const request = indexedDB.open(this.dbName, this.dbVersion);
-
-            request.onerror = () => {
-                this.logger.error('Failed to open IndexedDB:', request.error);
-            };
-
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                if (!db.objectStoreNames.contains(this.storeName)) {
-                    db.createObjectStore(this.storeName, { keyPath: 'id' });
-                }
-            };
-
-            this.db = await new Promise((resolve, reject) => {
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-
+            await this.db.connect();
         } catch (error) {
-            this.logger.error('IndexedDB initialization failed:', error);
+            this.logger.error('Failed to initialize form store:', error);
         }
     }
 
@@ -53,8 +41,6 @@ export class FormHandler {
     }
 
     async queueForm(request) {
-        if (!this.db) await this.initDb();
-
         const formData = await request.formData();
         const data = {};
         for (const [key, value] of formData.entries()) {
@@ -73,7 +59,7 @@ export class FormHandler {
             retryCount: 0
         };
 
-        await this.addToStore(form);
+        await this.db.add('pending-forms', form);
 
         if ('sync' in self.registration) {
             await self.registration.sync.register('form-sync');
@@ -81,9 +67,7 @@ export class FormHandler {
     }
 
     async syncPendingForms() {
-        if (!this.db) await this.initDb();
-
-        const forms = await this.getAllFromStore();
+        const forms = await this.db.getAll('pending-forms');
         
         for (const form of forms) {
             try {
@@ -94,14 +78,14 @@ export class FormHandler {
                 });
 
                 if (response.ok) {
-                    await this.deleteFromStore(form.id);
+                    await this.db.delete('pending-forms', form.id);
                     this.logger.log('Synced form:', form.id);
                 } else {
                     form.retryCount++;
                     if (form.retryCount < 3) {
-                        await this.addToStore(form);
+                        await this.db.add('pending-forms', form);
                     } else {
-                        await this.deleteFromStore(form.id);
+                        await this.db.delete('pending-forms', form.id);
                         this.logger.error('Max retries reached for form:', form.id);
                     }
                 }
@@ -109,38 +93,5 @@ export class FormHandler {
                 this.logger.error('Failed to sync form:', error);
             }
         }
-    }
-
-    async addToStore(form) {
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readwrite');
-            const store = transaction.objectStore(this.storeName);
-            const request = store.put(form);
-
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    }
-
-    async getAllFromStore() {
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readonly');
-            const store = transaction.objectStore(this.storeName);
-            const request = store.getAll();
-
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    }
-
-    async deleteFromStore(id) {
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readwrite');
-            const store = transaction.objectStore(this.storeName);
-            const request = store.delete(id);
-
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
-        });
     }
 }

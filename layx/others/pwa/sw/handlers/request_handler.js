@@ -144,18 +144,23 @@ export class RequestHandler {
     }
 
     isExcluded(request, config) {
-        if (!config.exclude) return false;
+        if (!config?.exclude) return false;
+        const { urls = [], types = [], patterns = [] } = config.exclude;
 
-        // Check if URL matches static patterns
-        const urlMatches = config.urls.some(pattern => {
-            const regex = new RegExp(pattern.replace('*', '.*'));
-            return regex.test(request.url);
-        });
+        // Check excluded URLs
+        if (urls.some(url => request.url.includes(url))) {
+            return true;
+        }
 
-        // Check if resource type is included
-        const typeMatches = config.types.includes(request.destination);
+        // Check excluded types
+        if (types.includes(request.destination)) {
+            return true;
+        }
 
-        if (urlMatches || typeMatches) return true;
+        // Check excluded patterns
+        if (patterns.some(pattern => pattern.test(request.url))) {
+            return true;
+        }
 
         return false;
     }

@@ -163,27 +163,3 @@ export class IndexedDBUtil {
         });
     }
 }
-
-// Example usage:
-/*
-const db = new IndexedDBUtil('myDB', 1)
-    .addStore('forms', { keyPath: 'id', autoIncrement: true })
-    .addStore('cache', { keyPath: 'url' });
-
-// Usage in async function:
-async function example() {
-    await db.connect();
-    
-    // Add data
-    await db.add('forms', { 
-        id: Date.now(),
-        data: formData 
-    });
-    
-    // Get all forms
-    const forms = await db.getAll('forms');
-    
-    // Delete form
-    await db.delete('forms', formId);
-}
-*/

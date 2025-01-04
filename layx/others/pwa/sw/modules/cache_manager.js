@@ -10,6 +10,9 @@ export class CacheManager {
         this.config = config;
         this.logger = logger;
         this.caches = new Map();
+        this.lastCleanup = new Map();
+        this.cleanupInterval = 5 * 60 * 1000; // 5 minutes
+        this.batchSize = 50; // Process in batches of 50
         this.versionDB = new IndexedDBUtil('sw-cache-store', 1)
             .addStore('versions', { 
                 keyPath: 'name',
@@ -183,17 +186,12 @@ export class CacheManager {
     async put(request, response, cacheName) {
         try {
             const cache = await caches.open(this.getVersionedCacheName(cacheName));
-            const cacheConfig = this.getCacheConfig(cacheName);
             
             if (!response.ok) {
                 this.logger.warn(`Skipping cache for non-ok response: ${request.url}`);
                 return;
             }
 
-            if (cacheConfig) {
-                await this.enforceLimit(cache, cacheConfig);
-            }
-            
             const metadata = {
                 timestamp: Date.now(),
                 size: getResponseSize(response),
@@ -203,9 +201,120 @@ export class CacheManager {
 
             const enhancedResponse = enhanceResponseWithMetadata(response, metadata);
             await cache.put(request, enhancedResponse);
+            
+            // Check if cleanup is needed
+            await this.checkCleanupNeeded(cacheName);
+            
             this.logger.debug(`Cached ${request.url} in ${cacheName}`);
         } catch (error) {
             this.logger.error(`Failed to cache ${request.url}:`, error);
+        }
+    }
+
+    async checkCleanupNeeded(cacheName) {
+        const lastCleanup = this.lastCleanup.get(cacheName) || 0;
+        const now = Date.now();
+
+        if (now - lastCleanup >= this.cleanupInterval) {
+            // Schedule cleanup in the background
+            this.scheduleCacheCleanup(cacheName);
+            this.lastCleanup.set(cacheName, now);
+        }
+    }
+
+    scheduleCacheCleanup(cacheName) {
+        setTimeout(async () => {
+            try {
+                await this.cleanupCache(cacheName);
+            } catch (error) {
+                this.logger.error(`Scheduled cleanup failed for ${cacheName}:`, error);
+            }
+        }, 0);
+    }
+
+    async cleanupCache(cacheName) {
+        const cache = await caches.open(this.getVersionedCacheName(cacheName));
+        const config = this.getCacheConfig(cacheName);
+        if (!config) return;
+
+        try {
+            const entries = await cache.keys();
+            const totalEntries = entries.length;
+            
+            if (this.needsSizeCleanup(config, totalEntries)) {
+                await this.batchCleanup(cache, entries, config);
+            }
+        } catch (error) {
+            this.logger.error(`Cache cleanup failed for ${cacheName}:`, error);
+        }
+    }
+
+    needsSizeCleanup(config, totalEntries) {
+        return (config.maxItems && totalEntries > config.maxItems * 1.2) || // 20% over limit
+               (config.maxSize && totalEntries > this.batchSize); // Only check size in batches
+    }
+
+    async batchCleanup(cache, entries, config) {
+        let totalSize = 0;
+        let processedEntries = [];
+
+        // Process entries in batches
+        for (let i = 0; i < entries.length; i += this.batchSize) {
+            const batch = entries.slice(i, i + this.batchSize);
+            const batchStats = await this.processBatch(cache, batch, config);
+            
+            totalSize += batchStats.size;
+            processedEntries = processedEntries.concat(batchStats.entries);
+
+            // Sort and remove oldest entries if needed
+            if (this.shouldRemoveEntries(config, processedEntries.length, totalSize)) {
+                await this.removeOldestEntries(cache, processedEntries, config);
+                break; // Exit after cleanup
+            }
+        }
+    }
+
+    async processBatch(cache, batch, config) {
+        let batchSize = 0;
+        let batchEntries = [];
+
+        for (const request of batch) {
+            const response = await cache.match(request);
+            if (!response) continue;
+
+            const metadata = getMetadataFromResponse(response);
+            if (metadata) {
+                batchEntries.push({
+                    request,
+                    timestamp: metadata.timestamp,
+                    size: metadata.size || 0
+                });
+                batchSize += metadata.size || 0;
+            }
+        }
+
+        return { size: batchSize, entries: batchEntries };
+    }
+
+    shouldRemoveEntries(config, entryCount, totalSize) {
+        return (config.maxItems && entryCount > config.maxItems) ||
+               (config.maxSize && totalSize > config.maxSize);
+    }
+
+    async removeOldestEntries(cache, entries, config) {
+        // Sort by timestamp
+        entries.sort((a, b) => a.timestamp - b.timestamp);
+
+        let removed = 0;
+        let removedSize = 0;
+
+        while (entries.length > 0 && 
+               this.shouldRemoveEntries(config, entries.length - removed, entries.reduce((sum, e) => sum + e.size, 0) - removedSize)) {
+            const entry = entries.shift();
+            await cache.delete(entry.request);
+            removed++;
+            removedSize += entry.size;
+            this.logger.debug(`Removed old cache entry: ${entry.request.url}`);
         }
     }
 

@@ -1,11 +1,11 @@
-import { CacheManager } from './layx/others/pwa/sw/modules/cache_manager.js';
-import { RequestHandler } from './layx/others/pwa/sw/handlers/request_handler.js';
-import { FormHandler } from './layx/others/pwa/sw/handlers/form_handler.js';
-import { PushHandler } from './layx/others/pwa/sw/handlers/push_handler.js';
-import { SyncHandler } from './layx/others/pwa/sw/handlers/sync_handler.js';
-import { MessageHandler } from './layx/others/pwa/sw/handlers/message_handler.js';
-import { Logger } from './layx/others/pwa/sw/utils/logger.js';
-import { CONFIG } from './layx/others/pwa/sw/config.js';
+import { CacheManager } from './modules/cache_manager.js';
+import { RequestHandler } from './handlers/request_handler.js';
+import { FormHandler } from './handlers/form_handler.js';
+import { PushHandler } from './handlers/push_handler.js';
+import { SyncHandler } from './handlers/sync_handler.js';
+import { MessageHandler } from './handlers/message_handler.js';
+import { Logger } from './utils/logger.js';
+import { CONFIG } from './config.js';
 
 class ServiceWorkerApp {
     constructor() {

@@ -128,11 +128,11 @@ const layout = {
     },
     helper: {
         templates: {
-            numx: '.num-x-${num}{--num-x: ${num}}',
-            numy: '.num-y-${num}{--num-y: ${num}}',
+            num_x: '.num-x-${num}{--num-x: ${num}}',
+            num_y: '.num-y-${num}{--num-y: ${num}}',
             media: {
-                numx: '.num-x-${media}-${num}{--num-x: ${num}}',
-                numy: '.num-y-${media}-${num}{--num-y: ${num}}'
+                num_x: '.num-x-${media}-${num}{--num-x: ${num}}',
+                num_y: '.num-y-${media}-${num}{--num-y: ${num}}'
             }
         }
     }

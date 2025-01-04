@@ -136,7 +136,7 @@ async function processOptimizableFile(url, importedFilePath) {
     if (info.class?.length) {
         info.class.forEach(selector => {
             const classNums = extractClasses(htmlContent, selector, 'number');
-            const template = info.templates[selector.replace('-','')];
+            const template = info.templates[selector.replace('-','_')];
 
             if (template && classNums.length) {
                 const styles = classNums.map(num => 
@@ -157,7 +157,7 @@ async function processOptimizableFile(url, importedFilePath) {
                 if (!mediaQuery) return;
 
                 const classNums = extractClasses(htmlContent, `${selector}-${mediaKey}`, 'number');
-                const template = info.templates.media?.[selector.replace('-','')];
+                const template = info.templates.media?.[selector.replace('-','_')];
 
                 if (template && classNums.length) {
                     const styles = classNums.map(num => 

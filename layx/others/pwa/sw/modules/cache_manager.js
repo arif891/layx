@@ -159,37 +159,54 @@ export class CacheManager {
     }
 
     async get(request, cacheName) {
-        const response = await caches.match(request);
+        try {
+            const cache = await caches.open(this.getVersionedCacheName(cacheName));
+            const response = await cache.match(request);
 
-        if (response) {
+            if (!response) return null;
+
             // Check if cached response is still valid
             const cacheConfig = this.getCacheConfig(cacheName);
-            if (this.isResponseValid(response, cacheConfig)) {
+            if (!cacheConfig || this.isResponseValid(response, cacheConfig)) {
                 return response;
             }
-            await caches.delete(request);
-        }
 
-        return null;
+            // If response is invalid, delete it
+            await cache.delete(request);
+            return null;
+        } catch (error) {
+            this.logger.error(`Failed to get cached response for ${request.url}:`, error);
+            return null;
+        }
     }
 
     async put(request, response, cacheName) {
-        const cache = await caches.open(this.getVersionedCacheName(cacheName));
-        const cacheConfig = this.getCacheConfig(cacheName);
+        try {
+            const cache = await caches.open(this.getVersionedCacheName(cacheName));
+            const cacheConfig = this.getCacheConfig(cacheName);
+            
+            if (!response.ok) {
+                this.logger.warn(`Skipping cache for non-ok response: ${request.url}`);
+                return;
+            }
 
-        // Check cache limits before storing
-        await this.enforceLimit(cache, cacheConfig);
-        
-        const metadata = {
-            timestamp: Date.now(),
-            size: getResponseSize(response),
-            url: request.url,
-            type: request.destination
-        };
+            if (cacheConfig) {
+                await this.enforceLimit(cache, cacheConfig);
+            }
+            
+            const metadata = {
+                timestamp: Date.now(),
+                size: getResponseSize(response),
+                url: request.url,
+                type: request.destination
+            };
 
-        const enhancedResponse = enhanceResponseWithMetadata(response, metadata);
-        await cache.put(request, enhancedResponse);
-        this.logger.debug(`Cached ${request.url} in ${cacheName}`);
+            const enhancedResponse = enhanceResponseWithMetadata(response, metadata);
+            await cache.put(request, enhancedResponse);
+            this.logger.debug(`Cached ${request.url} in ${cacheName}`);
+        } catch (error) {
+            this.logger.error(`Failed to cache ${request.url}:`, error);
+        }
     }
 
     getVersionedCacheName(baseName) {
@@ -219,39 +236,66 @@ export class CacheManager {
     }
 
     getCacheConfig(cacheName) {
-        return Object.values(this.config)
-            .find(cache => cache.name === cacheName);
+        // Find the cache config in this.config that matches the cache name
+        const cacheEntry = Object.entries(this.config).find(([_, config]) => 
+            config.name === cacheName
+        );
+        return cacheEntry ? cacheEntry[1] : null;
     }
 
     isResponseValid(response, config) {
-        if (!config.maxAge) return true;
+        // If no config or no maxAge, consider response valid
+        if (!config?.maxAge) return true;
 
-        const metadata = this.getResponseMetadata(response);
-        if (!metadata) return true;
+        const metadata = getMetadataFromResponse(response);
+        if (!metadata?.timestamp) return true;
 
-        return Date.now() - metadata.timestamp < config.maxAge;
+        const age = Date.now() - metadata.timestamp;
+        const isValid = age < config.maxAge;
+
+        if (!isValid) {
+            this.logger.debug(`Cache entry expired: ${response.url}, age: ${age}ms`);
+        }
+
+        return isValid;
     }
 
     async enforceLimit(cache, config) {
-        if (!config.maxItems && !config.maxSize) return;
+        if (!config) return;
 
-        const entries = await cache.keys();
-        if (config.maxItems && entries.length >= config.maxItems) {
-            await cache.delete(entries[0]);
-        }
-
-        if (config.maxSize) {
-            let totalSize = 0;
-            for (const request of entries) {
-                const response = await cache.match(request);
-                const metadata = this.getResponseMetadata(response);
-                if (metadata) {
-                    totalSize += metadata.size;
-                    if (totalSize > config.maxSize) {
-                        await cache.delete(request);
+        try {
+            const entries = await cache.keys();
+            
+            // Handle item count limit
+            if (config.maxItems && typeof config.maxItems === 'number') {
+                while (entries.length >= config.maxItems) {
+                    const oldestEntry = entries.shift();
+                    if (oldestEntry) {
+                        await cache.delete(oldestEntry);
+                        this.logger.debug(`Removed old cache entry: ${oldestEntry.url}`);
                     }
                 }
             }
+
+            // Handle size limit
+            if (config.maxSize && typeof config.maxSize === 'number') {
+                let totalSize = 0;
+                for (const request of entries) {
+                    const response = await cache.match(request);
+                    if (!response) continue;
+
+                    const metadata = getMetadataFromResponse(response);
+                    if (metadata?.size) {
+                        totalSize += metadata.size;
+                        if (totalSize > config.maxSize) {
+                            await cache.delete(request);
+                            this.logger.debug(`Removed cache entry due to size limit: ${request.url}`);
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            this.logger.error('Error enforcing cache limits:', error);
         }
     }
 

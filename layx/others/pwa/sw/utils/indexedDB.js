@@ -103,7 +103,7 @@ export class IndexedDBUtil {
         });
     }
 
-    async delete(storeName, key) {
+    async deleteRecord(storeName, key) {
         const store = await this.transaction(storeName, 'readwrite');
         return new Promise((resolve, reject) => {
             const request = store.delete(key);
@@ -154,7 +154,7 @@ export class IndexedDBUtil {
         }
     }
 
-    async delete() {
+    async deleteDatabase() {
         await this.close();
         return new Promise((resolve, reject) => {
             const request = indexedDB.deleteDatabase(this.dbName);

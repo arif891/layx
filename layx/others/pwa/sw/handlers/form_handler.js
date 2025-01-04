@@ -78,14 +78,14 @@ export class FormHandler {
                 });
 
                 if (response.ok) {
-                    await this.db.delete('pending-forms', form.id);
+                    await this.db.deleteRecord('pending-forms', form.id);
                     this.logger.log('Synced form:', form.id);
                 } else {
                     form.retryCount++;
                     if (form.retryCount < 3) {
                         await this.db.add('pending-forms', form);
                     } else {
-                        await this.db.delete('pending-forms', form.id);
+                        await this.db.deleteRecord('pending-forms', form.id);
                         this.logger.error('Max retries reached for form:', form.id);
                     }
                 }

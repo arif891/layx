@@ -203,7 +203,7 @@ export class CacheManager {
             await cache.put(request, enhancedResponse);
             
             // Check if cleanup is needed
-            await this.checkCleanupNeeded(cacheName);
+            this.checkCleanupNeeded(cacheName);
             
             this.logger.debug(`Cached ${request.url} in ${cacheName}`);
         } catch (error) {

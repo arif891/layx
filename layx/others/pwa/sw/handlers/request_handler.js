@@ -19,7 +19,7 @@ export class RequestHandler {
             if (this.isStaticAsset(request)) {
                 return await this.cacheFirst(event);
             }
-            if (this.isExcluded(request, this.config.caches.runtime)) {
+            if (this.isExcluded(request, this.config.caches.runtime) || this.config.caches.runtime?.enabled === false) {
                 return await this.fetch(event);
             }
             return await this.networkFirst(event);
@@ -46,11 +46,13 @@ export class RequestHandler {
         }
     }
 
-    async cacheFirst(event) {
+    async cacheFirst(event , revalidate = false) {
         const cached = await this.cache.get(event.request, 'static');
         if (cached) {
+            if (revalidate) {
             // Start revalidation in background
             event.waitUntil(this.revalidate(event.request, cached.clone()));
+            }
             return cached;
         }
 

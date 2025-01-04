@@ -56,3 +56,20 @@ export function createRequest(originalRequest, headers) {
         redirect: originalRequest.redirect
     });
 }
+
+
+// Function to get the size of any cache
+export async function getCacheNumber(cacheName) {
+    const cache = await caches.open(cacheName);
+    const keys = await cache.keys();
+    return  keys.length;
+}
+
+// Function to estimate and present the percentage of storage capacity
+export async function storageCapacityDetail() {
+    const { usage, quota } = await navigator.storage.estimate();
+    const storageUsedPercent = Math.round((usage / quota) * 100);
+    const storageUsed = Math.round(usage / (1024 * 1024));
+    const storageAvailable = Math.round(quota / (1024 * 1024));
+    return { storageUsedPercent, storageUsed, storageAvailable };
+}

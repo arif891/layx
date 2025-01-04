@@ -1,5 +1,6 @@
 export const CONFIG = {
     version: '1.0.0',
+    navigationPreload: true,
     debug: {
         enabled: true,
         level: 'debug', // 'error' | 'warn' | 'info' | 'debug'
@@ -27,10 +28,8 @@ export const CONFIG = {
             types: ['image', 'font'],
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             maxItems: 100,
-            maxSize: 50 * 1024 * 1024, // 50MB
+            maxSize: 100 * 1024 * 1024, // 100MB
             priority: 'speed',
-            preload: true,
-            compression: true,
             exclude: {
                 urls: ['/api/*', '/dynamic/*'],
                 types: ['video', 'audio'],

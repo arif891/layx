@@ -2,7 +2,7 @@ export const CONFIG = {
     version: '1.0.0',
     debug: {
         enabled: true,
-        level: 'info', // 'error' | 'warn' | 'info' | 'debug'
+        level: 'debug', // 'error' | 'warn' | 'info' | 'debug'
         logToServer: false,
         serverEndpoint: '/api/logs'
     },
@@ -27,6 +27,7 @@ export const CONFIG = {
             types: ['image', 'font'],
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             maxItems: 100,
+            maxSize: 50 * 1024 * 1024, // 50MB
             priority: 'speed',
             preload: true,
             compression: true,
@@ -97,7 +98,7 @@ export const CONFIG = {
 
     offline: {
         autoSync: true,
-        syncPriority: ['forms', 'notifications'],
+        syncPriority: ['notifications', 'forms'],
         connectionChecks: {
             interval: 30000,
             timeout: 5000

@@ -31,7 +31,6 @@ echo "LayX version 0.1.0 alpha"
 
 # Check for Node.js
 if [ ! -f "${NODE_EXE}" ]; then
-    
     if [ -f "${PROGRAM_DIR}${CONFIG_DIR}node" ]; then
         NODE_EXE="${PROGRAM_DIR}${CONFIG_DIR}node"
         WEBP_EXE="${PROGRAM_DIR}${CONFIG_DIR}webp"

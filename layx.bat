@@ -32,7 +32,6 @@ ECHO LayX version 0.1.0 alpha
 
 REM Check for Node.js installation and set appropriate path
 IF NOT EXIST "%NODE_EXE%" (
-
     REM Check if Node.js exists in program directory
     IF EXIST "%PROGRAM_DIR%%CONFIG_DIR%node.exe" (
         SET "NODE_EXE=%PROGRAM_DIR%%CONFIG_DIR%node.exe"
@@ -52,31 +51,31 @@ IF NOT EXIST "%NODE_EXE%" (
 
 REM Process command line arguments if provided
 IF NOT "%~1"=="" (
-        REM Check for valid commands and route to appropriate label
-        IF /I "%~1"=="build" (
-            GOTO build 
-        ) ELSE IF /I "%~1"=="unbuild" (
-            GOTO unbuild 
-        ) ELSE IF /I "%~1"=="create" (
-            GOTO create
-        ) ELSE IF /I "%~1"=="optimage" (
-            GOTO optimizeImages
-        ) ELSE IF /I "%~1"=="install" (
-            GOTO install
-        ) ELSE IF /I "%~1"=="uninstall" (
-            GOTO uninstall
-        ) ELSE IF /I "%~1"=="add" (
+    REM Check for valid commands and route to appropriate label
+    IF /I "%~1"=="build" (
+        GOTO build 
+    ) ELSE IF /I "%~1"=="unbuild" (
+        GOTO unbuild 
+    ) ELSE IF /I "%~1"=="create" (
+        GOTO create
+    ) ELSE IF /I "%~1"=="optimage" (
+        GOTO optimizeImages
+    ) ELSE IF /I "%~1"=="install" (
+        GOTO install
+    ) ELSE IF /I "%~1"=="uninstall" (
+        GOTO uninstall
+    ) ELSE IF /I "%~1"=="add" (
+        "%NODE_EXE%" "%USE_DIR%%CONFIG_DIR%config.mjs"  %*
+    ) ELSE (
+        REM Display available options if invalid command
+        ECHO Available options are %COLOR_yellow%"build"%COLOR_RESET%, %COLOR_yellow%"unbuild"%COLOR_RESET%, %COLOR_yellow%"create"%COLOR_RESET%, %COLOR_yellow%"add"%COLOR_RESET%, %COLOR_yellow%"optimage"%COLOR_RESET%, %COLOR_yellow%"install"%COLOR_RESET% and %COLOR_yellow%"uninstall"%COLOR_RESET%.
+        IF NOT "%CURRENT_DIR%"=="%PROGRAM_DIR%" (
+            ECHO Forwading cmd to "config.mjs"
             "%NODE_EXE%" "%USE_DIR%%CONFIG_DIR%config.mjs"  %*
         ) ELSE (
-            REM Display available options if invalid command
-            ECHO Available options are %COLOR_yellow%"build"%COLOR_RESET%, %COLOR_yellow%"unbuild"%COLOR_RESET%, %COLOR_yellow%"create"%COLOR_RESET%, %COLOR_yellow%"add"%COLOR_RESET%, %COLOR_yellow%"optimage"%COLOR_RESET%, %COLOR_yellow%"install"%COLOR_RESET% and %COLOR_yellow%"uninstall"%COLOR_RESET%.
-            IF NOT "%CURRENT_DIR%"=="%PROGRAM_DIR%" (
-               ECHO Forwading cmd to "config.mjs"
-               "%NODE_EXE%" "%USE_DIR%%CONFIG_DIR%config.mjs"  %*
-            ) ELSE (
-              ECHO %STRING_dir_error%
-            )
+            ECHO %STRING_dir_error%
         )
+    )
     GOTO end
 ) ELSE (
     GOTO option
@@ -95,7 +94,7 @@ IF ERRORLEVEL 1 (
 )
 
 IF NOT "%CURRENT_DIR%"=="%PROGRAM_DIR%" (
-  "%NODE_EXE%" "%USE_DIR%%CONFIG_DIR%config.mjs" "build"
+    "%NODE_EXE%" "%USE_DIR%%CONFIG_DIR%config.mjs" "build"
 ) ELSE (
     ECHO %STRING_dir_error%
 )
@@ -113,7 +112,7 @@ IF ERRORLEVEL 1 (
 )
 
 IF NOT "%CURRENT_DIR%"=="%PROGRAM_DIR%" (
-  "%NODE_EXE%" "%USE_DIR%%CONFIG_DIR%config.mjs" "unbuild"
+    "%NODE_EXE%" "%USE_DIR%%CONFIG_DIR%config.mjs" "unbuild"
 ) ELSE (
     ECHO %STRING_dir_error%
 )
@@ -128,14 +127,14 @@ IF EXIST "%PROGRAM_DIR%" (
         IF EXIST "%CURRENT_DIR%\layx" (
             SET /P choice="There may be an existing LayX project. Do you want to replace it? (Y/N): "
 
-             IF /I "%choice%"=="y" (
-             ECHO %COLOR_cyan%Continuing...%COLOR_RESET%
-             ) ELSE IF /I "%choice%"=="n" (
-             GOTO end
-        ) ELSE (
-        ECHO %COLOR_yellow%Please choose a valid option.%COLOR_RESET%
-        GOTO create
-        )
+            IF /I "%choice%"=="y" (
+                ECHO %COLOR_cyan%Continuing...%COLOR_RESET%
+            ) ELSE IF /I "%choice%"=="n" (
+                GOTO end
+            ) ELSE (
+                ECHO %COLOR_yellow%Please choose a valid option.%COLOR_RESET%
+                GOTO create
+            )
         )
         
         REM Copy LayX files to current directory
@@ -191,13 +190,14 @@ for /r "%CURRENT_DIR%%IMAGES_DIR%" %%d in (*.png *.jpg) do (
 
 GOTO end
 
+REM Install label - Installs LayX
 :install
 REM Check for admin privileges
 net session >nul 2>&1
 IF ERRORLEVEL 1 (
     IF NOT EXIST "%CURRENT_DIR%layx.bat" (
-     ECHO %COLOR_red%layx.bat not found in the current directory.%COLOR_RESET%
-     GOTO end
+        ECHO %COLOR_red%layx.bat not found in the current directory.%COLOR_RESET%
+        GOTO end
     )
 
     ECHO %COLOR_yellow%Requesting Administrator privileges...%COLOR_RESET%
@@ -236,6 +236,7 @@ ECHO %COLOR_green%Installation completed.%COLOR_RESET%
 
 GOTO pause
 
+REM Uninstall label - Uninstalls LayX
 :uninstall
 IF NOT EXIST "%PROGRAM_DIR%" (
     ECHO %COLOR_yellow%LayX is not installed on your system.%COLOR_RESET%

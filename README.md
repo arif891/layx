@@ -52,6 +52,7 @@ Layx takes inspiration from Bootstrap but adopts a more modern and modular appro
 Layx introduces intuitive syntax for common layout elements:
 
 ### Container
+
 ```html
 <container>
    <div class='content'></div>
@@ -59,6 +60,7 @@ Layx introduces intuitive syntax for common layout elements:
 ```
 
 ### Main Layout System
+
 ```html
 <layout>
   <div class='x-6'></div>
@@ -67,6 +69,7 @@ Layx introduces intuitive syntax for common layout elements:
 ```
 
 ### Components (e.g., Navbar)
+
 ```html
 <navbar>
   <nav class='link-wrapper'>
@@ -131,13 +134,15 @@ root
     │
     └───pages
 ```
+
 </details>
 
 Key directories:
+
 - `layx/`: The core of the framework, including components, main styles, and utilities.
 - `config/`: Holds configuration files, tools and preferences.
 - `assets/`: Here you can put your all assets like CSS, JS, images, and media files.
-- `assets/[css|js]/base.[css|js]`: Here you can write your base CSS and JS which are common, it will be added after `layx` 
+- `assets/[css|js]/base.[css|js]`: Here you can write your base CSS and JS which are common, it will be added after `layx`
    CSS or JS in build time. This original CSS or JS file will be moved inside `layx/assets/[css|js]/user_base.[css|js]`.
 - `assets/[css|js]/pages/`: For page-specific content. Inside this dir all CSS and JS file will be minified and original one
   moved to `layx/assets/[css|js]/pages/`.
@@ -150,9 +155,11 @@ To install Layx on your Windows system:
 2. Extract the contents of the ZIP file.
 3. Open a terminal or command prompt and navigate to the extracted directory.
 4. Run the following command or click `layx.bat`:
+
     ```bash
     layx install
-    ``` 
+    ```
+
     <strong>Note:</strong> On Linux and macOS, before installation, you need to run <code>chmod +x ./layx.sh</code> to
             make it executable. Once installed, all commands remain the same.
 
@@ -160,6 +167,7 @@ To install Layx on your Windows system:
 
 1. **Create a New Project:**
    Open your terminal, navigate to your desired folder, and run:
+
    ```bash
    layx create
    ```
@@ -169,12 +177,14 @@ To install Layx on your Windows system:
 
 3. **Build Your Project:**
    When you're ready to deploy, run:
+
    ```bash
    layx build
    ```
 
 4. **Modify Your Project After Build:**
    Need to make changes? Use the `unbuild` command:
+
    ```bash
    layx unbuild
    ```

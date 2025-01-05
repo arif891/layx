@@ -266,7 +266,7 @@ navbar, .navbar {
     &.fixed {
         position: fixed;
         inset: 0 0 auto;
-        z-index: 5;
+        z-index: 10;
 
         @media (width < 992px) {
             &[open]:not(.left, .right, .top, .bottom, .full) {

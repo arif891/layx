@@ -29,7 +29,7 @@ const optimizableFiles = [
         url: 'main/layout/layout.css',
         optimize: {
             include: ['base', 'gap'],
-            class: ['x','xs','y','ys'],
+            class: ['x', 'xs', 'y', 'ys'],
             media: true,
             templates: layout.templates,
         }
@@ -67,7 +67,7 @@ async function processFiles(optimize) {
             ]);
             console.log(`Processed LayX base ${type}`);
 
-            await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir);
+            await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir, optimize);
 
         } catch (error) {
             console.error(`Error processing ${type} files:`, error);
@@ -77,7 +77,7 @@ async function processFiles(optimize) {
 
 }
 
-async function processPageFiles(type, pageFilesDir, pageFilesOutDir) {
+async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize) {
     const pageFiles = await getFilesWithExtension(pageFilesDir, type);
 
     for (const file of pageFiles) {
@@ -85,8 +85,12 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir) {
         const outPath = path.join(pageFilesOutDir, file);
         const content = await readFile(filePath);
 
-        await writeFile(outPath, content);
-        await writeFile(filePath, minify(content, type));
+        const processed = await processImports(content, filePath, type, optimize);
+        const filtered = removeImportStatements(processed);
+        const final = type === 'js' ? removeExportAndDefault(filtered) : filtered;
+
+        await writeFile(outPath, final);
+        await writeFile(filePath, minify(final, type));
         console.log(`Processed ${file}`);
     }
 }
@@ -136,10 +140,10 @@ async function processOptimizableFile(url, importedFilePath) {
     if (info.class?.length) {
         info.class.forEach(selector => {
             const classNums = extractClasses(htmlContent, selector, 'number');
-            const template = info.templates[selector.replace('-','_')];
+            const template = info.templates[selector.replace('-', '_')];
 
             if (template && classNums.length) {
-                const styles = classNums.map(num => 
+                const styles = classNums.map(num =>
                     genStyle(template, num)
                 ).join('\n');
                 finalContent.push(styles);
@@ -151,25 +155,25 @@ async function processOptimizableFile(url, importedFilePath) {
     if (info.media && info.class?.length) {
         info.class.forEach(selector => {
             const classMedias = extractClasses(htmlContent, selector, 'media');
-            
+
             classMedias.forEach(mediaKey => {
                 const mediaQuery = breakPoints[mediaKey]?.media;
                 if (!mediaQuery) return;
 
                 const classNums = extractClasses(htmlContent, `${selector}-${mediaKey}`, 'number');
-                const template = info.templates.media?.[selector.replace('-','_')];
+                const template = info.templates.media?.[selector.replace('-', '_')];
 
                 if (template && classNums.length) {
-                    const styles = classNums.map(num => 
+                    const styles = classNums.map(num =>
                         genStyle(template, num, mediaKey)
                     ).join('\n');
-                    
+
                     finalContent.push(wrapMedia(mediaQuery, styles));
                 }
             });
         });
     }
-    
+
     return finalContent.join('\n');
 }
 

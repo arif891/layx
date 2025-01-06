@@ -6,9 +6,9 @@
     --secondary-color: #94A3B8;
 
     /* Surface Colors */
-    --surface-primary: #F8FAFC;
-    --surface-secondary: #F1F5F9;
-    --surface-tertiary: #E2E8F0;
+    --surface-1-color: #F8FAFC;
+    --surface-2-color: #F1F5F9;
+    --surface-3-color: #E2E8F0;
 
     /* States */
     --success-color: #10B981;
@@ -26,9 +26,9 @@
     --secondary-color: #64748B;
 
     /* Surface Colors */
-    --surface-primary: #0F172A;
-    --surface-secondary: #1E293B;
-    --surface-tertiary: #334155;
+    --surface-1-color: #0F172A;
+    --surface-2-color: #1E293B;
+    --surface-3-color: #334155;
 
     /* States */
     --success-color: #34D399;

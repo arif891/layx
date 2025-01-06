@@ -5,12 +5,15 @@ sheet, .sheet {
   --padding-y: 1rem;
   --radius: 0;
   --indicator-offset: .5rem;
+  --bg: var(--bg-color, #fff);
+  --transition: .3s;
 
   visibility: hidden;
+  content-visibility: auto;
   position: fixed;
   z-index: 4;
-  background: var(--bg, #fff);
-  transition: var(--transition, .3s);
+  background: var(--bg);
+  transition: var(--transition);
   overscroll-behavior: none;
 
   &[open] {

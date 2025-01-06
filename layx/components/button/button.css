@@ -2,11 +2,12 @@ button:not(.default), .btn {
     --padding-x: 1rem;
     --padding-y: .6rem;
     --radius: .35rem;
+    --bg: var(--surface-color, rgb(250, 250, 250));
 
     display: inline-block;
     padding: var(--padding-y, var(--padding, .5rem)) var(--padding-x, var(--padding, .5rem));
     color: var(--color, inherit);
-    background: var(--bg, rgb(245, 245, 245));
+    background: var(--bg);
     border: var(--border, unset);
     border-radius: var(--radius, .35rem);
     font-family: inherit;
@@ -34,7 +35,7 @@ button:not(.default), .btn {
         outline-offset: calc(var(--outline-width, 1px) * -1);
 
         &:hover {
-            background-color: var(--bg, rgb(245, 245, 245));
+            background-color: var(--bg);
         }
     }
 

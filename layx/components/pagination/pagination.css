@@ -1,18 +1,29 @@
 pagination, .pagination {
+  --gap: .5rem;
+  --radius: .25rem;
+  --padding: .5rem;
+  --item-padding: .75rem 1rem;
+  --bg: var(--surface-color, rgb(250, 250, 250));
+  --item-bg:  rgba(var(--bg-color-rgb), .6);
+  --item-hover-bg: rgba(var(--bg-color-rgb), .9);
+  --item-active-bg: rgb(var(--bg-color-rgb));
+  --transition: .3s;
+
   display: flex;
   justify-content: center;
-  gap: var(--gap, .5rem);
-  background-color: var(--bg);
+  padding: var(--padding);
+  gap: var(--gap);
+  background: var(--bg);
 
   .item {
-    padding: .75rem 1rem;
-    background: var(--item-bg, rgba(var(--bg-color-rgb), .6));
+    padding: var(--item-padding);
+    background: var(--item-bg);
     line-height: 1;
     font-variant-numeric: tabular-nums;
-    border-radius: var(--radius, .25rem);
+    border-radius: var(--radius);
     cursor: pointer;
     user-select: none;
-    transition: var(--transition, .3s);
+    transition: var(--transition);
 
     a {
       text-decoration: none;
@@ -21,7 +32,7 @@ pagination, .pagination {
 
     &.active {
       pointer-events: none;
-      background: var(--item-active-bg, rgba(var(--bg-color-rgb), 1));
+      background: var(--item-active-bg);
 
       a {
         color: inherit;
@@ -51,7 +62,7 @@ pagination, .pagination {
     }
 
     &:hover {
-      background: var(--item-hover-bg, rgba(var(--bg-color-rgb), .9));
+      background: var(--item-hover-bg);
     }
   }
 }

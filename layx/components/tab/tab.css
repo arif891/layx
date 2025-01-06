@@ -1,7 +1,6 @@
-tab,
-.tab {
-    --bg: rgb(245, 245, 245);
-    --indicator-bg: rgb(245, 245, 245);
+tab, .tab {
+    --bg: var(--surface-color, rgb(250, 250, 250));
+    --indicator-bg: var(--surface-color, rgb(250, 250, 250));
     --indicator-radius: .5rem;
     display: block;
     user-select: none;

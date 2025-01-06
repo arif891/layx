@@ -2,7 +2,7 @@ card, .card {
   --padding: 1rem;
   --gap: .5rem;
   --radius: .5rem;
-  --bg: rgb(245, 245, 245);
+  --bg: var(--surface-color, rgb(250, 250, 250));
   --bg-modern: linear-gradient(145deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
   --blur: 15px;
 

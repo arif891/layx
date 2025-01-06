@@ -116,6 +116,7 @@ navbar, .navbar {
         /* Navigation Area */
         .warp-area {
             display: flex;
+            content-visibility: auto;
             overscroll-behavior: contain;
 
             @media (width < 992px) {
@@ -128,7 +129,7 @@ navbar, .navbar {
                 background: var(--warp-area-bg);
                 border-radius: var(--radius);
                 transition: var(--transition, .3s);
-                z-index: 5;
+                z-index: 10;
                 visibility: hidden;
                 opacity: 0;
                 user-select: none;
@@ -302,7 +303,7 @@ navbar, .navbar {
 
             @media (width >=992px) {
                 &:not(.dock.center) {
-                    background: var(--bg, #fff);
+                    background: var(--bg);
                     backdrop-filter: blur(var(--blur));
                 }
 
@@ -311,7 +312,7 @@ navbar, .navbar {
 
                     .main {
                         flex-grow: 0;
-                        background: var(--bg, #fff);
+                        background: var(--bg);
                         backdrop-filter: blur(var(--blur));
                     }
                 }

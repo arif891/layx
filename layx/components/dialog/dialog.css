@@ -5,6 +5,7 @@ dialog {
   --padding-y: 1.5rem;
   --gap: 1rem;
   --radius: .5rem;
+  --bg: var(--surface-color, rgb(250, 250, 250));
   --animation-duration: .6s;
 
   position: fixed;
@@ -15,7 +16,7 @@ dialog {
   border: var(--border, unset);
   border-radius: var(--radius);
   z-index: 5;
-  background: var(--bg , rgb(245, 245, 245));
+  background: var(--bg);
   backdrop-filter: blur(var(--blur));
   transform-origin: center top;
   animation: dialog-hide var(--animation-duration);

@@ -1,5 +1,6 @@
 section, .section {
     --padding-y: clamp(1rem, 5vh, 3rem);
+    background: var(--section-bg);
 
     &:not(.default) {
         layout {

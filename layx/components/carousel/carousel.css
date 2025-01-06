@@ -1,6 +1,8 @@
 carousel, .carousel {
     --height: 500px;
     --edge-offset: .5rem;
+    --indicator-bg: #fff;
+
     display: block;
     position: relative;
 
@@ -60,7 +62,7 @@ carousel, .carousel {
             border-radius: 2px;
             pointer-events: auto;
             opacity: .5;
-            background: var(--indicator-bg,#fff);
+            background: var(--indicator-bg);
             background-clip: padding-box;
             transition: .3s;
 

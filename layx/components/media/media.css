@@ -1,5 +1,6 @@
 video, audio {
     --radius: .5rem;
+    --bg: var(--surface-color, rgb(250, 250, 250));
     --play-button-color: var(--bg-color);
     --video-bg: rgb(215, 215, 215);
     --video-control-bg: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .5));
@@ -47,7 +48,7 @@ video {
             justify-content: flex-start;
             padding: var(--padding-y, var(--padding)) var(--padding-x, var(--padding));
             margin-top: auto;
-            background: var(--video-control-bg, linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .6)));
+            background: var(--video-control-bg);
         }
 
         &::-webkit-media-controls-timeline {
@@ -63,7 +64,7 @@ video {
     }
 
     &::cue {
-        background-color: var(--caption-bg, rgba(0, 0, 0, .6));
+        background-color: var(--caption-bg);
         font-family: inherit !important;
         font-weight: 500;
         background-clip: content-box;
@@ -79,7 +80,7 @@ video {
     }
 
     &[src$=".mp3"] {
-        background: var(--video-bg, rgb(215, 215, 215));
+        background: var(--video-bg);
 
         &::-webkit-media-text-track-display {
             top: 50% !important;
@@ -122,7 +123,7 @@ audio, video[src$=".mp3"] {
     &::-webkit-media-controls-enclosure {
         border-radius: var(--radius);
         padding: var(--padding-y, var(--padding)) var(--padding-x, var(--padding));
-        background: var(--bg, rgb(245, 245, 245));
+        background: var(--bg);
     }
 
     &::-webkit-media-controls-play-button {

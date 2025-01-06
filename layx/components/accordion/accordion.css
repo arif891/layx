@@ -3,6 +3,7 @@ accordion, .accordion {
     --padding-y: 1rem;
     --radius: .5rem;
     --margin-bottom: 1rem;
+    --bg: var(--surface-color, rgb(250, 250, 250));
     --item-bg: var(--bg-color);
     --transition-duration: .3s;
 

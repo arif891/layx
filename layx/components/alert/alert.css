@@ -3,6 +3,7 @@ alert, .alert {
     --padding-y: 1rem;
     --gap: 1rem;
     --radius: .5rem;
+    --bg: var(--surface-color, rgb(250, 250, 250));
     --bg-modern: linear-gradient(155deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.6));
     --blur: 10px;
     --border: none;
@@ -14,7 +15,7 @@ alert, .alert {
     font-size: min(calc(.9rem + .3vw), 1.2rem);
     padding: var(--padding-y, var(--padding, 1rem)) var(--padding-x, var(--padding, 1rem));
     border-radius: var(--radius);
-    background: var(--bg, rgb(245, 245, 245));
+    background: var(--bg);
     border: var(--border);
     opacity: 0;
     translate: 0 100%;

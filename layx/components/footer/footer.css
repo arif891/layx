@@ -1,6 +1,8 @@
 .footer__section {
     --padding-x: 1rem;
     --padding-y: 1.5rem;
+    --bg: var(--surface-color, rgb(250, 250, 250));
+
     padding: var(--padding-y) var(--padding-x);
     background-color: var(--bg);
 

@@ -168,15 +168,17 @@ REM Optimize Images label - Converts images to WebP format
 ECHO %COLOR_cyan%Optimizing images in "%IMAGES_DIR%"%COLOR_RESET%.
 
 REM Process all PNG and JPG files in the images directory
+shift
 for /r "%CURRENT_DIR%%IMAGES_DIR%" %%d in (*.png *.jpg) do (
     echo %%d | findstr /v /i "orginal_images_dir" > nul && (
         SET "IMAGE_DIR=%%~dpd"
         SET "IMAGE_NAME=%%~nd"
+        SET "IMAGE_EXT=.webp"
         
         ECHO Processing %%~nxd
 
         REM Convert to WebP format
-        "%WEBP_EXE%" "%%d" -o "%%~dpd%%~nd.webp" -q 90 -af  -progress -short
+        "%WEBP_EXE%" %* "%%d" -o "%IMAGE_DIR%%IMAGE_NAME%%IMAGE_EXT%"
 
         REM Create backup directory and move original
         IF NOT EXIST "%%~dpdorginal_images_dir\" (

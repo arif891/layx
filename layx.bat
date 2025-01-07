@@ -18,6 +18,7 @@ SET "CONFIG_DIR=config\"                       REM Configuration directory
 SET "IMAGES_DIR=assets\image\"                 REM Images directory
 SET "NODE_EXE=%CURRENT_DIR%%CONFIG_DIR%node.exe"   REM Path to Node.js executable
 SET "WEBP_EXE=%CURRENT_DIR%%CONFIG_DIR%webp.exe"   REM Path to WebP converter executable
+SET "AVIF_EXE=%CURRENT_DIR%%CONFIG_DIR%avif.exe"   REM Path to Avif converter executable
 SET "PROGRAM_DIR=C:\Program Files\LayX\"           REM Installation directory
 SET "FR_CURRENT_DIR=%CURRENT_DIR:\=/%"             REM Convert backslashes to forward slashes
 
@@ -168,23 +169,27 @@ REM Optimize Images label - Converts images to WebP format
 ECHO %COLOR_cyan%Optimizing images in "%IMAGES_DIR%"%COLOR_RESET%.
 
 REM Process all PNG and JPG files in the images directory
-shift
+SET "ARGS=%*"
+FOR /F "tokens=1*" %%A IN ("%ARGS%") DO (
+    SET "ARGS=%%B"
+)
+
 for /r "%CURRENT_DIR%%IMAGES_DIR%" %%d in (*.png *.jpg) do (
     echo %%d | findstr /v /i "orginal_images_dir" > nul && (
         SET "IMAGE_DIR=%%~dpd"
         SET "IMAGE_NAME=%%~nd"
-        SET "IMAGE_EXT=.webp"
+        SET "IMAGE_EXT=.avif"
         
         ECHO Processing %%~nxd
 
-        REM Convert to WebP format
-        "%WEBP_EXE%" %* "%%d" -o "%IMAGE_DIR%%IMAGE_NAME%%IMAGE_EXT%"
+        REM Convert to Avif format
+        "%AVIF_EXE%" %ARGS% "%%d" -o "%IMAGE_DIR%%IMAGE_NAME%%IMAGE_EXT%"
 
         REM Create backup directory and move original
         IF NOT EXIST "%%~dpdorginal_images_dir\" (
-            mkdir "%%~dpdorginal_images_dir\"
+            mkdir "%%~dpdorginal_images_dir\" 
         )
-        move "%%d" "%%~dpdorginal_images_dir\"
+        move "%%d" "%%~dpdorginal_images_dir\" 
 
         ECHO Processed: %%~nxd at %%~dpd
     )

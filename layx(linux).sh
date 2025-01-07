@@ -1,11 +1,6 @@
 #!/bin/bash
 
-# Color definitions
-COLOR_RED='\033[0;31m'
-COLOR_GREEN='\033[0;32m'
-COLOR_YELLOW='\033[0;33m'
-COLOR_CYAN='\033[0;36m'
-COLOR_RESET='\033[0m'
+VERSION="0.1.0 alpha"
 
 # Error messages
 STRING_NODE_FAIL="${COLOR_RED}Failed to execute Node.js. Please check the path and installation.${COLOR_RESET}"
@@ -18,8 +13,16 @@ CONFIG_DIR="config/"
 IMAGES_DIR="assets/image/"
 NODE_EXE="${CURRENT_DIR}${CONFIG_DIR}node"
 WEBP_EXE="${CURRENT_DIR}${CONFIG_DIR}webp"
+AVIF_EXE="${CURRENT_DIR}${CONFIG_DIR}avif"
 PROGRAM_DIR="/usr/local/LayX/"
 FR_CURRENT_DIR="${CURRENT_DIR}"
+
+# Color definitions
+COLOR_RED='\033[0;31m'
+COLOR_GREEN='\033[0;32m'
+COLOR_YELLOW='\033[0;33m'
+COLOR_CYAN='\033[0;36m'
+COLOR_RESET='\033[0m'
 
 if [ "${SCRIPT_DIR}" == "${PROGRAM_DIR}" ]; then
     USE_DIR="${SCRIPT_DIR}"
@@ -27,7 +30,7 @@ else
     USE_DIR="${CURRENT_DIR}"
 fi
 
-echo "LayX version 0.1.0 alpha"
+echo "LayX version ${VERSION}"
 
 # Check for Node.js
 if [ ! -f "${NODE_EXE}" ]; then
@@ -35,6 +38,7 @@ if [ ! -f "${NODE_EXE}" ]; then
     if [ -f "${PROGRAM_DIR}${CONFIG_DIR}node" ]; then
         NODE_EXE="${PROGRAM_DIR}${CONFIG_DIR}node"
         WEBP_EXE="${PROGRAM_DIR}${CONFIG_DIR}webp"
+        AVIF_EXE="${PROGRAM_DIR}${CONFIG_DIR}avif"
     else
         echo "Program Node.js also not found."
         if ! command -v node &> /dev/null; then
@@ -112,13 +116,15 @@ create() {
 optimize_images() {
     echo -e "${COLOR_CYAN}Optimizing images in ${IMAGES_DIR}${COLOR_RESET}"
     
+    ARGS="${@:2}"
     find "${CURRENT_DIR}${IMAGES_DIR}" -type f \( -name "*.png" -o -name "*.jpg" \) -not -path "*/orginal_images_dir/*" | while read -r image; do
         dir=$(dirname "${image}")
         name=$(basename "${image%.*}")
+        ext=".avif"
         
         echo "Processing $(basename "${image}")"
         
-        "${WEBP_EXE}" "${image}" -o "${dir}/${name}.webp" -q 90 -af -progress -short
+        "${AVIF_EXE}" ${ARGS} "${image}" -o "${dir}/${name}${ext}"
         
         mkdir -p "${dir}/orginal_images_dir"
         mv "${image}" "${dir}/orginal_images_dir/"
@@ -167,6 +173,7 @@ install() {
     chmod +x "${PROGRAM_DIR}layx.sh"
     chmod +x "${PROGRAM_DIR}${CONFIG_DIR}node"
     chmod +x "${PROGRAM_DIR}config/webp"
+    chmod +x "${PROGRAM_DIR}config/avif"
     
     # Create alias
     echo -e "${COLOR_CYAN}Creating alias...${COLOR_RESET}"

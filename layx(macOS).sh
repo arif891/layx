@@ -1,11 +1,6 @@
 #!/bin/bash
 
-# Color definitions
-COLOR_RED='\033[0;31m'
-COLOR_GREEN='\033[0;32m'
-COLOR_YELLOW='\033[0;33m'
-COLOR_CYAN='\033[0;36m'
-COLOR_RESET='\033[0m'
+VERSION="0.1.0 alpha"
 
 # Error messages
 STRING_NODE_FAIL="${COLOR_RED}Failed to execute Node.js. Please check the path and installation.${COLOR_RESET}"
@@ -18,8 +13,16 @@ CONFIG_DIR="config/"
 IMAGES_DIR="assets/image/"
 NODE_EXE="${CURRENT_DIR}${CONFIG_DIR}node"
 WEBP_EXE="${CURRENT_DIR}${CONFIG_DIR}webp"
+AVIF_EXE="${CURRENT_DIR}${CONFIG_DIR}avif"
 PROGRAM_DIR="/Applications/LayX/"
 FR_CURRENT_DIR="${CURRENT_DIR}"
+
+# Color definitions
+COLOR_RED='\033[0;31m'
+COLOR_GREEN='\033[0;32m'
+COLOR_YELLOW='\033[0;33m'
+COLOR_CYAN='\033[0;36m'
+COLOR_RESET='\033[0m'
 
 if [ "${SCRIPT_DIR}" == "${PROGRAM_DIR}" ]; then
     USE_DIR="${SCRIPT_DIR}"
@@ -27,7 +30,7 @@ else
     USE_DIR="${CURRENT_DIR}"
 fi
 
-echo "LayX version 0.1.0 alpha"
+echo "LayX version ${VERSION}"
 
 # Check for Node.js
 if [ ! -f "${NODE_EXE}" ]; then

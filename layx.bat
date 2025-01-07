@@ -1,5 +1,23 @@
 @ECHO OFF
 
+SET "VERSION=0.1.0 alpha"
+
+REM Define error messages with color formatting
+SET "STRING_node_fail=%COLOR_red%Failed to execute Node js. Please check the path and installation.%COLOR_RESET%"
+SET "STRING_dir_error=%COLOR_red%Can not perform this action here "%FR_CURRENT_DIR%"%COLOR_RESET%"
+
+REM Set up directory paths and executable locations
+SET "CURRENT_DIR=%CD%\"                            REM Current working directory
+SET "SCRIPT_DIR=%~dp0"                             REM Directory containing this script
+SET "CONFIG_DIR=config\"                           REM Configuration directory
+SET "IMAGES_DIR=assets\image\"                     REM Images directory
+SET "NODE_EXE=%CURRENT_DIR%%CONFIG_DIR%node.exe"   REM Path to Node.js executable
+SET "WEBP_EXE=%CURRENT_DIR%%CONFIG_DIR%webp.exe"   REM Path to WebP converter executable
+SET "AVIF_EXE=%CURRENT_DIR%%CONFIG_DIR%avif.exe"   REM Path to Avif converter executable
+SET "PROGRAM_DIR=C:\Program Files\LayX\"           REM Installation directory
+SET "FR_CURRENT_DIR=%CURRENT_DIR:\=/%"             REM Convert backslashes to forward slashes
+
+
 REM Define ANSI color codes for formatted console output
 SET COLOR_red=[31m
 SET COLOR_green=[32m
@@ -7,20 +25,6 @@ SET COLOR_yellow=[33m
 SET COLOR_cyan=[36m
 SET COLOR_RESET=[0m
 
-REM Define error messages with color formatting
-SET "STRING_node_fail=%COLOR_red%Failed to execute Node js. Please check the path and installation.%COLOR_RESET%"
-SET "STRING_dir_error=%COLOR_red%Can not perform this action here "%FR_CURRENT_DIR%"%COLOR_RESET%"
-
-REM Set up directory paths and executable locations
-SET "CURRENT_DIR=%CD%\"                        REM Current working directory
-SET "SCRIPT_DIR=%~dp0"                         REM Directory containing this script
-SET "CONFIG_DIR=config\"                       REM Configuration directory
-SET "IMAGES_DIR=assets\image\"                 REM Images directory
-SET "NODE_EXE=%CURRENT_DIR%%CONFIG_DIR%node.exe"   REM Path to Node.js executable
-SET "WEBP_EXE=%CURRENT_DIR%%CONFIG_DIR%webp.exe"   REM Path to WebP converter executable
-SET "AVIF_EXE=%CURRENT_DIR%%CONFIG_DIR%avif.exe"   REM Path to Avif converter executable
-SET "PROGRAM_DIR=C:\Program Files\LayX\"           REM Installation directory
-SET "FR_CURRENT_DIR=%CURRENT_DIR:\=/%"             REM Convert backslashes to forward slashes
 
 REM Determine which directory to use based on script location
 IF "%SCRIPT_DIR%"=="%PROGRAM_DIR%" (
@@ -29,7 +33,7 @@ IF "%SCRIPT_DIR%"=="%PROGRAM_DIR%" (
     SET "USE_DIR=%CURRENT_DIR%"
 )
 
-ECHO LayX version 0.1.0 alpha
+ECHO LayX version %VERSION%
 
 REM Check for Node.js installation and set appropriate path
 IF NOT EXIST "%NODE_EXE%" (

@@ -46,6 +46,10 @@ layout,.layout {
     .sub-y {
         grid-template-rows: subgrid;
     }
+
+    &.masonry {
+        grid-template-rows: masonry;
+    }
 }
 /*</base>*/
 

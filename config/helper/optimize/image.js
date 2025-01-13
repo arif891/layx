@@ -18,8 +18,6 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
         images = [...images, ...foundImages];
     }
 
-    console.log(images);
-
     if (images.length === 0) {
         return;
     }

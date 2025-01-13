@@ -64,7 +64,7 @@ async function updateUrlsInContent(content, type, optimizer) {
 
     for (const url of urls) {
         const optimizedUrl = url.replace(/\.(png|jpg|jpeg)$/, `.${optimizer}`);
-        content = content.replace(url, optimizedUrl);
+        content = content.replaceAll(url, optimizedUrl);
     }
 
     return content;
@@ -73,21 +73,21 @@ async function updateUrlsInContent(content, type, optimizer) {
 function extractUrls(content, type = 'html') {
     const srcRegex = /<(img|source)\b[^>]*\s+src=["'](\/assets\/image\/[^"']+\.(?:png|jpg|jpeg))["']/gi;
     const urlRegex = /url\(["']?(\/assets\/image\/[^"')]+\.(?:png|jpg|jpeg))["']?\)/gi;
-    const srcValues = [];
+    const srcValues = new Set();
     let match;
 
     switch (type) {
         case 'html':
             while ((match = srcRegex.exec(content)) !== null) {
-                srcValues.push(match[2]); 
+                srcValues.add(match[2]); 
             }
-            return srcValues;
+            return Array.from(srcValues);
 
         case 'css':
             while ((match = urlRegex.exec(content)) !== null) {
-                srcValues.push(match[1]);
+                srcValues.add(match[1]);
             }
-            return srcValues;
+            return Array.from(srcValues);
 
         default:
             throw new Error("Invalid type. Use 'html' or 'css'.");

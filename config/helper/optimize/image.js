@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import { exec } from 'node:child_process';
 
 import { layx } from '../../core/vars.js';
-import { getFilesWithExtension, getFilesContent } from '../../util/functions.js';
+import { getFilesWithExtension } from '../../util/functions.js';
 
 export { optimizeImages };
 
@@ -27,6 +27,8 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
     for (const image of images) {
         await optimizeImage(image, optimizerExe, optimizer);
     }
+
+    console.log(`Optimized images with ${optimizer}`);
 }
 
 async function optimizeImage(image, optimizerExe, optimizer) {
@@ -36,7 +38,41 @@ async function optimizeImage(image, optimizerExe, optimizer) {
             console.error(`Error optimizing image: ${image}`, error);
             return;
         }
-
-        console.log(`Optimized image: ${optimizedImage}`);
     });
+}
+
+async function updateUrls() {
+    await updateHtmlFiles(layx.directories.base);
+    await updateCssFiles(layx.directories.css);
+}
+
+async function updateHtmlFiles(directory) {
+    const htmlFiles = await getFilesWithExtension(directory, 'html', true);
+
+    for (const file of htmlFiles) {
+        const content = await readFile(file);
+        const updatedContent = updateUrlsInContent(content, 'html');
+        await writeFile(file, updatedContent);
+    }
+}
+
+async function updateCssFiles(directory) {
+    const cssFiles = await getFilesWithExtension(directory, 'css', true);
+
+    for (const file of cssFiles) {
+        const content = await readFile(file);
+        const updatedContent = updateUrlsInContent(content, 'css');
+        await writeFile(file, updatedContent);
+    }
+}
+
+function updateUrlsInContent(content, type) {
+    switch (type) {
+        case 'html':
+            return updateHtmlUrls(content);
+        case 'css':
+            return updateCssUrls(content);
+        default:
+            return content;
+    }
 }

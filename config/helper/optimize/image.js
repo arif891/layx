@@ -16,9 +16,9 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
     imageExtensions.forEach(async (ext) => {
         const foundImages = await getFilesWithExtension(imagesDir, ext);
         images = [...images, ...foundImages];
+        console.log(images);
     });
 
-    console.log(images);
 
     if (images.length === 0) {
         return;

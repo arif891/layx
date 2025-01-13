@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import { breakPoints } from "../core/vars.js";
 
 
-export { getFilesContent, ensureDirectoryExists,  getCssContentBlock, getFilesWithExtension, minify, extractClasses, readFile, writeFile };
+export { getFilesContent, ensureDirectoryExists,  getCssContentBlock, getFilesWithExtension, minify, extractClasses, readFile, writeFile, copyFile, moveFile, deleteFile };
 
 async function getFilesWithExtension(directory, extension, subDir = false, exclude = ['layx']) {
     const entries = await fs.readdir(directory, { withFileTypes: true });
@@ -129,3 +129,17 @@ async function writeFile(filePath, content, flag = 'w') {
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     return await fs.writeFile(filePath, content, { flag });
 }
+
+async function copyFile(source, destination) {
+    await fs.mkdir(path.dirname(destination), { recursive: true });
+    return await fs.copyFile(source, destination);
+}
+
+async function moveFile(source, destination) {
+    await fs.mkdir(path.dirname(destination), { recursive: true });
+    return await fs.rename(source, destination);
+}
+
+async function deleteFile(filePath) {
+    return await fs.unlink(filePath);
+} 

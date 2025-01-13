@@ -42,8 +42,8 @@ async function restorePageFiles(type, fromDir, toDir) {
   const Files = await getFilesWithExtension(fromDir, type);
 
   for (const file of Files) {
-    const content = await readFile(path.join(fromDir, file));
-    await writeFile(path.join(toDir, file), content);
+    const content = await readFile(file);
+    await writeFile(path.join(toDir, path.basename(file)), content);
     console.log(`Restored ${file} file.`);
   }
 }

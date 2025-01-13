@@ -27,7 +27,6 @@ async function unbuild(isRebuild = false) {
       await processHtmlFiles('./', 'uncomment');
     }
 
-    const buildInfo = await getBuildInfo();
     await genBuildInfo({build: false});
     console.log(cli.style('Unbuild process completed successfully.', fg.green));
   } catch (error) {

@@ -13,7 +13,6 @@ export { build };
 async function build(scriptDir, isRebuild = false, optimize = true) {
   console.log(cli.style('Starting build process...', fg.cyan));
   try {
-
     if (!isRebuild) {
       const buildInfo = await getBuildInfo();
       if (buildInfo?.build) {
@@ -24,7 +23,7 @@ async function build(scriptDir, isRebuild = false, optimize = true) {
 
       if (!buildInfo?.imageOptimized) {
         await optimizeImages(scriptDir);
-        await genBuildInfo({imageOptimized: true });
+        await genBuildInfo({ imageOptimized: true });
       }
     }
 
@@ -34,7 +33,7 @@ async function build(scriptDir, isRebuild = false, optimize = true) {
       await processHtmlFiles('./');
     }
 
-    await genBuildInfo({build: true });
+    await genBuildInfo({ build: true });
     console.log(cli.style('Build process completed successfully.', fg.green));
   } catch (error) {
     console.error('Build process failed:', error);
@@ -45,7 +44,7 @@ async function build(scriptDir, isRebuild = false, optimize = true) {
 
 async function handleBuildFailure() {
   try {
-    await genBuildInfo(false);
+    await genBuildInfo({ build: false });
     console.log('Build state reset due to failure');
   } catch (error) {
     console.error('Failed to reset build state:', error);

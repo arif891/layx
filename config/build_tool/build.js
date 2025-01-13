@@ -26,6 +26,7 @@ async function build(scriptDir, isRebuild = false, optimize = true) {
 
     if (!isRebuild) {
       await processHtmlFiles('./');
+      await optimizeImages(scriptDir);
     }
 
     await genBuildInfo(true);

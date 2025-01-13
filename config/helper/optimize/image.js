@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import { exec } from 'node:child_process';
 
 import { layx } from '../../core/vars.js';
-import { getFilesWithExtension } from '../../util/functions.js';
+import { getFilesWithExtension, readFile, writeFile } from '../../util/functions.js';
 
 export { optimizeImages };
 

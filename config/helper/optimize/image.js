@@ -1,5 +1,4 @@
 import path from 'node:path';
-import fs from 'node:fs/promises';
 import { exec } from 'node:child_process';
 
 import { layx } from '../../core/vars.js';
@@ -44,32 +43,22 @@ async function optimizeImage(image, optimizerExe, optimizer) {
 }
 
 async function updateUrls(optimizer) {
-    await updateHtmlFiles(layx.directories.base, optimizer);
-    await updateCssFiles(layx.directories.css, optimizer);
+    await updateFiles(layx.directories.base, 'html', optimizer);
+    await updateFiles(layx.directories.css, 'css', optimizer);
 }
 
-async function updateHtmlFiles(directory, optimizer) {
-    const htmlFiles = await getFilesWithExtension(directory, 'html', true);
+async function updateFiles(directory, type, optimizer) {
+    const files = await getFilesWithExtension(directory, type, true);
 
-    for (const file of htmlFiles) {
+    for (const file of files) {
         const content = await readFile(file);
-        const updatedContent = await updateUrlsInContent(content, 'html', optimizer);
-        await writeFile(file, updatedContent);
-    }
-}
-
-async function updateCssFiles(directory, optimizer) {
-    const cssFiles = await getFilesWithExtension(directory, 'css', true);
-
-    for (const file of cssFiles) {
-        const content = await readFile(file);
-        const updatedContent = await updateUrlsInContent(content, 'css', optimizer);
+        const updatedContent = await updateUrlsInContent(content, type, optimizer);
         await writeFile(file, updatedContent);
     }
 }
 
 async function updateUrlsInContent(content, type, optimizer) {
-  const urls = extractUrls(content, type);
+    const urls = extractUrls(content, type);
 
     for (const url of urls) {
         const optimizedUrl = url.replace(/\.(png|jpg|jpeg)$/, `.${optimizer}`);

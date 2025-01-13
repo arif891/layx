@@ -53,7 +53,7 @@ async function updateHtmlFiles(directory, optimizer) {
 
     for (const file of htmlFiles) {
         const content = await readFile(file);
-        const updatedContent = updateUrlsInContent(content, 'html', optimizer);
+        const updatedContent = await updateUrlsInContent(content, 'html', optimizer);
         await writeFile(file, updatedContent);
     }
 }
@@ -63,7 +63,7 @@ async function updateCssFiles(directory, optimizer) {
 
     for (const file of cssFiles) {
         const content = await readFile(file);
-        const updatedContent = updateUrlsInContent(content, 'css', optimizer);
+        const updatedContent = await updateUrlsInContent(content, 'css', optimizer);
         await writeFile(file, updatedContent);
     }
 }

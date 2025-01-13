@@ -3,6 +3,7 @@ import { processFiles } from './process.js';
 import { processHtmlFiles } from './process_html.js';
 import { genBuildInfo, getBuildInfo } from './functions.js';
 import { unbuild } from './un_build.js';
+import { optimizeImages } from '../helper/optimize/image.js';
 
 
 const cli = new CommandLineInterface();

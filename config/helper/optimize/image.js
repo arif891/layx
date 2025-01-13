@@ -28,6 +28,8 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
         await optimizeImage(image, optimizerExe, optimizer);
     }
 
+    await updateUrls(optimizer);
+
     console.log(`Optimized images with ${optimizer}`);
 }
 
@@ -41,38 +43,62 @@ async function optimizeImage(image, optimizerExe, optimizer) {
     });
 }
 
-async function updateUrls() {
-    await updateHtmlFiles(layx.directories.base);
-    await updateCssFiles(layx.directories.css);
+async function updateUrls(optimizer) {
+    await updateHtmlFiles(layx.directories.base, optimizer);
+    await updateCssFiles(layx.directories.css, optimizer);
 }
 
-async function updateHtmlFiles(directory) {
+async function updateHtmlFiles(directory, optimizer) {
     const htmlFiles = await getFilesWithExtension(directory, 'html', true);
 
     for (const file of htmlFiles) {
         const content = await readFile(file);
-        const updatedContent = updateUrlsInContent(content, 'html');
+        const updatedContent = updateUrlsInContent(content, 'html', optimizer);
         await writeFile(file, updatedContent);
     }
 }
 
-async function updateCssFiles(directory) {
+async function updateCssFiles(directory, optimizer) {
     const cssFiles = await getFilesWithExtension(directory, 'css', true);
 
     for (const file of cssFiles) {
         const content = await readFile(file);
-        const updatedContent = updateUrlsInContent(content, 'css');
+        const updatedContent = updateUrlsInContent(content, 'css', optimizer);
         await writeFile(file, updatedContent);
     }
 }
 
-function updateUrlsInContent(content, type) {
+async function updateUrlsInContent(content, type, optimizer) {
+  const urls = extractUrls(content, type);
+
+    for (const url of urls) {
+        const optimizedUrl = url.replace(/\.(png|jpg|jpeg)$/, `.${optimizer}`);
+        content = content.replace(url, optimizedUrl);
+    }
+
+    return content;
+}
+
+function extractUrls(content, type = 'html') {
+    const srcRegex = /<(img|source)\b[^>]*\s+src=["'](\/assets\/image\/[^"']+\.(?:png|jpg|jpeg))["']/gi;
+    const urlRegex = /url\(["']?(\/assets\/image\/[^"')]+\.(?:png|jpg|jpeg))["']?\)/gi;
+    const srcValues = [];
+    let match;
+
     switch (type) {
         case 'html':
-            return updateHtmlUrls(content);
+            while ((match = srcRegex.exec(content)) !== null) {
+                srcValues.push(match[2]); 
+            }
+            return srcValues;
+
         case 'css':
-            return updateCssUrls(content);
+            while ((match = urlRegex.exec(content)) !== null) {
+                srcValues.push(match[1]);
+            }
+            return srcValues;
+
         default:
-            return content;
+            throw new Error("Invalid type. Use 'html' or 'css'.");
     }
 }

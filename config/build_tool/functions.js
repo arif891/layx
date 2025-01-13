@@ -1,10 +1,20 @@
 import { readFile, writeFile } from '../util/functions.js'
 import { layx } from "../core/vars.js";
 
-async function genBuildInfo(buildState) {
+async function genBuildInfo(buildInfo = {}) {
+
+    let previousBuildInfo = {};
+
     try {
-        const buildInfo = JSON.stringify({ build: buildState }, null, 2);
-        await writeFile(layx.files.buildInfo, buildInfo);
+        const content = await readFile(layx.files.buildInfo);
+        previousBuildInfo = JSON.parse(content);
+    } catch (error) {
+       
+    }
+
+    try {
+        const  newBuildInfo = { ...previousBuildInfo, ...newBuildInfo };
+        await writeFile(layx.files.buildInfo, JSON.stringify(newBuildInfo, null, 2));
     } catch (error) {
         console.error('Failed to generate build info:', error);
         throw error;

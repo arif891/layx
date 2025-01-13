@@ -2,6 +2,7 @@ import CommandLineInterface from '../cli/cli.js';
 import { processHtmlFiles } from './process_html.js';
 import { genBuildInfo, getBuildInfo } from './functions.js'
 import { restoreFiles } from './restore.js';
+import { build } from './build.js';
 
 const cli = new CommandLineInterface();
 const { fg, bg } = cli;
@@ -16,7 +17,7 @@ async function unbuild(isRebuild = false) {
       const buildInfo = await getBuildInfo();
       if (!buildInfo?.build) {
         console.log(cli.style('This project does not build yet!', fg.yellow));
-        return
+        return;
       }
     }
 
@@ -26,7 +27,8 @@ async function unbuild(isRebuild = false) {
       await processHtmlFiles('./', 'uncomment');
     }
 
-    await genBuildInfo(false);
+    const buildInfo = await getBuildInfo();
+    await genBuildInfo({build: false});
     console.log(cli.style('Unbuild process completed successfully.', fg.green));
   } catch (error) {
     console.error('Unbuild process failed:', error);

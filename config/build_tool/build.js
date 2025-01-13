@@ -5,15 +5,15 @@ import { genBuildInfo, getBuildInfo } from './functions.js';
 import { unbuild } from './un_build.js';
 import { optimizeImages } from '../helper/optimize/image.js';
 
-
 const cli = new CommandLineInterface();
 const { fg, bg } = cli;
 
-export {build};
+export { build };
 
 async function build(scriptDir, isRebuild = false, optimize = true) {
   console.log(cli.style('Starting build process...', fg.cyan));
   try {
+
     if (!isRebuild) {
       const buildInfo = await getBuildInfo();
       if (buildInfo?.build) {
@@ -21,16 +21,20 @@ async function build(scriptDir, isRebuild = false, optimize = true) {
         await unbuild(true);
         return build(scriptDir, true);
       }
+
+      if (!buildInfo?.imageOptimized) {
+        await optimizeImages(scriptDir);
+        await genBuildInfo({imageOptimized: true });
+      }
     }
 
     await processFiles(optimize);
 
     if (!isRebuild) {
       await processHtmlFiles('./');
-      await optimizeImages(scriptDir);
     }
 
-    await genBuildInfo(true);
+    await genBuildInfo({build: true });
     console.log(cli.style('Build process completed successfully.', fg.green));
   } catch (error) {
     console.error('Build process failed:', error);

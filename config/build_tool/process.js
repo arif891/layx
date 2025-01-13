@@ -56,14 +56,12 @@ async function processFiles(optimize) {
                 readFile(config.base).catch(() => '')
             ]);
 
-            const processed = await processImports(sourceContent, config.source, type, optimize);
-            const filtered = removeImportStatements(processed);
-            const final = type === 'js' ? removeExportAndDefault(filtered) : filtered;
+            const finalContent = await processContent(sourceContent, config.source, type, optimize);
 
             await Promise.all([
-                writeFile(config.output, `/* layx ${type} code */\n${final}`),
+                writeFile(config.output, `/* layx ${type} code */\n${finalContent}`),
                 writeFile(config.baseOutput, `/* User base ${type} code */\n${baseContent}`),
-                writeFile(config.base, minify(final + baseContent, type))
+                writeFile(config.base, minify(finalContent + baseContent, type))
             ]);
             console.log(`Processed LayX base ${type}`);
 
@@ -85,14 +83,18 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize) {
         const outPath = path.join(pageFilesOutDir, file);
         const content = await readFile(filePath);
 
-        const processed = await processImports(content, filePath, type, optimize);
-        const filtered = removeImportStatements(processed);
-        const final = type === 'js' ? removeExportAndDefault(filtered) : filtered;
+        const finalContent = await processContent(content, filePath, type, optimize);
 
-        await writeFile(outPath, final);
-        await writeFile(filePath, minify(final, type));
+        await writeFile(outPath, finalContent);
+        await writeFile(filePath, minify(finalContent, type));
         console.log(`Processed ${file}`);
     }
+}
+
+async function processContent(content, filePath, type, optimize) {
+    const processed = await processImports(content, filePath, type, optimize);
+    const filtered = removeImportStatements(processed);
+    return type === 'js' ? removeExportAndDefault(filtered) : filtered;
 }
 
 async function processImports(content, filePath, type, optimize) {

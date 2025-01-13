@@ -5,9 +5,21 @@ import { breakPoints } from "../core/vars.js";
 
 export { getFilesContent, ensureDirectoryExists,  getCssContentBlock, getFilesWithExtension, minify, extractClasses, readFile, writeFile };
 
-async function getFilesWithExtension(directory, extension) {
-    const files = await fs.readdir(directory);
-    return files.filter(file => path.extname(file) === `.${extension}`);
+async function getFilesWithExtension(directory, extension, subDir = false, exclude = ['layx']) {
+    const entries = await fs.readdir(directory, { withFileTypes: true });
+    let files = [];
+
+    for (const entry of entries) {
+        const fullPath = path.join(directory, entry.name);
+
+        if (entry.isDirectory() && subDir && !exclude.includes(entry.name)) {
+            files = files.concat(await getFilesWithExtension(fullPath, extension, subDir, exclude));
+        } else if (entry.isFile() && path.extname(entry.name) === `.${extension}` && !exclude.includes(entry.name)) {
+            files.push(fullPath);
+        }
+    }
+
+    return files;
 }
 
 async function getFilesContent(directory, extension, subDir = false, exclude = ['layx']) {

@@ -10,7 +10,7 @@ const { fg, bg } = cli;
 
 export {build};
 
-async function build(isRebuild = false, optimize = true) {
+async function build(scriptDir, isRebuild = false, optimize = true) {
   console.log(cli.style('Starting build process...', fg.cyan));
   try {
     if (!isRebuild) {
@@ -18,7 +18,7 @@ async function build(isRebuild = false, optimize = true) {
       if (buildInfo?.build) {
         console.log(cli.style('Existing build detected. Initiating rebuild...', fg.yellow));
         await unbuild(true);
-        return build(true);
+        return build(scriptDir, true);
       }
     }
 

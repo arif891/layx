@@ -9,7 +9,7 @@ const [, , command] = process.argv;
 
 switch (command) {
   case 'build':
-    await build();
+    await build(scriptDir);
     break;
   case 'unbuild':
     await unbuild();

@@ -1,4 +1,5 @@
-navbar, .navbar {
+navbar,
+.navbar {
     /* Base Variables */
     --transition: .3s;
     --radius: none;
@@ -51,6 +52,7 @@ navbar, .navbar {
             --edge-offset-x: 3.5%;
 
             grid-template-columns: auto 1fr;
+            align-items: center;
             padding-block: var(--padding-y);
 
             .dock.center & {

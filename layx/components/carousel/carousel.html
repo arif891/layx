@@ -49,20 +49,12 @@
             }
 
             @keyframes view_carousel_inset {
-                entry 0% {
+                entry 0%, exit 100% {
                     clip-path: inset(25%);
                 }
 
-                entry 100% {
+                entry 100%, exit 0% {
                     clip-path: inset(0%);
-                }
-
-                exit 0% {
-                    clip-path: inset(0%);
-                }
-
-                exit 100% {
-                    clip-path: inset(25%);
                 }
             }
         </style>
@@ -127,7 +119,8 @@
         </container>
 
         <script type="module">
-            import Carousel from "./carousel.js";
+            import { Carousel } from "./carousel.js";
+            new Carousel();
         </script>
 
     </body>

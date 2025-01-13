@@ -13,7 +13,7 @@ carousel, .carousel {
     .main {
         display: flex;
         height: var(--height);
-        overflow: auto;
+        overflow: auto hidden;
         scrollbar-width: none;
         scroll-snap-type: x mandatory;
 
@@ -21,7 +21,8 @@ carousel, .carousel {
             flex-shrink: 0;
             height: 100%;
             width: 100%;
-            scroll-snap-align: start;
+            user-select: none;
+            scroll-snap-align: center;
             view-timeline: --carousel-item inline;
 
             &.auto {
@@ -30,6 +31,7 @@ carousel, .carousel {
         }
 
         .vertical & {
+            overflow: hidden auto;
             flex-direction: column;
             scroll-snap-type: y mandatory;
 

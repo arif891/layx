@@ -33,7 +33,7 @@ async function optimizeImage(image, optimizerExe, optimizer) {
     const optimizedImage = image.replace(path.extname(image), `.${optimizer}`);
     exec(`${optimizerExe} ${image} -o ${optimizedImage}`, (error, stdout, stderr) => {
         if (error) {
-            console.error(`Error optimizing image: ${image}`, error);
+            console.error(`Error optimizing image: ${image}`, error, stdout, stderr);
             return;
         }
 

@@ -13,10 +13,10 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
     const imageExtensions = ['jpg', 'jpeg', 'png'];
     let images = [];
 
-    imageExtensions.forEach(await async (ext) => {
+    for (const ext of imageExtensions) {
         const foundImages = await getFilesWithExtension(imagesDir, ext);
         images = [...images, ...foundImages];
-    });
+    }
 
     console.log(images);
 
@@ -24,9 +24,9 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
         return;
     }
 
-    images.forEach(async (image) => {
-        optimizeImage(image, optimizerExe, optimizer);
-    });
+    for (const image of images) {
+        await optimizeImage(image, optimizerExe, optimizer);
+    }
 }
 
 async function optimizeImage(image, optimizerExe, optimizer) {

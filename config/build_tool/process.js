@@ -117,7 +117,7 @@ async function processImports(content, filePath, type, optimize) {
         }
     }));
 
-    return [content, ...importedContents].join('\n');
+    return [...importedContents, content].join('\n');
 }
 
 

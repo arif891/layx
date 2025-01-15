@@ -79,14 +79,14 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize) {
     const pageFiles = await getFilesWithExtension(pageFilesDir, type);
 
     for (const file of pageFiles) {
-        const outPath = path.join(pageFilesOutDir, file);
+        const outPath = path.join(pageFilesOutDir, path.basename(file));
         const content = await readFile(file);
 
         const finalContent = await processContent(content, file, type, optimize);
 
-        await writeFile(outPath, finalContent);
+        await writeFile(outPath, content);
         await writeFile(file, minify(finalContent, type));
-        console.log(`Processed ${file}`);
+        console.log(`Processed ${path.basename(file)}`);
     }
 }
 

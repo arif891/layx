@@ -1,15 +1,15 @@
 button:not(.default), .btn {
-    --padding-x: 1rem;
-    --padding-y: .6rem;
-    --radius: .35rem;
+    --padding-x: 1em;
+    --padding-y: .6em;
+    --radius: .35em;
     --bg: var(--surface-color, rgb(250, 250, 250));
 
     display: inline-block;
-    padding: var(--padding-y, var(--padding, .5rem)) var(--padding-x, var(--padding, .5rem));
+    padding: var(--padding-y, var(--padding, .5em)) var(--padding-x, var(--padding, .5em));
     color: var(--color, inherit);
     background: var(--bg);
     border: var(--border, unset);
-    border-radius: var(--radius, .35rem);
+    border-radius: var(--radius, .35em);
     font-family: inherit;
     font-size: var(--font-size, 1rem);
     font-weight: 500;
@@ -40,33 +40,33 @@ button:not(.default), .btn {
     }
 
     &.wide {
-        --padding-y: .8rem;
+        --padding-y: .8em;
     }
 
     &.lg {
-        --padding-x: 1.4rem;
-        --padding-y: .8rem;
-        --radius: .4rem;
+        --padding-x: 1.2em;
+        --padding-y: .7em;
+        --radius: .4em;
         --font-size: 1.1rem;
 
         &.wide {
-            --padding-y: 1rem;
+            --padding-y: .8em;
         }
     }
 
     &.xl {
-        --padding-x: 1.8rem;
-        --padding-y: 1rem;
-        --radius: .5rem;
+        --padding-x: 1.4em;
+        --padding-y: .8em;
+        --radius: .5em;
         --font-size: 1.2rem;
 
         &.wide {
-            --padding-y: 1.2rem;
+            --padding-y: 1em;
         }
     }
 
     &.r {
-        --radius: 10rem;
+        --radius: 10em;
     }
 
     &.dark {

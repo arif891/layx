@@ -42,7 +42,7 @@ alert, .alert {
       font-size: inherit;
       line-height: inherit;
       height: 1lh !important;
-      background-size: 60%;
+      background-size: 50%;
       background-color: unset;
     }
 }

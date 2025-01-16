@@ -4,12 +4,13 @@
     display: block;
     color: inherit;
     white-space: pre;
-    font-family: monospace;
-    background: var(--bg, rgb(250, 250, 250));
     padding: var(--padding);
     margin-block: .5rem;
     border-radius: .5rem;
-    font-size: min(calc(.9rem + .3vw), 1.1rem);
+    font-family: monospace;
+    line-height: 1.5;
+    font-size: min(calc(.9rem + .3vw), 1.05rem);
+    background: var(--bg, rgb(250, 250, 250));
     overflow: auto;
     scrollbar-width: thin;
 

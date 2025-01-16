@@ -55,6 +55,20 @@
     Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self';"
     Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
     Header edit Set-Cookie ^(.*)$ $1; HttpOnly; Secure; SameSite=Strict
+
+    # Enable ETags
+    FileETag MTime Size
+
+    # Static assets with long cache (1 month)
+    <FilesMatch "\.(avif|webp|png|jpg|jpeg|gif|ico|mp3|mp4|webm|woff2|woff|ttf|eot)$">
+        Header set Cache-Control "public, max-age=262800, immutable"
+    </FilesMatch>
+
+    # CSS and JavaScript files (7 days)
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "max-age=604800, must-revalidate"
+    </FilesMatch>
+
 </IfModule>
 
 # 5. Directory Listing Protection

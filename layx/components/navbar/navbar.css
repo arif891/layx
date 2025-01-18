@@ -1,5 +1,4 @@
-navbar,
-.navbar {
+navbar, .navbar {
     /* Base Variables */
     --transition: .3s;
     --radius: none;

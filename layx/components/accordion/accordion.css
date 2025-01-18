@@ -16,7 +16,7 @@ accordion, .accordion {
     .item {
         display: grid;
         grid-template-rows: max-content 0fr;
-        border-radius: var(--radius, .5rem);
+        border-radius: var(--radius);
         background: var(--item-bg);
         outline-color: transparent;
         transition: grid-template-rows var(--transition-duration) ease-out;

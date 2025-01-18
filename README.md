@@ -2,10 +2,6 @@
 
 ![Layx Social Preview](.github/layx_social_preview.png)
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![Downloads](https://img.shields.io/github/downloads/arif891/Layx/total.svg)](https://github.com/arif891/Layx/releases/)
-
 Layx is a powerful and extensible CSS framework designed for modern web development. It combines advanced layout capabilities with high customizability, making it ideal for both small and large-scale projects. With its modular architecture, Layx offers the flexibility you need to create responsive, scalable, and maintainable web applications.
 
 > **Main Point:** "Don't write common code ever and ever, write unique code, build unique things."

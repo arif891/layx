@@ -55,9 +55,7 @@ dialog {
       }
 
       .close {
-        padding: 0;
-        height: 1.35rem;
-        background-color: unset;
+       background-color: unset;
       }
     }
 

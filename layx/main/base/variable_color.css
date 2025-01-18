@@ -1,5 +1,6 @@
 /* Other color variables (light theme) */
-:root, [theme=light] {
+:root,
+[theme=light] {
     /* Colors */
     --brand-color: #2DD4BF;
     --primary-color: #3B82F6;
@@ -9,6 +10,11 @@
     --surface-1-color: #F8FAFC;
     --surface-2-color: #F1F5F9;
     --surface-3-color: #E2E8F0;
+
+    /* Text Colors */
+    --text-1-color: #181818;
+    --text-2-color: #323339;
+    --text-3-color: #434954;
 
     /* States */
     --success-color: #10B981;
@@ -29,6 +35,11 @@
     --surface-1-color: #0F172A;
     --surface-2-color: #1E293B;
     --surface-3-color: #334155;
+
+    /* Text Colors */
+    --text-1-color: #F9FAFB;
+    --text-2-color: #D1D5DB;
+    --text-3-color: #9CA3AF;
 
     /* States */
     --success-color: #34D399;

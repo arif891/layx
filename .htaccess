@@ -66,7 +66,7 @@
 
     # CSS and JavaScript files (7 days)
     <FilesMatch "\.(css|js)$">
-        Header set Cache-Control "max-age=604800, must-revalidate"
+        Header set Cache-Control "max-age=65700, must-revalidate"
     </FilesMatch>
 
 </IfModule>

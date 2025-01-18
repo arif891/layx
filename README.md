@@ -161,9 +161,6 @@ Key directories:
 - `assets/[css|js]/pages/`: For page-specific content. Inside this dir all CSS and JS file will be minified and original one
   moved to `layx/assets/[css|js]/pages/`.
 
-
-
-
 ## Installation
 
 To install Layx on your system:

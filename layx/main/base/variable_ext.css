@@ -1,0 +1,29 @@
+:root {
+    /* space */
+    --space-1: calc(var(--base-space) * 2);
+    --space-2: calc(var(--base-space) * 3);
+    --space-3: calc(var(--base-space) * 4);
+    --space-4: calc(var(--base-space) * 5);
+    --space-5: calc(var(--base-space) * 6);
+
+    /* radius */
+    --radius-1: calc(var(--base-radius) * 2);
+    --radius-2: calc(var(--base-radius) * 3);
+    --radius-3: calc(var(--base-radius) * 4);
+    --radius-4: calc(var(--base-radius) * 5);
+    --radius-5: calc(var(--base-radius) * 6);
+
+    /* vpu */
+    --vpu-1: calc(var(--base-vpu) * 2);
+    --vpu-2: calc(var(--base-vpu) * 3);
+    --vpu-3: calc(var(--base-vpu) * 4);
+    --vpu-4: calc(var(--base-vpu) * 5);
+    --vpu-5: calc(var(--base-vpu) * 6);
+
+    /* duration */
+    --duration-1: calc(var(--base-duration) * 2);
+    --duration-2: calc(var(--base-duration) * 3);
+    --duration-3: calc(var(--base-duration) * 4);
+    --duration-4: calc(var(--base-duration) * 5);
+    --duration-5: calc(var(--base-duration) * 6);
+}

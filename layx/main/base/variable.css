@@ -7,13 +7,12 @@
     --line-height: initial;
 
     /* Spacing and Sizing */
-    --base-space: .5rem;
-    --base-radius: .5rem;
+    --base-space: .25rem;
+    --base-radius: .25rem;
     --base-vpu: calc(.1vh + .1vw);
 
     /* Animation and Transitions */
-    --base-transition-duration: .3s;
-    --base-animation-duration: .3s;
+    --base-duration: .3s;
 }
 
 

@@ -1,31 +1,31 @@
-inline, .inline {
+.d-inline, .d-i, .inline {
     display: inline !important;
 }
 
-inline-block, .inline-block {
+.d-inline-block, .d-ib, .inline-block {
     display: inline-block !important;
 }
 
-block, .block {
+.d-block, .d-b, .block {
     display: block !important;
 }
 
-grid, .grid {
+.d-grid, .d-g, .grid {
     display: grid !important;
 }
 
-inline-grid, .inline-grid {
+.d-inline-grid, .d-ig, .inline-grid {
     display: inline-grid !important;
 }
 
-flex, .flex {
+.d-flex, .d-f, .flex {
     display: flex !important;
 }
 
-inline-flex, .inline-flex {
+.d-inline-flex, .d-if, .inline-flex {
     display: inline-flex !important;
 }
 
-.none {
+.d-none, .d-n, .none {
     display: none !important;
 }

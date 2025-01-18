@@ -1,13 +1,7 @@
 :root,[theme=light] { 
-    --primary-color: #0d6efd;
-    --secondary-color: #6c757d;
-    --link-color: #0d6efd;
-    --link-hover-color: #0a58ca;
+
 }
 
 [theme=dark] {
-    --primary-color: #0d6efd;
-    --secondary-color: #6c757d;
-    --link-color: #6ea8fe;
-    --link-hover-color: #8bb9fe;
+
 }

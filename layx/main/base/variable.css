@@ -6,13 +6,19 @@
     --font-weight: 500;
     --line-height: initial;
 
-    /* Spacing and Sizing */
+    /* Base Spacing and Sizing */
     --base-space: .25rem;
     --base-radius: .25rem;
     --base-vpu: calc(.1vh + .1vw);
 
     /* Animation and Transitions */
     --base-duration: .3s;
+
+    /* Others */
+    --space: var(--base-space);
+    --radius: var(--base-radius);
+    --vpu: var(--base-vpu);
+    --duration: var(--base-duration);
 }
 
 
@@ -25,7 +31,7 @@
     --link-color: #2da5e6;
     --surface-color: rgb(250, 250, 250);
     --accent-color: #bae7ff;
-    
+
     --scrollbar-color: rgba(var(--color-rgb), .3);
     --color: rgb(var(--color-rgb));
     --bg-color: rgb(var(--bg-color-rgb));

@@ -195,7 +195,7 @@ For comprehensive guides and API references, visit our [official documentation](
 
 ## 🤝 Contributing
 
-We welcome contributions of all kinds! To get started, please read our [Contributing Guide](CONTRIBUTING.md).
+We welcome contributions of all kinds! To get started, please read our [Contributing Guide](https://layx.xyz/docs/about/contributing).
 
 ## 📄 License
 

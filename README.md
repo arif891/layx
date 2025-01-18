@@ -2,15 +2,28 @@
 
 ![Layx Social Preview](.github/layx_social_preview.png)
 
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![Downloads](https://img.shields.io/github/downloads/arif891/Layx/total.svg)](https://github.com/arif891/Layx/releases/)
+
 Layx is a powerful and extensible CSS framework designed for modern web development. It combines advanced layout capabilities with high customizability, making it ideal for both small and large-scale projects. With its modular architecture, Layx offers the flexibility you need to create responsive, scalable, and maintainable web applications.
 
- **Main Point:** "Don't write common code ever and ever, write unique code, build unique things."
+> **Main Point:** "Don't write common code ever and ever, write unique code, build unique things."
+
+## ✨ Highlights
+
+- 🚫 **Zero Runtime** - No JavaScript dependencies required
+- 📦 **Modular Architecture** - Organize styles into reusable components
+- 🎨 **Highly Customizable** - Easy theming with CSS variables
+- 🔧 **Modern Tooling** - Built-in CLI, bundler and image optimization
+- 📱 **Mobile-First** - Responsive design system that works everywhere
 
 > **Note:** Layx is currently in the development stage and available for testing. We welcome your feedback and contributions!
 
 ## Table of Contents
 
 - [Layx](#layx)
+  - [✨ Highlights](#-highlights)
   - [Table of Contents](#table-of-contents)
   - [🚀 Key Features](#-key-features)
   - [🧠 Approach](#-approach)
@@ -19,7 +32,7 @@ Layx is a powerful and extensible CSS framework designed for modern web developm
     - [Main Layout System](#main-layout-system)
     - [Components (e.g., Navbar)](#components-eg-navbar)
   - [📁 Project Structure](#-project-structure)
-  - [🛠️ Installation](#️-installation)
+  - [Installation](#installation)
   - [🚀 Quick Start Guide](#-quick-start-guide)
   - [📚 Documentation](#-documentation)
   - [🤝 Contributing](#-contributing)
@@ -32,6 +45,7 @@ Layx is a powerful and extensible CSS framework designed for modern web developm
 - 📱 **Responsive Grid System:** Build fluid layouts that adapt seamlessly to any screen size.
 - ⚡ **Utility-First Classes:** Speed up your development workflow with a comprehensive set of utility classes.
 - 🔧 **Built-in JavaScript Components:** Enhance your layouts with interactive features using pre-built JS components.
+- 🛠️ **Build Tool:** Bundle your project and remove unused code.
 - 🖼️ **Image Optimization:** Boost performance with the integrated image optimizer.
 - 💻 **Command-Line Interface (CLI):** Efficiently manage your projects with our intuitive CLI.
 - 🚀 **No Runtime Needed:** Enjoy optimal performance without any runtime dependencies.
@@ -147,9 +161,12 @@ Key directories:
 - `assets/[css|js]/pages/`: For page-specific content. Inside this dir all CSS and JS file will be minified and original one
   moved to `layx/assets/[css|js]/pages/`.
 
-## 🛠️ Installation
 
-To install Layx on your Windows system:
+
+
+## Installation
+
+To install Layx on your system:
 
 1. Download the Layx setup file from our [download](https://layx.xyz/download) page.
 2. Extract the contents of the ZIP file.

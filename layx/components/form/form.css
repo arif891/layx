@@ -1,5 +1,5 @@
 :is(form, label, input, textarea, select, option, .validate-wrapper):not(.default) {
-    --padding-x: .8rem;
+    --padding-x: .85rem;
     --padding-y: 1rem;
     --radius: .5rem;
     --margin-bottom: 1rem;
@@ -364,7 +364,7 @@ select:not(.default) {
         transition: background-color .15s;
 
         &:is(:focus, :hover) {
-            background-color: var(--option-bg, rgb(236, 249, 255));
+            background-color: color-mix(in srgb, var(--accent-color) 25%, var(--bg-color) 75%);
             outline: none;
         }
 

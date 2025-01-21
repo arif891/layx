@@ -1,5 +1,6 @@
 breadcrumb,.breadcrumb {
     --separator: '/';
+    --space: .5rem;
     display: flex;
 
     .item {
@@ -13,8 +14,8 @@ breadcrumb,.breadcrumb {
         }
 
         &:not(:last-child)::after {
-            content: var(--separator, '/');
-            margin-inline: .5rem;
+            content: var(--separator);
+            margin-inline: var(--space);
             color: var(--separator-color, var(--color, #2e2e2e));
         }
     }

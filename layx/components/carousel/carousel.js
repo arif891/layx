@@ -147,10 +147,12 @@ class Carousel {
     setupMouseDrag(carousel, state, items) {
         let startX = 0;
         let isDragging = false;
+        let hasMoved = false;
 
         carousel.addEventListener('mousedown', (e) => {
             startX = e.pageX;
             isDragging = true;
+            hasMoved = false;
         });
 
         carousel.addEventListener('mousemove', (e) => {
@@ -158,6 +160,7 @@ class Carousel {
 
             const diff = startX - e.pageX;
             if (Math.abs(diff) > 50) {
+                hasMoved = true;
                 this.navigate(carousel, state, diff > 0 ? 1 : -1);
                 isDragging = false;
             }
@@ -170,6 +173,14 @@ class Carousel {
         carousel.addEventListener('mouseleave', () => {
             isDragging = false;
         });
+
+        // Prevent default behavior if dragged
+        carousel.addEventListener('click', (e) => {
+            if (hasMoved) {
+                e.preventDefault();
+                hasMoved = false;
+            }
+        }, true);
     }
 
     navigate(carousel, state, direction) {

@@ -123,7 +123,7 @@ backdrop {
     transition: var(--backdrop-transition, .3s);
     backdrop-filter: blur(var(--blur));
 
-    &[open] {
+    &[open], &.open {
         visibility: visible;
         opacity: 1;
     }

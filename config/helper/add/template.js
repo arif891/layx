@@ -54,9 +54,9 @@ async function templateAdd(scriptDir) {
             templateInfo.dependencies.js.map(async js => {
                 if (!importUrls.includes(js.path)) {
                     console.log('Adding template dependencies JS:',js.path);
-                    content += `\nimport ${js.name} from '${js}';`;
+                    content += `\nimport ${js.name} from '${js.path}';`;
                     writeFile(layx.files.layxJs, content);
-                    console.log(`${js} added at ${layx.files.layxJs}.`);
+                    console.log(`${js.path} added at ${layx.files.layxJs}.`);
                 } 
             });
         }

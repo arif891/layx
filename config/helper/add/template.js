@@ -64,5 +64,6 @@ async function templateAdd(scriptDir) {
         console.log(`\nTemplate '${templateName}' added successfully!\n`);
     } catch (error) {
         console.error(`Error processing templates: ${error}`);
+        throw error;
     }
 }

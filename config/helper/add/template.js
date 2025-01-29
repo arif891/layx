@@ -22,8 +22,8 @@ async function templateAdd(scriptDir) {
 
         if (templateInfo.files) {
             await Promise.all(
-                templateInfo.files.map(file => {
-                    downloadFile(templateUrl + templatePath + '/' + file.name, file.path)
+                templateInfo.files.map(async file => {
+                   await downloadFile(templateUrl + templatePath + '/' + file.name, file.path)
                 })
             );
             console.log('Template files downloaded successfully!');

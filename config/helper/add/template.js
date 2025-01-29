@@ -13,15 +13,18 @@ async function templateAdd(scriptDir) {
 
         const templateName = argsObj.values.template[0].toLowerCase();
         const templateInfo = infoObj[templateName];
+        const templatePath = templateInfo.path;
 
         if (!templateInfo) {
             console.error(`Template '${templateName}' not found!`);
             return;
         }
 
-        if(templateInfo.files) {
+        if (templateInfo.files) {
             await Promise.all(
-                templateInfo.files.map(file => downloadFile(templateUrl + file.name, file.path))
+                templateInfo.files.map(file => {
+                    downloadFile(templateUrl + templatePath + '/' + file.name, file.path)
+                })
             );
             console.log('Template files downloaded successfully!');
         }

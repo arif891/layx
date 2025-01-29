@@ -32,24 +32,15 @@ const options = {
 const argsObj = parseArgs({ options, strict: false });
 
 async function handleAdd(scriptDir) {
-    if (!argsObj.values.component && !argsObj.values.font) {
-      console.warn("Please specify a component using '--component' or '-c', or a font using '--font' or '-f'.");
-      return;
-    }
-  
     if (argsObj.values.component) {
       await componentAdd(scriptDir);
-    }
-  
-    if (argsObj.values.template) {
+    } else if (argsObj.values.template) {
       await templateAdd(scriptDir);
-    }
-  
-    if (argsObj.values.block) {
+    } else if (argsObj.values.block) {
       await blockAdd(scriptDir);
-    }
-  
-    if (argsObj.values.font) {
+    } else if (argsObj.values.font) {
       await fontAdd(scriptDir);
+    } else {
+      console.warn("Please specify a argument after add, like -c, -t, -b, -f"); 
     }
   }

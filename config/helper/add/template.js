@@ -35,7 +35,7 @@ async function templateAdd(scriptDir) {
 
         if (templateInfo.dependencies.css) {
             const content = await readFile(layx.files.layxCss);
-            const importUrls = extractImportUrls(content);
+            const importUrls = extractImportUrls(content, 'css');
 
             templateInfo.dependencies.css.map(async css => {
                 if (!importUrls.includes(css)) {
@@ -49,7 +49,7 @@ async function templateAdd(scriptDir) {
 
         if (templateInfo.dependencies.js) {
             const content = await readFile(layx.files.layxJs);
-            const importUrls = extractImportUrls(content);
+            const importUrls = extractImportUrls(content, 'js');
 
             templateInfo.dependencies.js.map(async js => {
                 if (!importUrls.includes(js.path)) {

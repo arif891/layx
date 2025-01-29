@@ -14,42 +14,53 @@ async function templateAdd(scriptDir) {
         });
         const infoObj = await info.json();
 
-        const templateName = argsObj.values.template[0].toLowerCase();
-        const templateInfo = infoObj[templateName];
+        const templateNames = argsObj.values.template.map(t => t.toLowerCase());
+        console.log(`\nProcessing ${templateNames.length} templates...\n`);
 
-        if (!templateInfo?.path) {
-            throw new Error(`Invalid template configuration for '${templateName}'`);
+        for (const templateName of templateNames) {
+            try {
+                const templateInfo = infoObj[templateName];
+
+                if (!templateInfo?.path) {
+                    console.error(`Skipping invalid template: '${templateName}'`);
+                    continue;
+                }
+
+                console.log(`\nAdding template '${templateName}'...\n`);
+
+                // Process template files
+                if (templateInfo.files?.length) {
+                    await Promise.all(
+                        templateInfo.files.map(async file => {
+                            if (!file.name || !file.path) {
+                                console.warn(`Skipping invalid file entry in template ${templateName}`);
+                                return;
+                            }
+                            
+                            try {
+                                console.log(`Downloading: ${file.name}`);
+                                await downloadFile(templateUrl + templateInfo.path + '/' + file.name, file.path);
+                                console.log(`File added: ${file.path}`);
+                            } catch (err) {
+                                console.error(`Failed to process file ${file.name}:`, err.message);
+                            }
+                        })
+                    );
+                }
+
+                // Process dependencies
+                await processDependencies(templateInfo, 'css', layx.files.layxCss);
+                await processDependencies(templateInfo, 'js', layx.files.layxJs);
+
+                console.log(`Template '${templateName}' added successfully!\n`);
+            } catch (error) {
+                console.error(`Error processing template '${templateName}': ${error.message}`);
+            }
         }
 
-        console.log(`\nAdding template '${templateName}'...\n`);
-
-        // Process template files
-        if (templateInfo.files?.length) {
-            await Promise.all(
-                templateInfo.files.map(async file => {
-                    if (!file.name || !file.path) {
-                        console.warn(`Skipping invalid file entry in template ${templateName}`);
-                        return;
-                    }
-                    
-                    try {
-                        console.log(`Downloading: ${file.name}`);
-                        await downloadFile(templateUrl + templateInfo.path + '/' + file.name, file.path);
-                        console.log(`File added: ${file.path}`);
-                    } catch (err) {
-                        console.error(`Failed to process file ${file.name}:`, err.message);
-                    }
-                })
-            );
-        }
-
-        // Process dependencies
-        await processDependencies(templateInfo, 'css', layx.files.layxCss);
-        await processDependencies(templateInfo, 'js', layx.files.layxJs);
-
-        console.log(`\nTemplate '${templateName}' added successfully!\n`);
+        console.log('Template processing completed.');
     } catch (error) {
-        console.error(`Error processing template: ${error.message}`);
+        console.error(`Error fetching template information: ${error.message}`);
     }
 }
 

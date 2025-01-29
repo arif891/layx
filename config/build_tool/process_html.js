@@ -4,14 +4,14 @@ import fs from "node:fs/promises";
 
 export {processHtmlFiles};
 
-async function processHtmlFiles(startPath, mode = 'comment') {
+async function processHtmlFiles(startPath, mode = 'comment', exclude = ['layx']) {
     async function* findHtmlFiles(dir) {
       const entries = await fs.readdir(dir, { withFileTypes: true });
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
-        if (entry.isDirectory()) {
+        if (entry.isDirectory() && !exclude.includes(entry.name)) {
           yield* findHtmlFiles(fullPath);
-        } else if (entry.isFile() && path.extname(entry.name) === '.html') {
+        } else if (entry.isFile() && path.extname(entry.name) === '.html' && !exclude.includes(entry.name)) {
           yield fullPath;
         }
       }

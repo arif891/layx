@@ -20,7 +20,7 @@ async function templateAdd(scriptDir) {
             return;
         }
 
-        console.log(`Adding template '${templateName}'...`);
+        console.log(`\nAdding template '${templateName}'...\n`);
 
         if (templateInfo.files) {
             await Promise.all(
@@ -33,7 +33,7 @@ async function templateAdd(scriptDir) {
         }
 
 
-        console.log(`Template '${templateName}' added successfully!`);
+        console.log(`\nTemplate '${templateName}' added successfully!\n`);
     } catch (error) {
         console.error(`Error processing templates: ${error.message}`);
     }

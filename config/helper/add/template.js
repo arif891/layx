@@ -21,13 +21,11 @@ async function templateAdd(scriptDir) {
         }
 
         if (templateInfo.files) {
-            await Promise.all(
-                templateInfo.files.map(async file => {
-                    console.log('Downloading:', file.name);
-                    await downloadFile(templateUrl + templatePath + '/' + file.name, file.path);
-                    console.log('File added', file.path);
-                })
-            );
+            templateInfo.files.map(async file => {
+                console.log('Downloading:', file.name);
+                await downloadFile(templateUrl + templatePath + '/' + file.name, file.path);
+                console.log('File added', file.path);
+            })
         }
 
 

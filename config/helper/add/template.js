@@ -20,6 +20,8 @@ async function templateAdd(scriptDir) {
             return;
         }
 
+        console.log(`Adding template '${templateName}'...`);
+
         if (templateInfo.files) {
             await Promise.all(
                 templateInfo.files.map(async file => {

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getCssContentBlock, extractClasses } from '../util/functions.js'
+import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getCssContentBlock, extractClasses, extractImportUrls } from '../util/functions.js'
 import { layx, breakPoints, layout } from '../core/vars.js'
 
 
@@ -189,14 +189,6 @@ function genStyle(template, num, media = '') {
         console.error(`Error generating style: ${error.message}`);
         return '';
     }
-}
-
-function extractImportUrls(content, type) {
-    const regex = type === 'css'
-        ? /@import\s+url\(([^)]+)\);/g
-        : /import\s+(?:\w+|\{[^}]+\})\s+from\s+['"]([^'"]+)['"]/g;
-
-    return [...content.matchAll(regex)].map(match => match[1].replace(/['"]/g, ''));
 }
 
 function removeExportAndDefault(content) {

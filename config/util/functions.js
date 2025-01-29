@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import { breakPoints } from "../core/vars.js";
 
 
-export { getFilesContent, ensureDirectoryExists,  getCssContentBlock, getFilesWithExtension, minify, extractClasses, readFile, writeFile, copyFile, moveFile, deleteFile };
+export { getFilesContent, ensureDirectoryExists,  getCssContentBlock, getFilesWithExtension, minify, extractClasses, extractImportUrls, readFile, writeFile, copyFile, moveFile, deleteFile };
 
 async function getFilesWithExtension(directory, extension, subDir = false, exclude = ['layx']) {
     const entries = await fs.readdir(directory, { withFileTypes: true });
@@ -117,6 +117,14 @@ function extractClasses(html, startClass, type = 'class') {
     };
 
     return Array.from(resultSet).sort(sortFunctions[type]);
+}
+
+function extractImportUrls(content, type) {
+    const regex = type === 'css'
+        ? /@import\s+url\(([^)]+)\);/g
+        : /import\s+(?:\w+|\{[^}]+\})\s+from\s+['"]([^'"]+)['"]/g;
+
+    return [...content.matchAll(regex)].map(match => match[1].replace(/['"]/g, ''));
 }
 
 

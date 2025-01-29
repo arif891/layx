@@ -26,8 +26,6 @@ async function templateAdd(scriptDir) {
                     continue;
                 }
 
-                console.log(`\nAdding template '${templateName}'...\n`);
-
                 // Process template files
                 if (templateInfo.files?.length) {
                     await Promise.all(

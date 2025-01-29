@@ -1,6 +1,6 @@
 import { argsObj } from './handle_add.js';
 import { downloadFile } from '../download/download.js';
-import { readFile, writeFile, extractImportUrls } from '../../util/functions.js';
+import { readFile, writeFile, extractImportUrls, validatePath } from '../../util/functions.js';
 import { layx } from '../../core/vars.js';
 
 export { templateAdd };
@@ -9,61 +9,73 @@ const templateUrl = 'https://raw.githubusercontent.com/arif891/layx_templates/ma
 
 async function templateAdd(scriptDir) {
     try {
-        const info = await fetch(templateUrl + 'info.json');
+        const info = await fetch(templateUrl + 'info.json').catch(() => {
+            throw new Error('Failed to fetch template information');
+        });
         const infoObj = await info.json();
 
         const templateName = argsObj.values.template[0].toLowerCase();
         const templateInfo = infoObj[templateName];
-        const templatePath = templateInfo?.path;
 
-        if (!templateInfo) {
-            console.error(`Template '${templateName}' not found!`);
-            return;
+        if (!templateInfo?.path) {
+            throw new Error(`Invalid template configuration for '${templateName}'`);
         }
 
         console.log(`\nAdding template '${templateName}'...\n`);
 
-        if (templateInfo.files) {
+        // Process template files
+        if (templateInfo.files?.length) {
             await Promise.all(
                 templateInfo.files.map(async file => {
-                    console.log('Downloading:', file.name);
-                    await downloadFile(templateUrl + templatePath + '/' + file.name, file.path);
-                    console.log('File added', file.path);
+                    if (!file.name || !file.path) {
+                        console.warn(`Skipping invalid file entry in template ${templateName}`);
+                        return;
+                    }
+                    
+                    try {
+                        console.log(`Downloading: ${file.name}`);
+                        await validatePath(file.path);
+                        await downloadFile(templateUrl + templateInfo.path + '/' + file.name, file.path);
+                        console.log(`File added: ${file.path}`);
+                    } catch (err) {
+                        console.error(`Failed to process file ${file.name}:`, err.message);
+                    }
                 })
             );
         }
 
-        if (templateInfo.dependencies.css) {
-            let content = await readFile(layx.files.layxCss);
-            const importUrls = extractImportUrls(content, 'css');
-
-            templateInfo.dependencies.css.map(async css => {
-                if (!importUrls.includes(css)) {
-                    console.log('Adding template dependencies CSS:', css);
-                    content += `\n@import url(${css});`;
-                    writeFile(layx.files.layxCss, content);
-                    console.log(`${css} added at ${layx.files.layxCss}.`);
-                } 
-            });
-        }
-
-        if (templateInfo.dependencies.js) {
-            let content = await readFile(layx.files.layxJs);
-            const importUrls = extractImportUrls(content, 'js');
-
-            templateInfo.dependencies.js.map(async js => {
-                if (!importUrls.includes(js.path)) {
-                    console.log('Adding template dependencies JS:',js.path);
-                    content += `\nimport ${js.name} from '${js.path}';`;
-                    writeFile(layx.files.layxJs, content);
-                    console.log(`${js.path} added at ${layx.files.layxJs}.`);
-                } 
-            });
-        }
+        // Process dependencies
+        await processDependencies(templateInfo, 'css', layx.files.layxCss);
+        await processDependencies(templateInfo, 'js', layx.files.layxJs);
 
         console.log(`\nTemplate '${templateName}' added successfully!\n`);
     } catch (error) {
-        console.error(`Error processing templates: ${error}`);
+        console.error(`Error processing template: ${error.message}`);
         throw error;
+    }
+}
+
+async function processDependencies(templateInfo, type, filePath) {
+    const deps = templateInfo.dependencies?.[type];
+    if (!deps?.length) return;
+
+    try {
+        let content = await readFile(filePath);
+        const importUrls = extractImportUrls(content, type);
+        
+        for (const dep of deps) {
+            const path = type === 'js' ? dep.path : dep;
+            if (importUrls.includes(path)) continue;
+
+            console.log(`Adding ${type.toUpperCase()} dependency:`, path);
+            content += type === 'js' 
+                ? `\nimport ${dep.name} from '${path}';`
+                : `\n@import url(${path});`;
+            
+            await writeFile(filePath, content);
+            console.log(`Added ${type.toUpperCase()} dependency to ${filePath}`);
+        }
+    } catch (err) {
+        console.error(`Failed to process ${type} dependencies:`, err.message);
     }
 }

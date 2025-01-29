@@ -1,6 +1,6 @@
 import { argsObj } from './handle_add.js';
 import { downloadFile } from '../download/download.js';
-import { log } from 'console';
+import { extractImportUrls } from '../../util/functions.js';
 
 export { templateAdd };
 

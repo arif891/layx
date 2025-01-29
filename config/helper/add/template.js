@@ -1,6 +1,6 @@
 import { argsObj } from './handle_add.js';
 import { downloadFile } from '../download/download.js';
-import { readFile ,extractImportUrls } from '../../util/functions.js';
+import { readFile, writeFile, extractImportUrls } from '../../util/functions.js';
 import { layx } from '../../core/vars.js';
 
 export { templateAdd };
@@ -41,6 +41,7 @@ async function templateAdd(scriptDir) {
                 if (!importUrls.includes(css)) {
                     console.log('Adding template dependencies CSS:', css);
                     content += `\n@import url(${css});`;
+                    writeFile(layx.files.layxCss, content);
                     console.log(`${css} added at ${layx.files.layxCss}.`);
                 } 
             });
@@ -54,6 +55,7 @@ async function templateAdd(scriptDir) {
                 if (!importUrls.includes(js.path)) {
                     console.log('Adding template dependencies JS:',js.path);
                     content += `\nimport ${js.name} from '${js}';`;
+                    writeFile(layx.files.layxJs, content);
                     console.log(`${js} added at ${layx.files.layxJs}.`);
                 } 
             });

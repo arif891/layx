@@ -1,6 +1,6 @@
 import { argsObj } from './handle_add.js';
 import { downloadFile } from '../download/download.js';
-import { readFile, writeFile, extractImportUrls, validatePath } from '../../util/functions.js';
+import { readFile, writeFile, extractImportUrls } from '../../util/functions.js';
 import { layx } from '../../core/vars.js';
 
 export { templateAdd };
@@ -34,7 +34,6 @@ async function templateAdd(scriptDir) {
                     
                     try {
                         console.log(`Downloading: ${file.name}`);
-                        await validatePath(file.path);
                         await downloadFile(templateUrl + templateInfo.path + '/' + file.name, file.path);
                         console.log(`File added: ${file.path}`);
                     } catch (err) {
@@ -51,7 +50,6 @@ async function templateAdd(scriptDir) {
         console.log(`\nTemplate '${templateName}' added successfully!\n`);
     } catch (error) {
         console.error(`Error processing template: ${error.message}`);
-        throw error;
     }
 }
 

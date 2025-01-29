@@ -1,6 +1,7 @@
 import { argsObj } from './handle_add.js';
 import { downloadFile } from '../download/download.js';
-import { extractImportUrls } from '../../util/functions.js';
+import { readFile ,extractImportUrls } from '../../util/functions.js';
+import { layx } from '../../core/vars.js';
 
 export { templateAdd };
 
@@ -32,6 +33,31 @@ async function templateAdd(scriptDir) {
             );
         }
 
+        if (templateInfo.dependencies.css) {
+            const content = await readFile(layx.files.layxCss);
+            const importUrls = extractImportUrls(content);
+
+            templateInfo.dependencies.css.map(async css => {
+                if (!importUrls.includes(css)) {
+                    console.log('Adding template dependencies CSS:', css);
+                    content += `\n@import url(${css});`;
+                    console.log(`${css} added at ${layx.files.layxCss}.`);
+                } 
+            });
+        }
+
+        if (templateInfo.dependencies.js) {
+            const content = await readFile(layx.files.layxJs);
+            const importUrls = extractImportUrls(content);
+
+            templateInfo.dependencies.js.map(async js => {
+                if (!importUrls.includes(js.path)) {
+                    console.log('Adding template dependencies JS:',js.path);
+                    content += `\nimport ${js.name} from '${js}';`;
+                    console.log(`${js} added at ${layx.files.layxJs}.`);
+                } 
+            });
+        }
 
         console.log(`\nTemplate '${templateName}' added successfully!\n`);
     } catch (error) {

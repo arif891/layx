@@ -23,14 +23,15 @@ async function templateAdd(scriptDir) {
         if (templateInfo.files) {
             await Promise.all(
                 templateInfo.files.map(async file => {
-                   await downloadFile(templateUrl + templatePath + '/' + file.name, file.path)
+                    console.log('Downloading:', file.name);
+                    await downloadFile(templateUrl + templatePath + '/' + file.name, file.path);
+                    console.log('File added', file.path);
                 })
             );
-            console.log('Template files downloaded successfully!');
         }
 
 
-        console.log('Template Info:', templateInfo);
+        console.log(`Template '${templateName}' added successfully!`);
     } catch (error) {
         console.error(`Error processing templates: ${error.message}`);
     }

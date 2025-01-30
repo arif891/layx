@@ -36,7 +36,7 @@ async function componentAdd(scriptDir) {
                             
                             try {
                                 console.log(`Downloading: ${file.name}`);
-                                await downloadFile(componentUrl + componentInfo.path + '/' + file.name, file.path);
+                                await downloadFile(componentUrl + componentInfo.path + '/' + file.name, componentInfo.localpath + '/' + file.path);
                                 console.log(`File added: ${file.path}`);
                             } catch (err) {
                                 console.error(`Failed to process file ${file.name}:`, err.message);

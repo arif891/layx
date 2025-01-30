@@ -1,283 +1,284 @@
 #!/bin/bash
 
+# **********************
+# * Configuration Zone *
+# **********************
 VERSION="0.1.0 alpha"
-
-# Error messages
-STRING_NODE_FAIL="${COLOR_RED}Failed to execute Node.js. Please check the path and installation.${COLOR_RESET}"
-STRING_DIR_ERROR="${COLOR_RED}Cannot perform this action here ${FR_CURRENT_DIR}${COLOR_RESET}"
-
-# Directory settings
-CURRENT_DIR="$(pwd)/"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
-CONFIG_DIR="config/"
-IMAGES_DIR="assets/image/"
-NODE_EXE="${CURRENT_DIR}${CONFIG_DIR}node"
-WEBP_EXE="${CURRENT_DIR}${CONFIG_DIR}webp"
-AVIF_EXE="${CURRENT_DIR}${CONFIG_DIR}avif"
 PROGRAM_DIR="/Applications/LayX/"
-FR_CURRENT_DIR="${CURRENT_DIR}"
+CONFIG_DIR="config/"
+CONFIG_FILE="config.mjs"
+IMAGES_DIR="assets/image/"
+ARGS=""
+SNIPPETS_PATH="${SCRIPT_DIR}${CONFIG_DIR}syntax/layx.code-snippets"
+SNIPPETS_DIR="$HOME/Library/Application Support/Code/User/snippets/"
 
-# Color definitions
+# *********************
+# * ANSI Color Codes  *
+# *********************
 COLOR_RED='\033[0;31m'
 COLOR_GREEN='\033[0;32m'
 COLOR_YELLOW='\033[0;33m'
 COLOR_CYAN='\033[0;36m'
 COLOR_RESET='\033[0m'
 
-if [ "${SCRIPT_DIR}" == "${PROGRAM_DIR}" ]; then
-    USE_DIR="${SCRIPT_DIR}"
-else
-    USE_DIR="${CURRENT_DIR}"
-fi
+# *********************
+# * Error Messages    *
+# *********************
+STRING_NODE_FAIL="${COLOR_RED}Failed to execute Node.js. Please check the path and installation.${COLOR_RESET}"
+STRING_DIR_ERROR="${COLOR_RED}Cannot perform this action in ${PWD}${COLOR_RESET}"
 
-echo "LayX version ${VERSION}"
+# *********************
+# * Initialize Paths  *
+# *********************
+CURRENT_DIR="$(pwd)/"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
+SCRIPT_PATH="${SCRIPT_DIR}$(basename "${BASH_SOURCE[0]}")"
 
-# Check for Node.js
-if [ ! -f "${NODE_EXE}" ]; then
-    if [ -f "${PROGRAM_DIR}${CONFIG_DIR}node" ]; then
-        NODE_EXE="${PROGRAM_DIR}${CONFIG_DIR}node"
-        WEBP_EXE="${PROGRAM_DIR}${CONFIG_DIR}webp"
-    else
-        echo "Program Node.js also not found."
-        if ! command -v node &> /dev/null; then
-            echo "Node.js is not installed."
-        else
-            echo "Node.js found globally."
-            NODE_EXE="node"
-        fi
-    fi
-fi
+# Derive executable paths
+NODE_EXE="${SCRIPT_DIR}${CONFIG_DIR}node"
+WEBP_EXE="${SCRIPT_DIR}${CONFIG_DIR}webp"
+AVIF_EXE="${SCRIPT_DIR}${CONFIG_DIR}avif"
 
-build() {
-    echo "Building..."
-    echo "Using Node: ${NODE_EXE}"
-    if ! "${NODE_EXE}" -v; then
-        echo "${STRING_NODE_FAIL}"
-        exit 1
-    fi
 
-    if [ "${CURRENT_DIR}" != "${PROGRAM_DIR}" ]; then
-        "${NODE_EXE}" "${USE_DIR}${CONFIG_DIR}config.mjs" "build"
-    else
-        echo "${STRING_DIR_ERROR}"
-    fi
-}
+# *********************
+# * Main Execution    *
+# *********************
+echo "LayX version $VERSION"
 
-unbuild() {
-    echo "Unbuilding..."
-    echo "Using Node: ${NODE_EXE}"
-    if ! "${NODE_EXE}" -v; then
-        echo "${STRING_NODE_FAIL}"
-        exit 1
-    fi
-
-    if [ "${CURRENT_DIR}" != "${PROGRAM_DIR}" ]; then
-        "${NODE_EXE}" "${USE_DIR}${CONFIG_DIR}config.mjs" "unbuild"
-    else
-        echo "${STRING_DIR_ERROR}"
-    fi
-}
-
-create() {
-    if [ -d "${PROGRAM_DIR}" ]; then
-        if [ "${CURRENT_DIR}" != "${PROGRAM_DIR}" ]; then
-            if [ -d "${CURRENT_DIR}/layx" ]; then
-                read -p "There may be an existing LayX project. Do you want to replace it? (y/N): " choice
-                case "${choice}" in
-                    [Yy]* ) echo -e "${COLOR_CYAN}Continuing...${COLOR_RESET}";;
-                    [Nn]* | "" ) return;;
-                    * ) echo -e "${COLOR_YELLOW}Please choose a valid option.${COLOR_RESET}"; create; return;;
-                esac
-            fi
-            
-            echo -e "${COLOR_CYAN}Copying LayX files...${COLOR_RESET}"
-            cp -R "${PROGRAM_DIR}"* "${CURRENT_DIR}"
-            
-            if [ -d "${CURRENT_DIR}${CONFIG_DIR}" ]; then
-                echo -e "${COLOR_CYAN}Cleaning up unnecessary files...${COLOR_RESET}"
-                rm -rf "${CURRENT_DIR}${CONFIG_DIR}"
-            fi
-            
-            if [ -f "${CURRENT_DIR}/layx.sh" ]; then
-                rm "${CURRENT_DIR}/layx.sh"
-            fi
-            
-            echo -e "${COLOR_GREEN}LayX project created in the current directory.${COLOR_RESET}"
-        else
-            echo -e "${COLOR_RED}Error: You are already in the LayX program directory. Please change to a different directory.${COLOR_RESET}"
-        fi
-    else
-        echo -e "${COLOR_YELLOW}LayX is not installed. Please install it first.${COLOR_RESET}"
-    fi
-}
-
-optimize_images() {
-    echo -e "${COLOR_CYAN}Optimizing images in ${IMAGES_DIR}${COLOR_RESET}"
-    
-    find "${CURRENT_DIR}${IMAGES_DIR}" -type f \( -name "*.png" -o -name "*.jpg" \) -not -path "*/orginal_images_dir/*" | while read -r image; do
-        dir=$(dirname "${image}")
-        name=$(basename "${image%.*}")
-        
-        echo "Processing $(basename "${image}")"
-        
-        "${WEBP_EXE}" "${image}" -o "${dir}/${name}.webp" -q 90 -af -progress -short
-        
-        mkdir -p "${dir}/orginal_images_dir"
-        mv "${image}" "${dir}/orginal_images_dir/"
-        
-        echo "Processed: $(basename "${image}") at ${dir}"
-    done
-}
-
-install() {
-    # Check for root privileges using sudo
-    if [ "$(id -u)" != "0" ]; then
-        if [ ! -f "${CURRENT_DIR}/layx.sh" ]; then
-            echo -e "${COLOR_RED}layx.sh not found in the current directory.${COLOR_RESET}"
-            exit 1
-        fi
-        
-        echo -e "${COLOR_YELLOW}Requesting administrator privileges...${COLOR_RESET}"
-        sudo "$0" install
-        exit $?
-    fi
-
-    if [ -d "${PROGRAM_DIR}" ]; then
-        if [ "${CURRENT_DIR}" == "${PROGRAM_DIR}" ]; then
-            echo -e "${COLOR_YELLOW}Program already installed.${COLOR_RESET}"
-            return
-        fi
-
-        read -p "Program directory already exists, would you like to update or replace? (y/N): " choice
-        case "${choice}" in
-            [Yy]* ) echo -e "${COLOR_CYAN}Continuing...${COLOR_RESET}";;
-            [Nn]* | "" ) return;;
-            * ) echo -e "${COLOR_YELLOW}Please choose a valid option.${COLOR_RESET}"; install; return;;
-        esac
-    fi
-
-    echo -e "${COLOR_CYAN}Installing...${COLOR_RESET}"
-    echo "Copying Files."
-    mkdir -p "${PROGRAM_DIR}"
-    cp -R "${SCRIPT_DIR}"* "${PROGRAM_DIR}"
-    
-    # VS Code snippets installation for macOS
-    mkdir -p "$HOME/Library/Application Support/Code/User/snippets/"
-    cp -R "${SCRIPT_DIR}${CONFIG_DIR}syntax/layx.code-snippets" "$HOME/Library/Application Support/Code/User/snippets/"
-    
-    # Create and configure alias in macOS shell
-    SHELL_RC="$HOME/.zshrc"
-    if [ ! -f "$SHELL_RC" ]; then
-        # Fallback to bash if zsh is not the default shell
-        SHELL_RC="$HOME/.bash_profile"
-    fi
-    
-    # Add LayX alias to shell config
-    if ! grep -q "alias layx=" "$SHELL_RC"; then
-        echo "alias layx='${PROGRAM_DIR}layx.sh'" >> "$SHELL_RC"
-        echo -e "${COLOR_CYAN}Added layx alias to $SHELL_RC${COLOR_RESET}"
-    else
-        echo -e "${COLOR_YELLOW}layx alias already exists${COLOR_RESET}"
-    fi
-    
-    # Add to PATH
-    if ! grep -q "${PROGRAM_DIR}" "$SHELL_RC"; then
-        echo "export PATH=\$PATH:${PROGRAM_DIR}" >> "$SHELL_RC"
-        echo -e "${COLOR_CYAN}Added ${PROGRAM_DIR} to PATH in $SHELL_RC${COLOR_RESET}"
-    else
-        echo -e "${COLOR_YELLOW}${PROGRAM_DIR} is already in the PATH${COLOR_RESET}"
-    fi
-
-    # Set executable permissions and ownership
-    echo -e "${COLOR_CYAN}Setting permissions...${COLOR_RESET}"
-    chmod +x "${PROGRAM_DIR}layx.sh"
-    chmod +x "${PROGRAM_DIR}${CONFIG_DIR}node"
-    chmod +x "${PROGRAM_DIR}config/webp"
-    chmod -R 755 "${PROGRAM_DIR}"
-    chown -R $(whoami):admin "${PROGRAM_DIR}"
-
-    echo -e "${COLOR_GREEN}Installation completed.${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}Please restart your terminal or run 'source $SHELL_RC' to use the layx command${COLOR_RESET}"
-}
-
-uninstall() {
-    if [ ! -d "${PROGRAM_DIR}" ]; then
-        echo -e "${COLOR_YELLOW}LayX is not installed on your system.${COLOR_RESET}"
-        exit 1
-    fi
-
-    if [ "$(id -u)" != "0" ]; then
-        echo -e "${COLOR_YELLOW}Requesting administrator privileges...${COLOR_RESET}"
-        sudo "$0" uninstall
-        exit $?
-    fi
-
-    echo -e "${COLOR_CYAN}Uninstalling...${COLOR_RESET}"
-    
-    if [ -d "${PROGRAM_DIR}" ]; then
-        rm -rf "${PROGRAM_DIR}"
-    else
-        echo "${PROGRAM_DIR} not found."
-    fi
-
-    # Remove from shell config
-    SHELL_RC="$HOME/.zshrc"
-    if [ ! -f "$SHELL_RC" ]; then
-        SHELL_RC="$HOME/.bash_profile"
-    fi
-    
-    if [ -f "$SHELL_RC" ]; then
-        sed -i '' "\|export PATH=\$PATH:${PROGRAM_DIR}|d" "$SHELL_RC"
-        sed -i '' "\|alias layx=|d" "$SHELL_RC"
-    fi
-
-    echo "Uninstallation completed."
-    echo -e "${COLOR_YELLOW}Please restart your terminal or run 'source $SHELL_RC' to update your PATH.${COLOR_RESET}"
-}
-
-show_options() {
-    echo -e "${COLOR_CYAN}Please choose an option:${COLOR_RESET}"
-    echo "1. Build"
-    echo "2. Unbuild"
-    echo "3. Create"
-    echo "4. Optimize Images"
-    echo "5. Install"
-    echo "6. Uninstall"
-    echo "7. Exit"
-
-    read -p "Enter your choice (1-7): " choice
-    case $choice in
-        1) build ;;
-        2) unbuild ;;
-        3) create ;;
-        4) optimize_images ;;
-        5) install ;;
-        6) uninstall ;;
-        7) exit 0 ;;
-        *) echo -e "${COLOR_YELLOW}Please choose a valid option.${COLOR_RESET}"; show_options ;;
-    esac
-}
-
-# Main script execution
-if [ $# -eq 0 ]; then
-    show_options
-else
+if [ $# -gt 0 ]; then
     case "$1" in
         "build") build ;;
         "unbuild") unbuild ;;
         "create") create ;;
-        "optimage") optimize_images ;;
+        "add") shift; "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" "$@" ;;
+        "setup") 
+            validate_node
+            "$NODE_EXE" "create-setup.mjs"
+            ;;
+        "optimizeImages") optimize_images ;;
         "install") install ;;
         "uninstall") uninstall ;;
-        "add") "${NODE_EXE}" "${USE_DIR}${CONFIG_DIR}config.mjs" "$@" ;;
-        *)
-            echo -e "Available options are ${COLOR_YELLOW}\"build\"${COLOR_RESET}, ${COLOR_YELLOW}\"unbuild\"${COLOR_RESET}, ${COLOR_YELLOW}\"create\"${COLOR_RESET}, ${COLOR_YELLOW}\"add\"${COLOR_RESET}, ${COLOR_YELLOW}\"optimage\"${COLOR_RESET}, ${COLOR_YELLOW}\"install\"${COLOR_RESET} and ${COLOR_YELLOW}\"uninstall\"${COLOR_RESET}."
-            if [ "${CURRENT_DIR}" != "${PROGRAM_DIR}" ]; then
-                echo "Forwarding cmd to \"config.mjs\""
-                "${NODE_EXE}" "${USE_DIR}${CONFIG_DIR}config.mjs" "$@"
-            else
-                echo "${STRING_DIR_ERROR}"
-            fi
-            ;;
+        *) echo -e "${COLOR_YELLOW}Invalid command. Valid options: build, unbuild, create, add, optimizeImages, install, uninstall${COLOR_RESET}" ;;
     esac
+else
+    while true; do
+        echo -e "${COLOR_CYAN}Please choose an option:${COLOR_RESET}"
+        echo "1. Build"
+        echo "2. Unbuild"
+        echo "3. Create"
+        echo "4. Optimize Images"
+        echo "5. Install"
+        echo "6. Uninstall"
+        echo "7. Exit"
+        
+        read -p "Enter your choice (1-7): " choice
+        case $choice in
+            1) build ;;
+            2) unbuild ;;
+            3) create ;;
+            4) optimize_images ;;
+            5) install ;;
+            6) uninstall ;;
+            7) break ;;
+            *) echo -e "${COLOR_YELLOW}Invalid choice. Please try again.${COLOR_RESET}" ;;
+        esac
+    done
 fi
+
+
+# *********************
+# * Main Functions    *
+# *********************
+build() {
+    validate_node
+    if [ "$CURRENT_DIR" != "$PROGRAM_DIR" ]; then
+        "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" build
+    else
+        echo -e "$STRING_DIR_ERROR"
+    fi
+}
+
+unbuild() {
+    validate_node
+    if [ "$CURRENT_DIR" != "$PROGRAM_DIR" ]; then
+        "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" unbuild
+    else
+        echo -e "$STRING_DIR_ERROR"
+    fi
+}
+
+create() {
+    if [ ! -d "$PROGRAM_DIR" ]; then
+        echo -e "${COLOR_YELLOW}LayX is not installed. Please install first.${COLOR_RESET}"
+        return
+    fi
+
+    if [ -d "${CURRENT_DIR}layx" ]; then
+        while true; do
+            read -p "Existing LayX project found. Overwrite? (Y/N): " choice
+            case $choice in
+                [Yy]* ) echo -e "${COLOR_CYAN}Continuing...${COLOR_RESET}"; break;;
+                [Nn]* ) return;;
+                * ) continue;;
+            esac
+        done
+    fi
+
+    for item in "$PROGRAM_DIR"*; do
+        base_name=$(basename "$item")
+        if [ "$base_name" != "config" ] && [ "$base_name" != "layx.sh" ]; then
+            if [ -d "$item" ]; then
+                cp -R "$item" "${CURRENT_DIR}${base_name}"
+            else
+                cp "$item" "${CURRENT_DIR}${base_name}"
+            fi
+        fi
+    done
+
+    echo -e "${COLOR_GREEN}Project created successfully!${COLOR_RESET}"
+}
+
+optimize_images() {
+    processed=0
+    find "${CURRENT_DIR}${IMAGES_DIR}" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) | while read -r file; do
+        echo "Processing $(basename "$file")"
+        dir=$(dirname "$file")
+        filename=$(basename "$file")
+        name="${filename%.*}"
+        
+        mkdir -p "${dir}/original_images_dir"
+        if mv "$file" "${dir}/original_images_dir/$filename"; then
+            "$AVIF_EXE" $ARGS "${dir}/original_images_dir/$filename" -o "${dir}/${name}.avif"
+            processed=1
+        fi
+    done
+
+    if [ $processed -eq 1 ]; then
+        echo -e "${COLOR_GREEN}Image optimization completed${COLOR_RESET}"
+    else
+        echo -e "${COLOR_YELLOW}No images found to process${COLOR_RESET}"
+    fi
+}
+
+install() {
+    if [ "$SCRIPT_DIR" = "$PROGRAM_DIR" ]; then
+        echo -e "${COLOR_YELLOW}Already installed in $PROGRAM_DIR${COLOR_RESET}"
+        return
+    }
+
+    check_permissions "/Applications" || return 1
+
+    if [ -d "$PROGRAM_DIR" ]; then
+        read -p "Existing installation found. Update or overwrite? (Y/N): " choice
+        case $choice in
+            [Yy]* ) ;;
+            * ) return;;
+        esac
+    fi
+
+    # Create program directory with sudo if needed
+    sudo mkdir -p "$PROGRAM_DIR"
+    sudo copy_safe "$SCRIPT_DIR" "$PROGRAM_DIR"
+
+    # Set executable permissions
+    echo -e "${COLOR_CYAN}Setting executable permissions...${COLOR_RESET}"
+    sudo chmod +x "${PROGRAM_DIR}layx.sh"
+    sudo chmod +x "${PROGRAM_DIR}${CONFIG_DIR}node"
+    sudo chmod +x "${PROGRAM_DIR}${CONFIG_DIR}webp"
+    sudo chmod +x "${PROGRAM_DIR}${CONFIG_DIR}avif"
+
+    # Handle aliases for both zsh and bash
+    echo -e "${COLOR_CYAN}Creating alias...${COLOR_RESET}"
+    local shell_file
+    if [ -f "$HOME/.zshrc" ]; then
+        shell_file="$HOME/.zshrc"
+    elif [ -f "$HOME/.bash_profile" ]; then
+        shell_file="$HOME/.bash_profile"
+    else
+        shell_file="$HOME/.bash_profile"
+        touch "$shell_file"
+    fi
+
+    if ! grep -q "alias layx=" "$shell_file"; then
+        echo "alias layx='${PROGRAM_DIR}layx.sh'" >> "$shell_file"
+        echo -e "${COLOR_GREEN}Added alias to $shell_file${COLOR_RESET}"
+    else
+        echo -e "${COLOR_YELLOW}Alias 'layx' already exists in $shell_file${COLOR_RESET}"
+    fi
+
+    # Create symbolic link in /usr/local/bin
+    sudo mkdir -p /usr/local/bin
+    sudo ln -sf "${PROGRAM_DIR}layx.sh" /usr/local/bin/layx
+
+    # Copy code snippets
+    mkdir -p "$SNIPPETS_DIR"
+    copy_safe "$SNIPPETS_PATH" "$SNIPPETS_DIR"
+
+    # Set proper permissions
+    sudo chown -R $(whoami):staff "$PROGRAM_DIR"
+    sudo chmod -R 755 "$PROGRAM_DIR"
+
+    echo -e "${COLOR_GREEN}Installation completed successfully!${COLOR_RESET}"
+    echo -e "${COLOR_CYAN}Please restart your terminal or run 'source $shell_file' to use the 'layx' command${COLOR_RESET}"
+}
+
+uninstall() {
+    check_permissions "/Applications" || return 1
+
+    if [ -d "$PROGRAM_DIR" ]; then
+        if sudo rm -rf "$PROGRAM_DIR"; then
+            # Remove symbolic link
+            sudo rm -f /usr/local/bin/layx
+            
+            # Remove aliases from shell config files
+            if [ -f "$HOME/.zshrc" ]; then
+                sed -i '' "/alias layx=/d" "$HOME/.zshrc"
+            fi
+            if [ -f "$HOME/.bash_profile" ]; then
+                sed -i '' "/alias layx=/d" "$HOME/.bash_profile"
+            fi
+            
+            echo -e "${COLOR_GREEN}Uninstallation completed${COLOR_RESET}"
+            echo -e "${COLOR_CYAN}Please restart your terminal for the changes to take effect${COLOR_RESET}"
+        else
+            echo -e "${COLOR_RED}Failed to remove program directory${COLOR_RESET}"
+        fi
+    fi
+}
+
+
+# *********************
+# * Helper Functions  *
+# *********************
+validate_node() {
+    if [ ! -f "$NODE_EXE" ]; then
+        if command -v node &> /dev/null; then
+            NODE_EXE="node"
+            echo -e "${COLOR_CYAN}Program node.js not found. Using system Node.js installation${COLOR_RESET}"
+        else
+            echo -e "${COLOR_RED}Node.js not found!${COLOR_RESET}"
+            return 1
+        fi
+    fi
+    return 0
+}
+
+copy_safe() {
+    local src="$1"
+    local dst="$2"
+    mkdir -p "$dst" || return 1
+    cp -R "$src"* "$dst" 2>/dev/null
+    return $?
+}
+
+check_permissions() {
+    if [ ! -w "$1" ]; then
+        echo -e "${COLOR_YELLOW}Requesting administrative privileges...${COLOR_RESET}"
+        if ! sudo -v; then
+            echo -e "${COLOR_RED}Failed to get administrative privileges${COLOR_RESET}"
+            return 1
+        fi
+        return 0
+    fi
+    return 0
+}

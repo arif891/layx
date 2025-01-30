@@ -2,8 +2,8 @@ import { readFile, writeFile, extractImportUrls } from '../../util/functions.js'
 
 export {processDependencies };
 
-async function processDependencies(Info, type, filePath) {
-    const deps = Info.dependencies?.[type];
+async function processDependencies(info, type, filePath) {
+    const deps = info.dependencies?.[type];
     if (!deps?.length) return;
 
     try {

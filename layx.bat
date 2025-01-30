@@ -157,7 +157,7 @@ NET SESSION >NUL 2>&1 || (
 )
 
 IF EXIST "%PROGRAM_DIR%" (
-    SET /P choice="Existing installation found. Overwrite? (Y/N): "
+    SET /P choice="Existing installation found. Update or overwrite? (Y/N): "
     IF /I NOT "!choice!"=="Y" GOTO end
 )
 

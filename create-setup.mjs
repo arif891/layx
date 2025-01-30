@@ -26,8 +26,7 @@ async function createSetup() {
 
         for (const platform of platforms) {
             const platformDir = path.join(setupDir, platform.name, '/');
-            await copyDir('./', platformDir);
-            await clearSetup(platformDir, platform.name);
+            await copyDir('./', platformDir, platform.name);
         }
     } catch (error) {
         console.error('Error creating setup:', error);
@@ -35,7 +34,7 @@ async function createSetup() {
     }
 }
 
-async function copyDir(src, dest) {
+async function copyDir(src, dest, platformName) {
     try {
         await fs.mkdir(dest, { recursive: true });
         const entries = await fs.readdir(src, { withFileTypes: true });
@@ -47,55 +46,34 @@ async function copyDir(src, dest) {
             const destPath = path.join(dest, entry.name);
 
             if (entry.isDirectory()) {
-                await copyDir(srcPath, destPath);
+                await copyDir(srcPath, destPath, platformName);
             } else {
-                await fs.copyFile(srcPath, destPath);
-            }
-        }
-    } catch (error) {
-        console.error('Error copying directory:', error);
-        throw error;
-    }
-}
+                // Check if file should be copied for this platform
+                let shouldCopy = true;
+                let finalName = entry.name;
 
-async function clearSetup(dir, platformName) {
-    try {
-        const entries = await fs.readdir(dir, { withFileTypes: true });
-
-        for (const entry of entries) {
-            if (entry.isFile()) {
-                let shouldDelete = true;
-                const filePath = path.join(dir, entry.name);
-
+                // Check if file has any platform-specific extension
                 for (const platform of platforms) {
-                    if (platform.name === platformName) {
-                        for (const extension of platform.extensions) {
-                            if (entry.name.includes(extension)) {
-                                shouldDelete = false;
-                                if (platform.name !== 'windows') {
-                                    const newPath = path.join(dir, entry.name.replace(extension, ''));
-                                    await fs.rename(filePath, newPath);
-                                }
-                                break;
+                    for (const extension of platform.extensions) {
+                        if (entry.name.includes(extension)) {
+                            // Only copy if it matches current platform
+                            shouldCopy = platform.name === platformName;
+                            // Remove platform suffix for non-windows files
+                            if (shouldCopy && platform.name !== 'windows') {
+                                finalName = entry.name.replace(extension, '');
                             }
-                        }
-                    } else {
-                        for (const extension of platform.extensions) {
-                            if (entry.name.includes(extension)) {
-                                shouldDelete = true;
-                                break;
-                            }
+                            break;
                         }
                     }
                 }
 
-                if (shouldDelete) {
-                    await fs.unlink(filePath);
+                if (shouldCopy) {
+                    await fs.copyFile(srcPath, path.join(dest, finalName));
                 }
             }
         }
     } catch (error) {
-        console.error('Error clearing setup:', error);
+        console.error('Error copying directory:', error);
         throw error;
     }
 }

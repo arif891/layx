@@ -10,6 +10,8 @@ async function processDependencies(info, type, filePath) {
         let content = await readFile(filePath);
         const importUrls = extractImportUrls(content, type);
 
+        content += '\n\n/* ' + info.name + ' dependencies */';
+
         for (const dep of deps) {
             const path = type === 'js' ? dep.path : dep;
             if (importUrls.includes(path)) continue;

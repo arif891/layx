@@ -17,6 +17,8 @@ async function templateAdd(scriptDir) {
 
         const templateNames = argsObj.values.template.map(t => t.toLowerCase());
 
+        console.log('\nAdding templates...\n');
+
         for (const templateName of templateNames) {
             try {
                 const templateInfo = infoObj[templateName];

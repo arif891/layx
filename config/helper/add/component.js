@@ -18,6 +18,8 @@ async function componentAdd(scriptDir) {
 
         const componentNames = argsObj.values.component.map(t => t.toLowerCase());
 
+        console.log('\nAdding components...\n');
+
         for (const componentName of componentNames) {
             try {
                 const componentInfo = infoObj[componentName];

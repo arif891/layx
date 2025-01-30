@@ -1,0 +1,124 @@
+accordion, .accordion {
+    --padding-x: 1rem;
+    --padding-y: 1rem;
+    --radius: .5rem;
+    --margin-bottom: 1rem;
+    --bg: var(--surface-color, rgb(250, 250, 250));
+    --item-bg: var(--bg-color);
+    --transition-duration: .3s;
+
+    display: block;
+    padding: .5rem;
+    overflow-y: auto;
+    background: var(--bg);
+    scrollbar-width: none;
+
+    .item {
+        display: grid;
+        grid-template-rows: max-content 0fr;
+        border-radius: var(--radius);
+        background: var(--item-bg);
+        outline-color: transparent;
+        transition: grid-template-rows var(--transition-duration) ease-out;
+
+        &:not(:last-of-type) {
+            margin-bottom: var(--margin-bottom, .5rem);
+        }
+
+        &[open] {
+            grid-template-rows: max-content 1fr;
+            
+            .title::after {
+                rotate: 180deg;
+            }
+        }
+
+        &:has(.title:focus-visible) {
+            outline: 1px solid var(--accent-color);
+        }
+
+        .title {
+            display: flex;
+            gap: .5lh;
+            justify-content: space-between;
+            font: inherit;
+            font-size: min(calc(1rem + .3vw), 1.375rem);
+            font-weight: 600;
+            text-align: start;
+            padding: var(--padding-y, var(--padding, .5rem)) var(--padding-x, var(--padding, .5rem)) ;
+            background: unset;
+            border: unset;
+            margin: unset;
+            cursor: pointer;
+            user-select: none;
+
+            &::after {
+                content: '';
+                height: .9lh;
+                aspect-ratio: 1;
+                border-radius: 50%;
+                background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23212529' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M2 5L8 11L14 5'/%3e%3c/svg%3e") center no-repeat, var(--accent-color);
+                background-size: 50%;
+                transition: .3s;
+            }
+
+            [theme=dark] & {
+                &::after {
+                    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M2 5L8 11L14 5'/%3e%3c/svg%3e") center no-repeat, var(--accent-color);
+                    background-size: 60%;
+                }
+            }
+
+            &:focus-visible {
+                outline: none;
+            }
+        }
+
+        .content {
+            overflow: hidden;
+            padding-inline: var(--padding-x, var(--padding, .5rem));
+            transition: margin-bottom var(--transition-duration) ease-out;
+
+            [open] & {
+              margin-bottom: var(--padding-y, var(--padding, .5rem));
+            }
+
+            :last-child {
+               margin-bottom: unset;
+            }
+        }
+    }
+
+    
+    &.on-hover {
+        .item {
+            &:hover {
+                grid-template-rows: max-content 1fr;
+
+                .title::after {
+                    rotate: 180deg;
+                }
+
+                .content {
+                    margin-bottom: var(--padding-y, var(--padding, .5rem));
+                }
+            }
+        }
+    }
+
+    &.no-transition {
+        .item {
+            &, .content {
+                transition: none;
+            }
+        }
+    }
+
+    @media (prefers-reduced-motion) {
+        .item {
+            &, .content {
+                transition: none;
+            }
+        }
+    }
+}

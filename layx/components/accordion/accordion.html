@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+
+        <link rel="stylesheet" href="accordion.css">
+
+        <link rel="stylesheet" href="/layx/main/base/variable.css">
+        <link rel="stylesheet" href="/layx/main/base/base.css">
+        <link rel="stylesheet" href="/layx/main/typography/typography.css">
+        <link rel="stylesheet" href="/layx//main/container/container.css">
+
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                background-color: antiquewhite;
+            }
+
+            .demo__container {
+                max-width: 60ch;
+                margin-top: 1rem;
+                margin-inline: auto;
+
+                accordion {
+                    --bg: none;
+                    --item-bg: rgba(var(--bg-color-rgb), .7);
+                    border-radius: .5rem;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <container class="demo__container">
+
+            <h3 style="padding-left: .5rem;">Accordion</h3>
+
+            <accordion>
+                <div class="item">
+                    <button class="default title">What is web design?</button>
+
+                    <div class="content">
+                        <p>Web design involves creating the visual elements and layout of a website. This includes the
+                            structure, color scheme, typography, images, and overall user interface (UI) to ensure an
+                            appealing, functional, and user-friendly experience.</p>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <button class="default title">What is responsive web design?</button>
+
+                    <div class="content">
+                        <p>Responsive web design is an approach that ensures a website looks good and functions well on
+                            all devices, from desktops to tablets and smartphones. It uses flexible layouts, grids, and
+                            media queries to adjust content based on the screen size.</p>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <button class="default title">Why is mobile-first design important?</button>
+
+                    <div class="content">
+                        <p>Mobile-first design prioritizes the mobile experience when building a website, ensuring it
+                            works optimally on smaller screens before scaling up for larger devices. With the majority
+                            of internet traffic now coming from mobile devices, it's essential to design for mobile
+                            users first.</p>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <button class="default title">What is a website wireframe?</button>
+
+                    <div class="content">
+                        <p>A wireframe is a basic blueprint of a website, outlining the layout and structure without any
+                            design elements like color or images. It's used in the planning stage to map out where
+                            different elements will appear on each page.</p>
+                    </div>
+                </div>
+            </accordion>
+
+        </container>
+
+        <script type="module">
+            import Accordion from './accordion.js';
+        </script>
+    </body>
+
+</html>

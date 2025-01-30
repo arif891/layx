@@ -18,7 +18,7 @@ async function componentAdd(scriptDir) {
 
         const componentNames = argsObj.values.component.map(t => t.toLowerCase());
 
-        console.log('\nAdding components...\n');
+        console.log('\n\nAdding components...\n\n');
 
         for (const componentName of componentNames) {
             try {
@@ -29,7 +29,7 @@ async function componentAdd(scriptDir) {
                     continue;
                 }
 
-                console.log(`\nAdding component '${componentInfo.name}'...\n`);
+                console.log(`Adding component '${componentInfo.name}'...\n`);
 
                 // Process component files
                 if (componentInfo.files?.length) {
@@ -55,13 +55,13 @@ async function componentAdd(scriptDir) {
                 await processDependencies(componentInfo, 'css', layx.files.layxCss);
                 await processDependencies(componentInfo, 'js', layx.files.layxJs);
 
-                console.log(`\nComponent '${componentInfo.name}' version: ${componentInfo.version} added successfully!\n`);
+                console.log(`\nComponent '${componentInfo.name}' version: ${componentInfo.version} added successfully!`);
             } catch (error) {
                 console.error(`Error processing component '${componentName}': ${error.message}`);
             }
         }
 
-        console.log('Component processing completed.');
+        console.log('\n\nComponent processing completed.');
     } catch (error) {
         console.error(`Error processing component: ${error.message}`);
     }

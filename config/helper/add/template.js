@@ -28,7 +28,7 @@ async function templateAdd(scriptDir) {
                     continue;
                 }
 
-                console.log(`\nAdding template '${templateInfo.name}'...\n`);
+                console.log(`Adding template '${templateInfo.name}'...\n`);
 
                 // Process template files
                 if (templateInfo.files?.length) {
@@ -54,13 +54,13 @@ async function templateAdd(scriptDir) {
                 await processDependencies(templateInfo, 'css', layx.files.layxCss);
                 await processDependencies(templateInfo, 'js', layx.files.layxJs);
 
-                console.log(`\nTemplate '${templateInfo.name}' version: ${templateInfo.version} added successfully!\n`);
+                console.log(`\nTemplate '${templateInfo.name}' version: ${templateInfo.version} added successfully!`);
             } catch (error) {
                 console.error(`Error processing template '${templateName}': ${error.message}`);
             }
         }
 
-        console.log('Template processing completed.');
+        console.log('\n\nTemplate processing completed.');
     } catch (error) {
         console.error(`Error fetching template information: ${error.message}`);
     }

@@ -12,12 +12,9 @@
 @import url(helpers/layout/layout_helper.css);
 
 /* Components */
-@import url(components/button/button.css);
 
 
 /* Utilities */
 
 
 /* Other */
-@import url(others/icon/icon.css);
-@import url(others/theme/theme.css);

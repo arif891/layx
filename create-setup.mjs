@@ -2,7 +2,7 @@ import path from 'node:path';
 import fs from "node:fs/promises";
 import { existsSync } from 'node:fs';
 
-const exclude = ['LICENSE', 'README.md', 'create-setup.mjs'];
+const exclude = ['LICENSE', 'README.md', 'create-setup.mjs', 'setup'];
 
 const platforms = [
     {
@@ -42,7 +42,7 @@ async function copyDir(src, dest, platformName) {
         const entries = await fs.readdir(src, { withFileTypes: true });
 
         for (const entry of entries) {
-            if (entry.name.startsWith('.') || entry.name === 'setup') continue;
+            if (entry.name.startsWith('.') || exclude.includes(entry.name)) continue;
 
             const srcPath = path.join(src, entry.name);
             const destPath = path.join(dest, entry.name);

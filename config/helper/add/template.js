@@ -17,7 +17,7 @@ async function templateAdd(scriptDir) {
 
         const templateNames = argsObj.values.template.map(t => t.toLowerCase());
 
-        console.log('\nAdding templates...\n');
+        console.log('\n\nAdding templates...\n\n');
 
         for (const templateName of templateNames) {
             try {
@@ -27,6 +27,8 @@ async function templateAdd(scriptDir) {
                     console.error(`Skipping invalid template: '${templateName}'`);
                     continue;
                 }
+
+                console.log(`\nAdding template '${templateInfo.name}'...\n`);
 
                 // Process template files
                 if (templateInfo.files?.length) {

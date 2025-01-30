@@ -29,6 +29,8 @@ async function componentAdd(scriptDir) {
                     continue;
                 }
 
+                console.log(`\nAdding component '${componentInfo.name}'...\n`);
+
                 // Process component files
                 if (componentInfo.files?.length) {
                     await Promise.all(

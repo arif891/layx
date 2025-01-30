@@ -7,7 +7,11 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 SET "VERSION=0.1.0 alpha"
 SET "PROGRAM_DIR=C:\Program Files\LayX\"
 SET "CONFIG_DIR=config\"
+SET "CONFIG_FILE=config.mjs"
 SET "IMAGES_DIR=assets\image\"
+SET "ARGS="
+SET "SNIPPETS_PATH=%SCRIPT_DIR%%CONFIG_DIR%syntax\layx.code-snippets"
+SET "SNIPPETS_DIR=C:\Users\%username%\AppData\Roaming\Code\User\snippets\"
 
 :: *********************
 :: * ANSI Color Codes  *
@@ -74,14 +78,14 @@ GOTO interactive_menu
 :build
 CALL :validate_node
 IF NOT "%CURRENT_DIR%"=="%PROGRAM_DIR%" (
-    "%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%config.mjs" build
+    "%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%%CONFIG_FILE%" build
 ) ELSE (ECHO %STRING_dir_error%)
 GOTO end
 
 :unbuild
 CALL :validate_node
 IF NOT "%CURRENT_DIR%"=="%PROGRAM_DIR%" (
-    "%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%config.mjs" unbuild
+    "%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%%CONFIG_FILE%" unbuild
 ) ELSE (ECHO %STRING_dir_error%)
 GOTO end
 
@@ -162,6 +166,9 @@ CALL :xcopy_safe "%SCRIPT_DIR%" "%PROGRAM_DIR%"
 :: Check if path already exists in system PATH
 PowerShell -Command "$currentPath = [Environment]::GetEnvironmentVariable('Path', 'Machine'); if ($currentPath -notlike '*%PROGRAM_DIR%*') { [Environment]::SetEnvironmentVariable('Path', $currentPath + ';%PROGRAM_DIR%', 'Machine'); Write-Host '%COLOR_green%Added to system PATH%COLOR_RESET%' } else { Write-Host '%COLOR_cyan%Path already exists in system PATH%COLOR_RESET%' }"
 
+:: Copy code snippets
+CALL :xcopy_safe "%SNIPPETS_PATH%" "%SNIPPETS_DIR%"
+
 ECHO %COLOR_green%Installation completed successfully!%COLOR_RESET%
 GOTO end_with_pause
 
@@ -200,7 +207,7 @@ EXIT /B 0
 SET "cmd=%~1"
 SHIFT
 IF /I "%cmd%"=="add" (
-    "%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%config.mjs" %*
+    "%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%%CONFIG_FILE%" %*
     EXIT /B
 )
 

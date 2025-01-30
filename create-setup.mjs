@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import { existsSync } from 'node:fs';
 
 const exclude = ['LICENSE', 'README.md', 'create-setup.mjs', 'setup'];
+const setupDir = 'setup/';
 
 const platforms = [
     {
@@ -18,7 +19,6 @@ const platforms = [
         extensions: ['(mac)']
     }
 ];
-const setupDir = 'setup/';
 
 async function createSetup() {
     console.log('Creating setup...');

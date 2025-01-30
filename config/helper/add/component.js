@@ -51,7 +51,7 @@ async function componentAdd(scriptDir) {
                 await processDependencies(componentInfo, 'css', layx.files.layxCss);
                 await processDependencies(componentInfo, 'js', layx.files.layxJs);
 
-                console.log(`Component '${componentName}' added successfully!\n`);
+                console.log(`Component '${componentInfo.name}' version: ${componentInfo.version} added successfully!\n`);
             } catch (error) {
                 console.error(`Error processing component '${componentName}': ${error.message}`);
             }

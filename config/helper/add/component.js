@@ -18,7 +18,7 @@ async function componentAdd(scriptDir) {
 
         const componentNames = argsObj.values.component.map(t => t.toLowerCase());
 
-        console.log('\n\nAdding components...\n\n');
+        console.log('\nAdding components...\n\n');
 
         for (const componentName of componentNames) {
             try {

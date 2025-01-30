@@ -2,21 +2,25 @@ import path from 'node:path';
 import fs from "node:fs/promises";
 import { existsSync } from 'node:fs';
 
+const version = '1.0.0 alpha';
 const exclude = ['LICENSE', 'README.md', 'create-setup.mjs', 'setup'];
 const setupDir = 'setup/';
 
 const platforms = [
     {
         name: 'windows',
-        extensions: ['.exe', '.bat']
+        extensions: ['.exe', '.bat'],
+        arch: 'x64'
     },
     {
         name: 'linux',
-        extensions: ['(linux)']
+        extensions: ['(linux)'],
+        arch: 'x64'
     },
     {
         name: 'mac',
-        extensions: ['(mac)']
+        extensions: ['(mac)'],
+        arch: 'arm64',
     }
 ];
 
@@ -28,7 +32,7 @@ async function createSetup() {
         }
 
         for (const platform of platforms) {
-            const platformDir = path.join(setupDir, platform.name, '/layx-setup/');
+            const platformDir = path.join(setupDir, platform.name, `/layx-setup-v${version}_${platform.name}_${platform.arch}/`).replaceAll(' ', '_');
             await copyDir('./', platformDir, platform.name);
         }
     } catch (error) {

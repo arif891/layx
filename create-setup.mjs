@@ -21,6 +21,7 @@ const platforms = [
 const setupDir = 'setup/';
 
 async function createSetup() {
+    console.log('Creating setup...');
     try {
         if(existsSync(setupDir)) {  
             await fs.rm(setupDir, { recursive: true });
@@ -34,6 +35,7 @@ async function createSetup() {
         console.error('Error creating setup:', error);
         process.exit(1);
     }
+    console.log('Setup created successfully!');
 }
 
 async function copyDir(src, dest, platformName) {

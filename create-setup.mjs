@@ -2,6 +2,8 @@ import path from 'node:path';
 import fs from "node:fs/promises";
 import { existsSync } from 'node:fs';
 
+const exclude = ['LICENSE', 'README.md', 'create-setup.mjs'];
+
 const platforms = [
     {
         name: 'windows',

@@ -2,7 +2,7 @@ import path from 'node:path';
 import fs from "node:fs/promises";
 import { existsSync } from 'node:fs';
 
-const version = '1.0.0 alpha';
+const version = '0.1.0 alpha';
 const exclude = ['LICENSE', 'README.md', 'create-setup.mjs', 'setup'];
 const setupDir = 'setup/';
 

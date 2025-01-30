@@ -96,7 +96,7 @@ IF EXIST "%CURRENT_DIR%\layx" (
     SET "choice="
     SET /P choice="Existing LayX project found. Overwrite? (Y/N): "
     IF /I "!choice!"=="Y" (ECHO %COLOR_cyan%Continuing...%COLOR_RESET%)
-    IF /I "!choice!"=="N" (GOTO end_with_pause)
+    IF /I "!choice!"=="N" (GOTO end)
     IF NOT DEFINED choice (GOTO create_retry)
 )
 
@@ -123,7 +123,7 @@ FOR /R "%CURRENT_DIR%%IMAGES_DIR%" %%F IN (*.png *.jpg *.jpeg) DO (
     IF NOT EXIST "%%~dpForiginal_images_dir\" (
         MD "%%~dpForiginal_images_dir" || (
             ECHO %COLOR_red%Failed to create backup directory%COLOR_RESET%
-            GOTO end_with_pause
+            GOTO end
         )
     )
     

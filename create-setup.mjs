@@ -28,7 +28,7 @@ async function createSetup() {
         }
 
         for (const platform of platforms) {
-            const platformDir = path.join(setupDir, platform.name, '/');
+            const platformDir = path.join(setupDir, platform.name, '/layx-setup/');
             await copyDir('./', platformDir, platform.name);
         }
     } catch (error) {

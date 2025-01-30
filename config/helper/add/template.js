@@ -52,7 +52,7 @@ async function templateAdd(scriptDir) {
                 await processDependencies(templateInfo, 'css', layx.files.layxCss);
                 await processDependencies(templateInfo, 'js', layx.files.layxJs);
 
-                console.log(`Template '${templateInfo.name}' version: ${templateInfo.version} added successfully!\n`);
+                console.log(`\nTemplate '${templateInfo.name}' version: ${templateInfo.version} added successfully!\n`);
             } catch (error) {
                 console.error(`Error processing template '${templateName}': ${error.message}`);
             }

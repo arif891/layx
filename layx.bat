@@ -211,6 +211,12 @@ IF /I "%cmd%"=="add" (
     EXIT /B
 )
 
+IF /I "%cmd%"=="setup" (
+    CALL :validate_node
+    "%NODE_EXE%" "create-setup.mjs"
+    EXIT /B
+)
+
 FOR %%A IN (build unbuild create optimizeImages install uninstall) DO (
     IF /I "%cmd%"=="%%A" (
         GOTO %%A

@@ -1,1 +1,0 @@
-const platforms = ['windows', 'mac', 'linux'];

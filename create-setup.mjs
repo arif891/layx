@@ -18,8 +18,8 @@ const platforms = [
         arch: 'x64'
     },
     {
-        name: 'mac',
-        extensions: ['(mac)'],
+        name: 'macOS',
+        extensions: ['(macOS)'],
         arch: 'arm64',
     }
 ];

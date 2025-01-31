@@ -20,6 +20,7 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
     }
 
     if (images.length === 0) {
+        console.log('No images found to optimize.');
         return;
     }
 

@@ -124,33 +124,8 @@ ECHO %COLOR_green%Project created successfully!%COLOR_RESET%
 GOTO end
 
 :optimizeImages
-SET "processed=0"
-FOR /R "%CURRENT_DIR%%IMAGES_DIR%" %%F IN (*.png *.jpg *.jpeg) DO (
-
-    ECHO %%~dpF | FIND /i "original_images_dir" >NUL
-    if errorlevel 1 (
-        ECHO Processing %%~nxF
-        SET "output_path=%%~dpForiginal_images_dir\%%~nxF"
-        
-        IF NOT EXIST "%%~dpForiginal_images_dir\" (
-            MD "%%~dpForiginal_images_dir" || (
-                ECHO %COLOR_red%Failed to create backup directory%COLOR_RESET%
-                GOTO end
-            )
-        )
-        
-        MOVE "%%F" "!output_path!" >NUL && (
-            "%AVIF_EXE%" %ARGS% "!output_path!" -o "%%~dpF%%~nF.avif"
-            SET "processed=1"
-        )
-    )
-)
-
-IF %processed% EQU 1 (
-    ECHO %COLOR_green%Image optimization completed%COLOR_RESET%
-) ELSE (
-    ECHO %COLOR_yellow%No images found to process%COLOR_RESET%
-)
+CALL :validate_node
+"%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%%CONFIG_FILE%" optimizeImages
 GOTO end
 
 :install

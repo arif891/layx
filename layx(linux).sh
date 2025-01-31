@@ -124,25 +124,8 @@ create() {
 }
 
 optimize_images() {
-    processed=0
-    find "${CURRENT_DIR}${IMAGES_DIR}" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) ! -path "*/original_images_dir/*" | while read -r file; do
-        echo "Processing $(basename "$file")"
-        dir=$(dirname "$file")
-        filename=$(basename "$file")
-        name="${filename%.*}"
-        
-        mkdir -p "${dir}/original_images_dir"
-        if mv "$file" "${dir}/original_images_dir/$filename"; then
-            "$AVIF_EXE" $ARGS "${dir}/original_images_dir/$filename" -o "${dir}/${name}.avif"
-            processed=1
-        fi
-    done
-
-    if [ $processed -eq 1 ]; then
-        echo -e "${COLOR_GREEN}Image optimization completed${COLOR_RESET}"
-    else
-        echo -e "${COLOR_YELLOW}No images found to process${COLOR_RESET}"
-    fi
+    validate_node
+   "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" optimizeImages
 }
 
 install() {

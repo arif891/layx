@@ -278,12 +278,12 @@ else
         
         read -p "Enter your choice (1-7): " choice
         case $choice in
-            1) build ;;
-            2) unbuild ;;
-            3) create ;;
-            4) optimize_images ;;
-            5) install ;;
-            6) uninstall ;;
+            1) build; break ;;
+            2) unbuild; break ;;
+            3) create; break ;;
+            4) optimize_images; break ;;
+            5) install; break ;;
+            6) uninstall; break ;;
             7) break ;;
             *) echo -e "${COLOR_YELLOW}Invalid choice. Please try again.${COLOR_RESET}" ;;
         esac

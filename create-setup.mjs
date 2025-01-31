@@ -6,13 +6,13 @@ const version = '0.1.0 alpha';
 const exclude = [
     'LICENSE', 'README.md', 'create-setup.mjs', 'setup',
 
-    'accordion', 'alert', 'breadcrumb', 'card', 'carousel', 'chart', 'dialog', 'draggable', 'media',
-    'pagination', 'popover', 'section', 'sheet', 'tab', 'tooltip', 'window',
+    // 'accordion', 'alert', 'breadcrumb', 'card', 'carousel', 'chart', 'dialog', 'draggable', 'media',
+    // 'pagination', 'popover', 'section', 'sheet', 'tab', 'tooltip', 'window',
 
-    'ai', 'background', 'dynamic_render', 'partial_render', 'pwa', 'scroll_driven_animation', 'smooth_scroll',
-    'syntax_highlighter', 'view_transition',
+    // 'ai', 'background', 'dynamic_render', 'partial_render', 'pwa', 'scroll_driven_animation', 'smooth_scroll',
+    // 'syntax_highlighter', 'view_transition',
 
-    'utilities'
+    // 'utilities'
 ];
 const setupDir = 'setup/';
 

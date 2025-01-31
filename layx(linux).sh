@@ -4,7 +4,7 @@
 # * Configuration Zone *
 # **********************
 VERSION="0.1.0 alpha"
-PROGRAM_DIR="/opt/LayX/"
+PROGRAM_DIR="/opt/layx/"
 CONFIG_DIR="config/"
 CONFIG_FILE="config.mjs"
 IMAGES_DIR="assets/image/"

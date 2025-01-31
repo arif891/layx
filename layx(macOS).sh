@@ -255,7 +255,7 @@ if [ $# -gt 0 ]; then
         "build") build ;;
         "unbuild") unbuild ;;
         "create") create ;;
-        "add") shift; "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" "$@" ;;
+        "add") "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" "$@" ;;
         "setup") 
             validate_node
             "$NODE_EXE" "create-setup.mjs"

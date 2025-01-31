@@ -3,7 +3,17 @@ import fs from "node:fs/promises";
 import { existsSync } from 'node:fs';
 
 const version = '0.1.0 alpha';
-const exclude = ['LICENSE', 'README.md', 'create-setup.mjs', 'setup'];
+const exclude = [
+    'LICENSE', 'README.md', 'create-setup.mjs', 'setup',
+
+    'accordion', 'alert', 'breadcrumb', 'card', 'carousel', 'chart', 'dialog', 'draggable', 'media',
+    'pagination', 'popover', 'section', 'sheet', 'tab', 'tooltip', 'window',
+
+    'ai', 'background', 'dynamic_render', 'partial_render', 'pwa', 'scroll_driven_animation', 'smooth_scroll',
+    'syntax_highlighter', 'view_transition',
+
+    'utilities'
+];
 const setupDir = 'setup/';
 
 const platforms = [
@@ -27,7 +37,7 @@ const platforms = [
 async function createSetup() {
     console.log('Creating setup...');
     try {
-        if(existsSync(setupDir)) {  
+        if (existsSync(setupDir)) {
             await fs.rm(setupDir, { recursive: true });
         }
 

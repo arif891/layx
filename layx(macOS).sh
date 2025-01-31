@@ -40,50 +40,46 @@ WEBP_EXE="${SCRIPT_DIR}${CONFIG_DIR}webp"
 AVIF_EXE="${SCRIPT_DIR}${CONFIG_DIR}avif"
 
 
-# *********************
-# * Main Execution    *
-# *********************
-echo "LayX version $VERSION"
 
-if [ $# -gt 0 ]; then
-    case "$1" in
-        "build") build ;;
-        "unbuild") unbuild ;;
-        "create") create ;;
-        "add") shift; "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" "$@" ;;
-        "setup") 
-            validate_node
-            "$NODE_EXE" "create-setup.mjs"
-            ;;
-        "optimizeImages") optimize_images ;;
-        "install") install ;;
-        "uninstall") uninstall ;;
-        *) echo -e "${COLOR_YELLOW}Invalid command. Valid options: build, unbuild, create, add, optimizeImages, install, uninstall${COLOR_RESET}" ;;
-    esac
-else
-    while true; do
-        echo -e "${COLOR_CYAN}Please choose an option:${COLOR_RESET}"
-        echo "1. Build"
-        echo "2. Unbuild"
-        echo "3. Create"
-        echo "4. Optimize Images"
-        echo "5. Install"
-        echo "6. Uninstall"
-        echo "7. Exit"
-        
-        read -p "Enter your choice (1-7): " choice
-        case $choice in
-            1) build ;;
-            2) unbuild ;;
-            3) create ;;
-            4) optimize_images ;;
-            5) install ;;
-            6) uninstall ;;
-            7) break ;;
-            *) echo -e "${COLOR_YELLOW}Invalid choice. Please try again.${COLOR_RESET}" ;;
-        esac
-    done
-fi
+
+
+# *********************
+# * Helper Functions  *
+# *********************
+validate_node() {
+    if [ ! -f "$NODE_EXE" ]; then
+        if command -v node &> /dev/null; then
+            NODE_EXE="node"
+            echo -e "${COLOR_CYAN}Program node.js not found. Using system Node.js installation${COLOR_RESET}"
+        else
+            echo -e "${COLOR_RED}Node.js not found!${COLOR_RESET}"
+            return 1
+        fi
+    fi
+    return 0
+}
+
+copy_safe() {
+    local src="$1"
+    local dst="$2"
+    mkdir -p "$dst" || return 1
+    cp -R "$src"* "$dst" 2>/dev/null
+    return $?
+}
+
+check_permissions() {
+    if [ ! -w "$1" ]; then
+        echo -e "${COLOR_YELLOW}Requesting administrative privileges...${COLOR_RESET}"
+        if ! sudo -v; then
+            echo -e "${COLOR_RED}Failed to get administrative privileges${COLOR_RESET}"
+            return 1
+        fi
+        return 0
+    fi
+    return 0
+}
+
+
 
 
 # *********************
@@ -247,38 +243,49 @@ uninstall() {
 }
 
 
-# *********************
-# * Helper Functions  *
-# *********************
-validate_node() {
-    if [ ! -f "$NODE_EXE" ]; then
-        if command -v node &> /dev/null; then
-            NODE_EXE="node"
-            echo -e "${COLOR_CYAN}Program node.js not found. Using system Node.js installation${COLOR_RESET}"
-        else
-            echo -e "${COLOR_RED}Node.js not found!${COLOR_RESET}"
-            return 1
-        fi
-    fi
-    return 0
-}
 
-copy_safe() {
-    local src="$1"
-    local dst="$2"
-    mkdir -p "$dst" || return 1
-    cp -R "$src"* "$dst" 2>/dev/null
-    return $?
-}
 
-check_permissions() {
-    if [ ! -w "$1" ]; then
-        echo -e "${COLOR_YELLOW}Requesting administrative privileges...${COLOR_RESET}"
-        if ! sudo -v; then
-            echo -e "${COLOR_RED}Failed to get administrative privileges${COLOR_RESET}"
-            return 1
-        fi
-        return 0
-    fi
-    return 0
-}
+# *********************
+# * Main Execution    *
+# *********************
+echo "LayX version $VERSION"
+
+if [ $# -gt 0 ]; then
+    case "$1" in
+        "build") build ;;
+        "unbuild") unbuild ;;
+        "create") create ;;
+        "add") shift; "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" "$@" ;;
+        "setup") 
+            validate_node
+            "$NODE_EXE" "create-setup.mjs"
+            ;;
+        "optimizeImages") optimize_images ;;
+        "install") install ;;
+        "uninstall") uninstall ;;
+        *) echo -e "${COLOR_YELLOW}Invalid command. Valid options: build, unbuild, create, add, optimizeImages, install, uninstall${COLOR_RESET}" ;;
+    esac
+else
+    while true; do
+        echo -e "${COLOR_CYAN}Please choose an option:${COLOR_RESET}"
+        echo "1. Build"
+        echo "2. Unbuild"
+        echo "3. Create"
+        echo "4. Optimize Images"
+        echo "5. Install"
+        echo "6. Uninstall"
+        echo "7. Exit"
+        
+        read -p "Enter your choice (1-7): " choice
+        case $choice in
+            1) build ;;
+            2) unbuild ;;
+            3) create ;;
+            4) optimize_images ;;
+            5) install ;;
+            6) uninstall ;;
+            7) break ;;
+            *) echo -e "${COLOR_YELLOW}Invalid choice. Please try again.${COLOR_RESET}" ;;
+        esac
+    done
+fi

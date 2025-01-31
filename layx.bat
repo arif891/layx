@@ -126,19 +126,23 @@ GOTO end
 :optimizeImages
 SET "processed=0"
 FOR /R "%CURRENT_DIR%%IMAGES_DIR%" %%F IN (*.png *.jpg *.jpeg) DO (
-    ECHO Processing %%~nxF
-    SET "output_path=%%~dpForiginal_images_dir\%%~nxF"
-    
-    IF NOT EXIST "%%~dpForiginal_images_dir\" (
-        MD "%%~dpForiginal_images_dir" || (
-            ECHO %COLOR_red%Failed to create backup directory%COLOR_RESET%
-            GOTO end
+
+    ECHO %%~dpF | FIND /i "original_images_dir" >NUL
+    if errorlevel 1 (
+        ECHO Processing %%~nxF
+        SET "output_path=%%~dpForiginal_images_dir\%%~nxF"
+        
+        IF NOT EXIST "%%~dpForiginal_images_dir\" (
+            MD "%%~dpForiginal_images_dir" || (
+                ECHO %COLOR_red%Failed to create backup directory%COLOR_RESET%
+                GOTO end
+            )
         )
-    )
-    
-    MOVE "%%F" "!output_path!" >NUL && (
-        "%AVIF_EXE%" %ARGS% "!output_path!" -o "%%~dpF%%~nF.avif"
-        SET "processed=1"
+        
+        MOVE "%%F" "!output_path!" >NUL && (
+            "%AVIF_EXE%" %ARGS% "!output_path!" -o "%%~dpF%%~nF.avif"
+            SET "processed=1"
+        )
     )
 )
 

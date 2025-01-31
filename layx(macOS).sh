@@ -137,7 +137,7 @@ create() {
 
 optimize_images() {
     processed=0
-    find "${CURRENT_DIR}${IMAGES_DIR}" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) | while read -r file; do
+    find "${CURRENT_DIR}${IMAGES_DIR}" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) ! -path "*/original_images_dir/*" | while read -r file; do
         echo "Processing $(basename "$file")"
         dir=$(dirname "$file")
         filename=$(basename "$file")

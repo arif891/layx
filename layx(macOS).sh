@@ -9,8 +9,6 @@ CONFIG_DIR="config/"
 CONFIG_FILE="config.mjs"
 IMAGES_DIR="assets/image/"
 ARGS=""
-SNIPPETS_PATH="${SCRIPT_DIR}${CONFIG_DIR}syntax/layx.code-snippets"
-SNIPPETS_DIR="$HOME/Library/Application Support/Code/User/snippets/"
 
 # *********************
 # * ANSI Color Codes  *
@@ -39,6 +37,9 @@ NODE_EXE="${SCRIPT_DIR}${CONFIG_DIR}node"
 WEBP_EXE="${SCRIPT_DIR}${CONFIG_DIR}webp"
 AVIF_EXE="${SCRIPT_DIR}${CONFIG_DIR}avif"
 
+# Snippets path
+SNIPPETS_PATH="${SCRIPT_DIR}${CONFIG_DIR}syntax/layx.code-snippets"
+SNIPPETS_DIR="$HOME/Library/Application Support/Code/User/snippets/"
 
 
 

@@ -10,8 +10,6 @@ SET "CONFIG_DIR=config\"
 SET "CONFIG_FILE=config.mjs"
 SET "IMAGES_DIR=assets\image\"
 SET "ARGS="
-SET "SNIPPETS_PATH=%SCRIPT_DIR%%CONFIG_DIR%syntax\layx.code-snippets"
-SET "SNIPPETS_DIR=C:\Users\%username%\AppData\Roaming\Code\User\snippets\"
 
 :: *********************
 :: * ANSI Color Codes  *
@@ -39,6 +37,13 @@ SET "SCRIPT_PATH=%~f0"
 SET "NODE_EXE=%SCRIPT_DIR%%CONFIG_DIR%node.exe"
 SET "WEBP_EXE=%SCRIPT_DIR%%CONFIG_DIR%webp.exe"
 SET "AVIF_EXE=%SCRIPT_DIR%%CONFIG_DIR%avif.exe"
+
+:: Snippets path
+SET "SNIPPETS_PATH=%SCRIPT_DIR%%CONFIG_DIR%syntax\layx.code-snippets"
+SET "SNIPPETS_DIR=C:\Users\%username%\AppData\Roaming\Code\User\snippets\"
+
+
+
 
 :: *********************
 :: * Main Execution    *

@@ -125,7 +125,9 @@ GOTO end
 
 :optimizeImages
 CALL :validate_node
+ECHO %COLOR_cyan%Checking if any images are available to optimize...%COLOR_RESET%
 "%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%%CONFIG_FILE%" optimizeImages
+ECHO %COLOR_green%Optimization completed successfully!%COLOR_RESET%
 GOTO end
 
 :install

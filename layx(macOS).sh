@@ -137,7 +137,9 @@ create() {
 
 optimize_images() {
     validate_node
-   "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" optimizeImages
+    echo -e "${COLOR_CYAN}Checking if any images are available to optimize...${COLOR_RESET}"
+    "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" optimizeImages
+    echo -e "${COLOR_GREEN}Optimization completed successfully!${COLOR_RESET}"
 }
 
 install() {

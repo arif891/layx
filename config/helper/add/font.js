@@ -73,7 +73,7 @@ async function processFontFamily(fontName, fontInfoObj) {
 
         console.log(cli.style(`Added "${result.family}" font family successfully.`, fg.green));
     } catch (error) {
-        console.error(`Failed to add "${result.family}". Error:`, error.message);
+        console.error(cli.style( `Failed to add "${result.family}". Error:`, error.message), fg.red);
     }
 }
 

@@ -106,6 +106,8 @@ async function processImports(content, filePath, type, optimize, isPageFile) {
         try {
             const baseContent = await readFile(baseFilePath);
             const baseImports = extractImportUrls(baseContent, type);
+
+            console.log(baseContent);
             
             // Resolve base imports to absolute paths
             baseImportPaths = new Set(baseImports.map(url => 

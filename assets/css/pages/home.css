@@ -1,2 +1,1 @@
-/* Here you can write your page specific css code. */
-@import url(../../../layx/main/container/container.css);
+container, .container{--edge-offset-x: .75rem;display: block;margin-inline: var(--edge-offset-x);&.edge{display: grid;grid-template-columns: var(--edge-offset-x, 0px) 1fr var(--edge-offset-x, 0px);margin-inline: unset;& > *{grid-column: 2;}& > .full{grid-column: span 3;}}@media (width >= 576px){--edge-offset-x: 2.5% !important;}@media (width >= 992px){--edge-offset-x: 5% !important;}@media (aspect-ratio >= 21/9) and (width >= 2000px){--edge-offset-x: 15% !important;}@media (aspect-ratio >= 32/9) and (width >= 3000px){--edge-offset-x: 25% !important;}}

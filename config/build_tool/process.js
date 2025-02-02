@@ -56,8 +56,6 @@ async function processFiles(optimize) {
                 readFile(config.base).catch(() => '')
             ]);
 
-            await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir, optimize);
-
             const finalContent = await processContent(sourceContent, config.source, type, optimize);
 
             await Promise.all([
@@ -66,6 +64,8 @@ async function processFiles(optimize) {
                 writeFile(config.base, minify(finalContent + baseContent, type))
             ]);
             console.log(`Processed LayX base ${type}`);
+
+            await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir, optimize);
 
         } catch (error) {
             console.error(`Error processing ${type} files:`, error);
@@ -102,12 +102,10 @@ async function processImports(content, filePath, type, optimize, isPageFile) {
     // Check base file imports for page files
     let baseImportPaths = new Set();
     if (isPageFile) {
-        const baseFilePath = dirConfig[type].base;
+        const baseFilePath = dirConfig[type].source;
         try {
             const baseContent = await readFile(baseFilePath);
             const baseImports = extractImportUrls(baseContent, type);
-
-            console.log(baseContent);
             
             // Resolve base imports to absolute paths
             baseImportPaths = new Set(baseImports.map(url => 

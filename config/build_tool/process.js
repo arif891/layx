@@ -56,6 +56,8 @@ async function processFiles(optimize) {
                 readFile(config.base).catch(() => '')
             ]);
 
+            await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir, optimize);
+
             const finalContent = await processContent(sourceContent, config.source, type, optimize);
 
             await Promise.all([
@@ -64,8 +66,6 @@ async function processFiles(optimize) {
                 writeFile(config.base, minify(finalContent + baseContent, type))
             ]);
             console.log(`Processed LayX base ${type}`);
-
-            await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir, optimize);
 
         } catch (error) {
             console.error(`Error processing ${type} files:`, error);

@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 
 export {processHtmlFiles};
 
-async function processHtmlFiles(startPath, mode = 'comment', exclude = ['layx']) {
+async function processHtmlFiles(startPath, mode = 'comment', exclude = ['layx', 'setup']) {
     async function* findHtmlFiles(dir) {
       const entries = await fs.readdir(dir, { withFileTypes: true });
       for (const entry of entries) {

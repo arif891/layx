@@ -82,7 +82,7 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize) {
         const outPath = path.join(pageFilesOutDir, path.basename(file));
         const content = await readFile(file);
 
-        const finalContent = await processContent(content, file, type, optimize);
+        const finalContent = await processContent(content, file, type, optimize, true);
 
         await writeFile(outPath, content);
         await writeFile(file, minify(finalContent, type));
@@ -90,22 +90,46 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize) {
     }
 }
 
-async function processContent(content, filePath, type, optimize) {
-    const processed = await processImports(content, filePath, type, optimize);
+async function processContent(content, filePath, type, optimize, isPageFile = false) {
+    const processed = await processImports(content, filePath, type, optimize, isPageFile);
     const filtered = removeImportStatements(processed);
     return type === 'js' ? removeExportAndDefault(filtered) : filtered;
 }
 
-async function processImports(content, filePath, type, optimize) {
-
+async function processImports(content, filePath, type, optimize, isPageFile) {
     const importUrls = extractImportUrls(content, type);
+    
+    // Check base file imports for page files
+    let baseImportPaths = new Set();
+    if (isPageFile) {
+        const baseFilePath = dirConfig[type].source;
+        try {
+            const baseContent = await readFile(baseFilePath);
+            const baseImports = extractImportUrls(baseContent, type);
+            
+            // Resolve base imports to absolute paths
+            baseImportPaths = new Set(baseImports.map(url => 
+                path.resolve(path.dirname(baseFilePath), url)
+            ));
+        } catch (error) {
+            console.warn(`Warning: Could not read base file for duplicate import checking: ${error.message}`);
+        }
+    }
 
     const importedContents = await Promise.all(importUrls.map(async (url) => {
         const importedFilePath = path.resolve(path.dirname(filePath), url);
 
+        // Skip if resolved path is already imported in base file
+        if (isPageFile && baseImportPaths.has(importedFilePath)) {
+            console.log(`Skipping duplicate import of ${url} - already in base file`);
+            return '';
+        }
+
         try {
             if (type === 'css' && optimize) {
-                const optimizableFile = optimizableFiles.find(file => file.url === url);
+                const optimizableFile = optimizableFiles.find(file => 
+                    path.resolve(path.dirname(filePath), file.url) === importedFilePath
+                );
                 if (optimizableFile) {
                     return await processOptimizableFile(url, importedFilePath);
                 }
@@ -119,7 +143,6 @@ async function processImports(content, filePath, type, optimize) {
 
     return [...importedContents, content].join('\n');
 }
-
 
 async function processOptimizableFile(url, importedFilePath) {
     const info = optimizableFiles.find(file => file.url === url)?.optimize;

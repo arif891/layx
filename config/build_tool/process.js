@@ -118,6 +118,8 @@ async function processImports(content, filePath, type, optimize, isPageFile) {
     const importedContents = await Promise.all(importUrls.map(async (url) => {
         const importedFilePath = path.resolve(path.dirname(filePath), url);
 
+        console.log('pagefile', isPageFile, 'baseimports',baseImportPaths, 'file', importedFilePath );
+
         // Skip if resolved path is already imported in base file
         if (isPageFile && baseImportPaths.has(importedFilePath)) {
             console.log(`Skipping duplicate import of ${url} - already in base file`);

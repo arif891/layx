@@ -127,7 +127,7 @@ async function processImports(content, filePath, type, optimize, isPageFile) {
         try {
             if (type === 'css' && optimize) {
                 const optimizableFile = optimizableFiles.find(file => 
-                    path.resolve(filePath, file.url) === importedFilePath
+                    path.resolve(path.dirname(filePath), file.url) === importedFilePath
                 );
                 if (optimizableFile) {
                     return await processOptimizableFile(url, importedFilePath);

@@ -29,9 +29,17 @@ const expandData = {
 	}
 }
 
-const langs = {},
-	sanitize = (str = '') =>
-		str.replaceAll('&', '&#38;').replaceAll?.('<', '&lt;').replaceAll?.('>', '&gt;'),
+const langs = new Map(),
+	sanitize = (str = '') => {
+		const entities = {
+			'&': '&#38;',
+			'<': '&lt;',
+			'>': '&gt;',
+			'"': '&quot;',
+			"'": '&#39;'
+		};
+		return str.replace(/[&<>"']/g, char => entities[char]);
+	},
 	/**
 	 * Create a HTML element with the right token styling
 	 *
@@ -54,57 +62,77 @@ const langs = {},
  * - type of the token
  */
 export async function tokenize(src, lang, token) {
-	try {
-		let m,
-			part,
-			first = {},
-			match,
-			cache = [],
-			i = 0,
-			data = typeof lang === 'string' ? (await (langs[lang] ??= import(`./languages/${lang}.js`))) : lang,
-			// make a fast shallow copy to bee able to splice lang without change the original one
-			arr = [...typeof lang === 'string' ? data.default : lang.sub];
+    try {
+        let data;
+        if (typeof lang === 'string') {
+            data = langs.get(lang);
+            if (!data) {
+                data = await import(`./languages/${lang}.js`);
+                if (!data?.default) {
+                    throw new Error(`Invalid language module for ${lang}`);
+                }
+            }
+        } else {
+            data = lang;
+        }
 
-		while (i < src.length) {
-			first.index = null;
-			for (m = arr.length; m-- > 0;) {
-				part = arr[m].expand ? expandData[arr[m].expand] : arr[m];
-				// do not call again exec if the previous result is sufficient
-				if (cache[m] === undefined || cache[m].match.index < i) {
-					part.match.lastIndex = i;
-					match = part.match.exec(src);
-					if (match === null) {
-						// no more match with this regex can be disposed
-						arr.splice(m, 1);
-						cache.splice(m, 1);
-						continue;
-					}
-					// save match for later use to decrease performance cost
-					cache[m] = { match, lastIndex: part.match.lastIndex };
-				}
-				// check if it the first match in the string
-				if (cache[m].match[0] && (cache[m].match.index <= first.index || first.index === null))
-					first = {
-						part: part,
-						index: cache[m].match.index,
-						match: cache[m].match[0],
-						end: cache[m].lastIndex
-					}
-			}
-			if (first.index === null)
-				break;
-			token(src.slice(i, first.index), data.type);
-			i = first.end;
-			if (first.part.sub)
-				await tokenize(first.match, typeof first.part.sub === 'string' ? first.part.sub : (typeof first.part.sub === 'function' ? first.part.sub(first.match) : first.part), token);
-			else
-				token(first.match, first.part.type);
-		}
-		token(src.slice(i, src.length), data.type);
-	}
-	catch {
-		token(src);
-	}
+        let m,
+            part,
+            first = {},
+            match,
+            cache = [],
+            i = 0,
+            // Ensure we have a valid array to work with
+            arr = Array.isArray(data.sub) ? [...data.sub] : 
+                  Array.isArray(data.default) ? [...data.default] : 
+                  [];
+
+        if (arr.length === 0) {
+            token(src);
+            return;
+        }
+
+        while (i < src.length) {
+            first.index = null;
+            for (m = arr.length; m-- > 0;) {
+                part = arr[m].expand ? expandData[arr[m].expand] : arr[m];
+                // do not call again exec if the previous result is sufficient
+                if (cache[m] === undefined || cache[m].match.index < i) {
+                    part.match.lastIndex = i;
+                    match = part.match.exec(src);
+                    if (match === null) {
+                        // no more match with this regex can be disposed
+                        arr.splice(m, 1);
+                        cache.splice(m, 1);
+                        continue;
+                    }
+                    // save match for later use to decrease performance cost
+                    cache[m] = { match, lastIndex: part.match.lastIndex };
+                }
+                // check if it the first match in the string
+                if (cache[m].match[0] && (cache[m].match.index <= first.index || first.index === null))
+                    first = {
+                        part: part,
+                        index: cache[m].match.index,
+                        match: cache[m].match[0],
+                        end: cache[m].lastIndex
+                    }
+            }
+            if (first.index === null)
+                break;
+            token(src.slice(i, first.index), data.type);
+            i = first.end;
+            if (first.part.sub)
+                await tokenize(first.match, typeof first.part.sub === 'string' ? first.part.sub : (typeof first.part.sub === 'function' ? first.part.sub(first.match) : first.part), token);
+            else
+                token(first.match, first.part.type);
+        }
+        token(src.slice(i, src.length), data.type);
+    }
+    catch (error) {
+        console.error(`Tokenization error: ${error.message}`);
+        token(src);
+    }
 }
 
 /**
@@ -177,6 +205,13 @@ export let highlightAll = async (opt) =>
  * @param {string} languageName The name of the language
  * @param {{ default: LanguageDefinition }} language The language
  */
-export let loadLanguage = (languageName, language) => {
-	langs[languageName] = language;
+export async function loadLanguage(languageName, language) {
+	if (!language?.default?.length) {
+		throw new Error(`Invalid language definition for ${languageName}`);
+	}
+	langs.set(languageName, language);
+}
+
+export function clearLanguageCache() {
+	langs.clear();
 }

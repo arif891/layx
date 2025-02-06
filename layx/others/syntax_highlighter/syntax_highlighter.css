@@ -1,4 +1,6 @@
 [data-code-lang] {
+	font-family: monospace;
+	font-size: 1rem;
 	line-height: 1.5;
 	padding: 1rem;
 
@@ -10,7 +12,8 @@
 			display: flex;
 
 			.code {
-				font-size: 1rem;
+				color: inherit;
+				font: inherit;
 				white-space: pre;
 			}
 		}
@@ -21,11 +24,9 @@
 	.numbers {
 		padding-left: 5px;
 		counter-reset: line;
-		font-family: monospace;
 	}
 
 	.numbers div {
-		font-size: 1rem;
 		padding-right: 5px
 	}
 
@@ -33,6 +34,8 @@
 		display: block;
 		content: counter(line);
 		opacity: .6;
+		font: inherit;
+		font-variant-numeric: tabular-nums;
 		text-align: right;
 		margin-right: 5px;
 		counter-increment: line
@@ -42,23 +45,19 @@
 		font-style: italic
 	}
 
-	.err,
-	.kwd {
+	.err, .kwd {
 		color: #e16
 	}
 
-	.num,
-	.class {
+	.num, .class {
 		color: #f60
 	}
 
-	.numbers,
-	.cmnt {
+	.numbers, .cmnt {
 		color: #999
 	}
 
-	.insert,
-	.str {
+	.insert, .str {
 		color: #7d8
 	}
 
@@ -66,18 +65,15 @@
 		color: #3bf
 	}
 
-	.type,
-	.oper {
+	.type, .oper {
 		color: #5af
 	}
 
-	.section,
-	.func {
+	.section, .func {
 		color: #84f
 	}
 
-	.deleted,
-	.var {
+	.deleted, .var {
 		color: #f44
 	}
 
@@ -91,14 +87,11 @@
 	
 	[theme=dark] & {
 
-		.deleted,
-		.err,
-		.var {
+		.deleted, .err, .var {
 			color: #ff5261
 		}
 
-		.section,
-		.kwd {
+		.section, .kwd {
 			color: #ff7cc6
 		}
 
@@ -106,15 +99,11 @@
 			color: #eab07c
 		}
 
-		.numbers,
-		.cmnt {
+		.numbers, .cmnt {
 			color: #7d828b
 		}
 
-		.insert,
-		.type,
-		.func,
-		.bool {
+		.insert, .type, .func, .bool {
 			color: #71d58a
 		}
 

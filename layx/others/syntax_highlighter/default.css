@@ -1,0 +1,131 @@
+[data-code-lang] {
+
+	&.multiline {
+		line-height: 1.5;
+		max-width: 100%;
+		overflow-x: auto;
+
+		.wrapper {
+			display: flex;
+			white-space: pre;
+		}
+	}
+
+	&.oneline {}
+
+	.numbers {
+		padding-left: 5px;
+		counter-reset: line
+	}
+
+	.numbers div {
+		padding-right: 5px
+	}
+
+	.numbers div::before {
+		color: #999;
+		display: block;
+		content: counter(line);
+		opacity: .5;
+		text-align: right;
+		margin-right: 5px;
+		counter-increment: line
+	}
+
+	.cmnt {
+		font-style: italic
+	}
+
+	.err,
+	.kwd {
+		color: #e16
+	}
+
+	.num,
+	.class {
+		color: #f60
+	}
+
+	.numbers,
+	.cmnt {
+		color: #999
+	}
+
+	.insert,
+	.str {
+		color: #7d8
+	}
+
+	.bool {
+		color: #3bf
+	}
+
+	.type,
+	.oper {
+		color: #5af
+	}
+
+	.section,
+	.func {
+		color: #84f
+	}
+
+	.deleted,
+	.var {
+		color: #f44
+	}
+
+	.oneline {
+		padding: 12px 10px
+	}
+
+	.http.oneline .kwd {
+		background: #25f;
+		color: #fff;
+		padding: 5px 7px;
+		border-radius: 5px
+	}
+
+	
+	[theme=dark] & {
+
+		.deleted,
+		.err,
+		.var {
+			color: #ff5261
+		}
+
+		.section,
+		.kwd {
+			color: #ff7cc6
+		}
+
+		.class {
+			color: #eab07c
+		}
+
+		.numbers,
+		.cmnt {
+			color: #7d828b
+		}
+
+		.insert,
+		.type,
+		.func,
+		.bool {
+			color: #71d58a
+		}
+
+		.num {
+			color: #b581fd
+		}
+
+		.oper {
+			color: #80c6ff
+		}
+
+		.str {
+			color: #4dacfa
+		}
+	}
+}

@@ -1,13 +1,18 @@
 [data-code-lang] {
+	line-height: 1.5;
+	padding: 1rem;
 
 	&.multiline {
-		line-height: 1.5;
 		max-width: 100%;
 		overflow-x: auto;
 
 		.wrapper {
 			display: flex;
-			white-space: pre;
+
+			.code {
+				font-size: 1rem;
+				white-space: pre;
+			}
 		}
 	}
 
@@ -15,18 +20,19 @@
 
 	.numbers {
 		padding-left: 5px;
-		counter-reset: line
+		counter-reset: line;
+		font-family: monospace;
 	}
 
 	.numbers div {
+		font-size: 1rem;
 		padding-right: 5px
 	}
 
 	.numbers div::before {
-		color: #999;
 		display: block;
 		content: counter(line);
-		opacity: .5;
+		opacity: .6;
 		text-align: right;
 		margin-right: 5px;
 		counter-increment: line
@@ -73,10 +79,6 @@
 	.deleted,
 	.var {
 		color: #f44
-	}
-
-	.oneline {
-		padding: 12px 10px
 	}
 
 	.http.oneline .kwd {

@@ -76,7 +76,7 @@ label:not(.default) {
     border: var(--border, none);
     border-radius: var(--radius);
     outline: 3px solid transparent;
-    transition: .3s;
+    transition: outline-color .3s;
 
     &:not(:last-child) {
         margin-bottom: var(--margin-bottom);
@@ -292,8 +292,7 @@ input:not(.default) {
         transition: background-size .1s;
 
         &.value::after {
-            counter-set: value var(--value);
-            content: var(--value-before, '') counter(value) var(--value-after, '');
+            content: var(--value-before, '') attr(value) var(--value-after, '');
             pointer-events: none;
             position: absolute;
             inset: .5rem;

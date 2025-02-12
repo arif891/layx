@@ -21,10 +21,12 @@ class Form {
             input.style.setProperty('--value', input.value);
             input.style.setProperty('--min', input.min || '0');
             input.style.setProperty('--max', input.max || '100');
+            input.setAttribute('value', input.value);
 
             // Update CSS custom property on input change
             input.addEventListener('input', () => {
                 input.style.setProperty('--value', input.value);
+                input.setAttribute('value', input.value);
             });
         });
     }

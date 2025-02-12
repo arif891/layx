@@ -1,6 +1,6 @@
 /**
  * @typedef {Object} Options
- * @property {Boolean} [hideLineNumbers=false] Indicates whether to hide line numbers
+ * @property {Boolean} [lineNumbers=false] Indicates whether to hide line numbers
  */
 
 /**
@@ -136,6 +136,23 @@ export async function tokenize(src, lang, token) {
 }
 
 /**
+ * Handle copy button click event
+ * @param {Element} button Copy button element
+ * @param {Element} codeElement Code element to copy from
+ */
+function handleCopy(button, codeElement) {
+    navigator.clipboard.writeText(codeElement.textContent).then(() => {
+        button.classList.add('copied');
+        setTimeout(() => {
+            button.classList.remove('copied');
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        button.classList.add('failed');
+    });
+}
+
+/**
  * Highlight code text and return HTML string with syntax highlighting
  * 
  * @async
@@ -147,12 +164,14 @@ export async function tokenize(src, lang, token) {
  * @returns {Promise<string>} HTML string with syntax highlighting
  */
 export async function highlightText(src, lang, multiline = true, opt = {}) {
-	let tmp = ''
-	await tokenize(src, lang, (str, type) => tmp += toSpan(sanitize(str), type))
+    let tmp = ''
+    await tokenize(src, lang, (str, type) => tmp += toSpan(sanitize(str), type))
 
-	return multiline
-		? `<div class="wrapper"><div class="numbers">${'<div></div>'.repeat(!opt.hideLineNumbers && src.split('\n').length)}</div><code class="code">${tmp}</code></div>`
-		: tmp;
+    const html = multiline
+        ? `<div class="header"><span class="lang">${lang}</span><button class="copy" title="Copy Code"></button></div><div class="wrapper"><div class="numbers">${'<div></div>'.repeat(opt.lineNumbers && src.split('\n').length)}</div><code class="code">${tmp}</code></div>`
+        : `<div class="wrapper"><code class="code">${tmp}</code></div><button class="copy" title="Copy Code"></button>`;
+
+    return html;
 }
 
 /**
@@ -166,10 +185,17 @@ export async function highlightText(src, lang, multiline = true, opt = {}) {
  * @param {Options} [opt] Highlighting options
  */
 export async function highlightElement(elm, lang = elm.dataset.codeLang, mode, opt) {
-	let txt = elm.textContent;
-	mode ??= `${(txt.split('\n').length < 2 ? 'one' : 'multi')}line`;
-	elm.className = `${[...elm.classList].filter(className => !className.startsWith('')).join(' ')}code-block ${lang} ${mode} highlighted`;
-	elm.innerHTML = await highlightText(txt, lang, mode == 'multiline', opt);
+    let txt = elm.textContent.trim();
+    mode ??= `${(txt.split('\n').length < 2 ? 'one' : 'multi')}line`;
+    elm.className = `${[...elm.classList].filter(className => !className.startsWith('')).join(' ')}code-block ${lang} ${mode} highlighted`;
+    elm.innerHTML = await highlightText(txt, lang, mode == 'multiline', opt);
+    
+    // Add click handler for copy button
+    const copyButton = elm.querySelector('.copy');
+    const codeElement = elm.querySelector('.code');
+    if (copyButton && codeElement) {
+        copyButton.addEventListener('click', () => handleCopy(copyButton, codeElement));
+    }
 }
 
 /**

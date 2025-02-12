@@ -1,4 +1,4 @@
-import js from './js.js'
+import js from './javascript.js'
 
 export default [
 	{

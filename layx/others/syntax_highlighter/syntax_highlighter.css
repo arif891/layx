@@ -1,25 +1,75 @@
 [data-code-lang] {
+	--padding: 1rem;
 	font-family: monospace;
 	font-size: 1rem;
 	line-height: 1.5;
-	padding: 1rem;
+	max-width: 100%;
+	overflow-x: auto;
+	background-color: var(--surface-color);
+	border-radius: var(--radius);
+	white-space: pre;
+
+	&:not(.multiline, .oneline) {
+		padding: var(--padding);
+	}
 
 	&.multiline {
-		max-width: 100%;
-		overflow-x: auto;
+
+		.header {
+			display: flex;
+			justify-content: space-between;
+			padding: var(--padding);
+			border-bottom: 2px solid var(--bg-color);
+
+			.lang, .copy {
+             line-height: 1;
+			 font-size: .9rem;
+			}
+
+			.copy {
+				padding: 0;
+			}
+		}
 
 		.wrapper {
 			display: flex;
-
-			.code {
-				color: inherit;
-				font: inherit;
-				white-space: pre;
-			}
+			padding: var(--padding);
+			max-width: 100%;
+			overflow-x: auto;
 		}
 	}
 
-	&.oneline {}
+	&.oneline {
+		position: relative;
+		padding: var(--padding);
+
+		.wrapper {
+			max-width: 100%;
+			overflow-x: auto;
+		}
+
+		.copy {
+			position: absolute;
+			inset: 0 var(--padding) 0 auto;
+			padding: 0 0 0 1rem;
+			background: linear-gradient(to right, transparent , var(--surface-color) 20% 100%);
+		}
+	}
+
+	.code {
+		color: inherit;
+		font: inherit;
+	}
+
+	.copy {
+		&::before {
+			content: 'Copy';
+		}
+
+		&.copied::before {
+			content: 'Copied';
+		}
+	}
 
 	.numbers {
 		padding-left: 5px;

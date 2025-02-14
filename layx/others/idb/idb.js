@@ -56,6 +56,8 @@ class IDB {
     }
 
     async get(storeName, keyOrIndex, key) {
+        this.validateStoreName(storeName);
+        this.validateKey(keyOrIndex);
         try {
             const store = await this.store(storeName);
             const request = key !== undefined ? store.index(keyOrIndex).get(key) : store.get(keyOrIndex);
@@ -113,6 +115,10 @@ class IDB {
     }
 
     async put(storeName, value, key) {
+        this.validateStoreName(storeName);
+        if (!value) {
+            throw new Error('No value provided for put operation');
+        }
         try {
             const store = await this.store(storeName, "readwrite");
             return await this.request(store.put(value, key));
@@ -136,6 +142,67 @@ class IDB {
             return await this.request(store.clear());
         } catch (error) {
             throw new Error(`Clear operation failed: ${error.message}`);
+        }
+    }
+
+    async count(storeName, query) {
+        try {
+            const store = await this.store(storeName);
+            return await this.request(store.count(query));
+        } catch (error) {
+            throw new Error(`Count operation failed: ${error.message}`);
+        }
+    }
+
+    async getByIndex(storeName, indexName, value) {
+        try {
+            const store = await this.store(storeName);
+            const index = store.index(indexName);
+            return await this.request(index.get(value));
+        } catch (error) {
+            throw new Error(`GetByIndex operation failed: ${error.message}`);
+        }
+    }
+
+    async getAllByIndex(storeName, indexName, value) {
+        try {
+            const store = await this.store(storeName);
+            const index = store.index(indexName);
+            return await this.request(index.getAll(value));
+        } catch (error) {
+            throw new Error(`GetAllByIndex operation failed: ${error.message}`);
+        }
+    }
+
+    async bulkAdd(storeName, items) {
+        try {
+            const store = await this.store(storeName, "readwrite");
+            const promises = items.map(item => this.request(store.add(item)));
+            return await Promise.all(promises);
+        } catch (error) {
+            throw new Error(`BulkAdd operation failed: ${error.message}`);
+        }
+    }
+
+    async bulkPut(storeName, items) {
+        try {
+            const store = await this.store(storeName, "readwrite");
+            const promises = items.map(item => this.request(store.put(item)));
+            return await Promise.all(promises);
+        } catch (error) {
+            throw new Error(`BulkPut operation failed: ${error.message}`);
+        }
+    }
+
+    validateKey(key) {
+        if (!key && key !== 0) {
+            throw new Error('Invalid key provided');
+        }
+    }
+
+    validateStoreName(storeName) {
+        if (!storeName || typeof storeName !== 'string') {
+            throw new Error('Invalid store name provided');
         }
     }
 

@@ -112,19 +112,28 @@ a {
     }
 }
 
-backdrop {
+backdrop, dialog::backdrop, [popover].modal::backdrop {
     --backdrop-bg: rgba(var(--color-rgb),.3);
     position: fixed;
     inset: 0;
-    visibility: hidden;
+    display: none;
     opacity: 0;
     z-index: 2;
     background: var(--backdrop-bg, rgba(0,0,0,.3));
-    transition: var(--backdrop-transition, .3s);
+    transition: var(--backdrop-transition, .6s) allow-discrete;
     backdrop-filter: blur(var(--blur));
 
+    @starting-style {
+        opacity: 0 !important;
+    }
+
     &[open], &.open {
-        visibility: visible;
+        display: block;
         opacity: 1;
     }
+}
+
+dialog:open::backdrop, [popover].modal:popover-open::backdrop {
+    display: block;
+    opacity: 1;
 }

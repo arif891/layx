@@ -2,12 +2,12 @@ class SmoothScroll {
     constructor(options = {}) {
         this.targetScroll = window.scrollY;
         this.currentScroll = window.scrollY;
-        this.ease = options.ease || .075;
-        this.threshold = options.threshold || .5;
+        this.ease = options.ease || .05;
+        this.threshold = options.threshold || 1;
         this.isScrolling = false;
         this.rafId = null;
         this.enableTouch = options.enableTouch || false;
-        this.touchSensitivity = options.touchSensitivity || 2; 
+        this.touchSensitivity = options.touchSensitivity || 2;
 
         // Bind methods
         this.onWheel = this.onWheel.bind(this);
@@ -60,7 +60,7 @@ class SmoothScroll {
             PageUp: -window.innerHeight,
             PageDown: window.innerHeight,
             Home: -document.documentElement.scrollHeight,
-            End: document.documentElement.scrollHeight
+            End: document.documentElement.scrollHeight,
         };
 
         const delta = keys[event.key];
@@ -80,7 +80,7 @@ class SmoothScroll {
         event.preventDefault();
         const touch = event.touches[0];
         const deltaY = this.touchStart - touch.clientY;
-        this.targetScroll += deltaY * this.touchSensitivity; 
+        this.targetScroll += deltaY * this.touchSensitivity;
         this.touchStart = touch.clientY;
         this.clampTargetScroll();
         this.startScrolling();
@@ -94,6 +94,7 @@ class SmoothScroll {
     startScrolling() {
         if (!this.isScrolling) {
             this.isScrolling = true;
+            document.documentElement.style.scrollBehavior = 'auto';
             this.update();
         }
     }
@@ -109,6 +110,7 @@ class SmoothScroll {
             this.currentScroll = this.targetScroll;
             window.scrollTo(0, Math.round(this.currentScroll));
             this.isScrolling = false;
+            document.documentElement.style.scrollBehavior = '';
             cancelAnimationFrame(this.rafId);
         }
     }

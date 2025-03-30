@@ -10,7 +10,7 @@ carousel, .carousel {
         outline: none;
     }
     
-    .main {
+    .scroller {
         display: flex;
         height: var(--height);
         overflow: auto hidden;

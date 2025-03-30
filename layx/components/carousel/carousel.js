@@ -1,7 +1,7 @@
 class Carousel {
     constructor(selector = 'carousel', options = {}) {
         this.options = {
-            mainSelector: '.main',
+            scrollerSelector: '.scroller',
             itemSelector: '.item',
             autoplay: false,
             autoplayInterval: 3000,
@@ -20,10 +20,10 @@ class Carousel {
 
     init() {
         this.carousels.forEach(carousel => {
-            const main = carousel.querySelector(this.options.mainSelector);
+            const scroller = carousel.querySelector(this.options.scrollerSelector);
             const items = Array.from(carousel.querySelectorAll(this.options.itemSelector));
 
-            if (!main || items.length === 0) return;
+            if (!scroller || items.length === 0) return;
 
             this.ensureControls(carousel);
             this.ensureIndicators(carousel, items);
@@ -119,7 +119,7 @@ class Carousel {
         });
 
         // Intersection Observer for tracking visible slides
-        const main = carousel.querySelector(this.options.mainSelector);
+        const scroller = carousel.querySelector(this.options.scrollerSelector);
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -132,7 +132,7 @@ class Carousel {
                 }
             });
         }, {
-            root: main,
+            root: scroller,
             threshold: 0.5
         });
 
@@ -237,8 +237,8 @@ class Carousel {
         carousel.setAttribute('role', 'region');
         carousel.setAttribute('aria-label', 'Image Carousel');
         
-        const main = carousel.querySelector(this.options.mainSelector);
-        main.setAttribute('role', 'list');
+        const scroller = carousel.querySelector(this.options.scrollerSelector);
+        scroller.setAttribute('role', 'list');
 
         items.forEach((item, index) => {
             item.setAttribute('role', 'listitem');

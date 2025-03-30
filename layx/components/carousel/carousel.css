@@ -17,6 +17,10 @@ carousel, .carousel {
         scrollbar-width: none;
         scroll-snap-type: x mandatory;
 
+        .dragging & {
+            scroll-snap-type: none
+        }
+
         .item {
             flex-shrink: 0;
             height: 100%;

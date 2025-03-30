@@ -8,6 +8,7 @@ class Carousel {
             loop: false,
             mouseDrag: true,
             keyboardNavigation: true,
+            snap: true,
             ...options
         };
         
@@ -35,12 +36,13 @@ class Carousel {
                 isPaused: false
             };
 
-            // Use Object.defineProperty for better state management
-            Object.defineProperty(carousel, 'carouselState', {
-                value: state,
-                writable: false,
-                configurable: false
-            });
+            if (!carousel.hasOwnProperty('carouselState')) {
+                Object.defineProperty(carousel, 'carouselState', {
+                    value: state,
+                    writable: false,
+                    configurable: false
+                });
+            }
 
             const prevBtn = carousel.querySelector('.prev');
             const nextBtn = carousel.querySelector('.next');
@@ -146,41 +148,53 @@ class Carousel {
 
     setupMouseDrag(carousel, state, items) {
         let startX = 0;
+        let scrollLeft = 0;
         let isDragging = false;
-        let hasMoved = false;
+        const scroller = carousel.querySelector(this.options.scrollerSelector);
+
+        const onMouseMove = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - scroller.offsetLeft;
+            const walk = (x - startX) * 1;
+            scroller.scrollLeft = scrollLeft - walk;
+        };
+
+        const onMouseUp = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+
+            // Calculate the closest item and snap to it
+            if (this.options.snap) { // check snap option
+                let closestIndex = 0;
+                let minDistance = Infinity;
+
+                items.forEach((item, index) => {
+                    const itemOffset = item.offsetLeft - scroller.offsetLeft;
+                    const distance = Math.abs(scroller.scrollLeft - itemOffset);
+
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestIndex = index;
+                    }
+                });
+
+                this.goToSlide(carousel, state, closestIndex);
+            }
+
+            carousel.classList.remove('dragging');
+        };
 
         carousel.addEventListener('mousedown', (e) => {
-            startX = e.pageX;
             isDragging = true;
-            hasMoved = false;
+            startX = e.pageX - scroller.offsetLeft;
+            scrollLeft = scroller.scrollLeft;
+            carousel.classList.add('dragging');
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
         });
-
-        carousel.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-
-            const diff = startX - e.pageX;
-            if (Math.abs(diff) > 50) {
-                hasMoved = true;
-                this.navigate(carousel, state, diff > 0 ? 1 : -1);
-                isDragging = false;
-            }
-        });
-
-        carousel.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        carousel.addEventListener('mouseleave', () => {
-            isDragging = false;
-        });
-
-        // Prevent default behavior if dragged
-        carousel.addEventListener('click', (e) => {
-            if (hasMoved) {
-                e.preventDefault();
-                hasMoved = false;
-            }
-        }, true);
     }
 
     navigate(carousel, state, direction) {

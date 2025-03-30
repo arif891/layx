@@ -55,8 +55,6 @@ class SmoothScroll {
 
     onKeyDown(event) {
         const keys = {
-            ArrowUp: -50,
-            ArrowDown: 50,
             PageUp: -window.innerHeight,
             PageDown: window.innerHeight,
             Home: -document.documentElement.scrollHeight,
@@ -97,6 +95,12 @@ class SmoothScroll {
             document.documentElement.style.scrollBehavior = 'auto';
             this.update();
         }
+    }
+
+    scrollTo(target) {
+        this.targetScroll = target;
+        this.clampTargetScroll();
+        this.startScrolling();
     }
 
     update() {

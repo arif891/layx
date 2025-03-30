@@ -11,11 +11,11 @@ class Carousel {
             snap: true,
             ...options
         };
-        
+
         this.carousels = document.querySelectorAll(selector);
         this.autoplayIntervals = new WeakMap();
-        this.dragData = new WeakMap(); 
-        
+        this.dragData = new WeakMap();
+
         this.init();
     }
 
@@ -51,7 +51,7 @@ class Carousel {
             this.setupEventListeners(carousel, state, prevBtn, nextBtn, indicatorsWrapper, items);
             this.setupAccessibility(carousel, items);
             this.setupKeyboardNavigation(carousel, state);
-    
+
             if (this.options.autoplay) {
                 this.setupAutoplay(carousel, state);
             }
@@ -85,7 +85,7 @@ class Carousel {
     ensureIndicators(carousel, items) {
         if (carousel.hasAttribute('indicators')) {
             let indicatorWrapper = carousel.querySelector('.indicator-wrapper');
-            
+
             if (!indicatorWrapper) {
                 indicatorWrapper = document.createElement('div');
                 indicatorWrapper.classList.add('indicator-wrapper');
@@ -146,18 +146,32 @@ class Carousel {
         }
     }
 
+    isVertical(carousel) {
+        return carousel.classList.contains('vertical');
+    }
+
     setupMouseDrag(carousel, state, items) {
+        let startY = 0;
         let startX = 0;
         let scrollLeft = 0;
+        let scrollTop = 0;
         let isDragging = false;
         const scroller = carousel.querySelector(this.options.scrollerSelector);
+        const isVertical = this.isVertical(carousel);
 
         const onMouseMove = (e) => {
             if (!isDragging) return;
             e.preventDefault();
-            const x = e.pageX - scroller.offsetLeft;
-            const walk = (x - startX) * 1;
-            scroller.scrollLeft = scrollLeft - walk;
+
+            if (isVertical) {
+                const y = e.pageY - scroller.offsetTop;
+                const walk = (y - startY) * 1;
+                scroller.scrollTop = scrollTop - walk;
+            } else {
+                const x = e.pageX - scroller.offsetLeft;
+                const walk = (x - startX) * 1;
+                scroller.scrollLeft = scrollLeft - walk;
+            }
         };
 
         const onMouseUp = () => {
@@ -166,14 +180,16 @@ class Carousel {
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
 
-            // Calculate the closest item and snap to it
-            if (this.options.snap) { // check snap option
+            if (this.options.snap) {
                 let closestIndex = 0;
                 let minDistance = Infinity;
 
                 items.forEach((item, index) => {
-                    const itemOffset = item.offsetLeft - scroller.offsetLeft;
-                    const distance = Math.abs(scroller.scrollLeft - itemOffset);
+                    const itemOffset = isVertical ?
+                        item.offsetTop - scroller.offsetTop :
+                        item.offsetLeft - scroller.offsetLeft;
+                    const scrollPosition = isVertical ? scroller.scrollTop : scroller.scrollLeft;
+                    const distance = Math.abs(scrollPosition - itemOffset);
 
                     if (distance < minDistance) {
                         minDistance = distance;
@@ -189,8 +205,13 @@ class Carousel {
 
         carousel.addEventListener('mousedown', (e) => {
             isDragging = true;
-            startX = e.pageX - scroller.offsetLeft;
-            scrollLeft = scroller.scrollLeft;
+            if (isVertical) {
+                startY = e.pageY - scroller.offsetTop;
+                scrollTop = scroller.scrollTop;
+            } else {
+                startX = e.pageX - scroller.offsetLeft;
+                scrollLeft = scroller.scrollLeft;
+            }
             carousel.classList.add('dragging');
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
@@ -223,48 +244,50 @@ class Carousel {
     updateCarousel(carousel, state) {
         const items = carousel.querySelectorAll(this.options.itemSelector);
         const targetItem = items[state.currentIndex];
-        
+        const isVertical = this.isVertical(carousel);
+
         targetItem.scrollIntoView({
             behavior: 'smooth',
-            block: 'nearest',
-            inline: 'start'
+            block: isVertical ? 'start' : 'nearest',
+            inline: isVertical ? 'nearest' : 'start'
         });
+
 
         this.updateIndicators(carousel, state);
         this.updateActiveItem(items, state.currentIndex);
     }
 
     updateIndicators(carousel, state) {
-        const indicators = carousel.querySelectorAll('.indicator');
-        indicators?.forEach((indicator, index) => {
-            indicator.classList.toggle('active', index === state.currentIndex);
-        });
+        const wrapper = carousel.querySelector('.indicator-wrapper');
+        if (!wrapper) return;
+
+        const activeIndicator = wrapper.querySelector('.indicator.active');
+        activeIndicator?.classList.remove('active');
+        wrapper.children[state.currentIndex]?.classList.add('active');
     }
 
     updateActiveItem(items, currentIndex) {
-        items.forEach((item, index) => {
-            item.classList.toggle('active', index === currentIndex);
-        });
+        // Remove active class from current active item
+        const currentActive = items[currentIndex]?.parentElement.querySelector('.item.active');
+        if (currentActive) currentActive.classList.remove('active');
+
+        // Add active class to new active item
+        items[currentIndex]?.classList.add('active');
     }
 
     setupAccessibility(carousel, items) {
         carousel.setAttribute('role', 'region');
         carousel.setAttribute('aria-label', 'Image Carousel');
-        
+        carousel.setAttribute('aria-roledescription', 'carousel');
+
         const scroller = carousel.querySelector(this.options.scrollerSelector);
         scroller.setAttribute('role', 'list');
+        scroller.setAttribute('aria-live', 'polite');
 
         items.forEach((item, index) => {
             item.setAttribute('role', 'listitem');
             item.setAttribute('aria-label', `Slide ${index + 1} of ${items.length}`);
-        });
-
-        // Simplified control accessibility
-        ['prev', 'next'].forEach(type => {
-            const btn = carousel.querySelector(`.${type}`);
-            if (btn) {
-                btn.setAttribute('aria-label', `${type === 'prev' ? 'Previous' : 'Next'} slide`);
-            }
+            item.setAttribute('aria-roledescription', 'slide');
         });
     }
 
@@ -273,7 +296,7 @@ class Carousel {
 
         carousel.setAttribute('tabindex', '0');
 
-        const navigationMap = carousel.classList.contains('vertical') 
+        const navigationMap = carousel.classList.contains('vertical')
             ? { prev: 'ArrowUp', next: 'ArrowDown' }
             : { prev: 'ArrowLeft', next: 'ArrowRight' };
 
@@ -330,7 +353,7 @@ class Carousel {
     toggleAutoplay(carousel, state) {
         state.isPlaying = !state.isPlaying;
         state.isPaused = !state.isPlaying;
-        
+
         if (state.isPlaying) {
             this.setupAutoplay(carousel, state);
         } else {

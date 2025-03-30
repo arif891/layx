@@ -18,7 +18,7 @@ carousel, .carousel {
         scroll-snap-type: x mandatory;
 
         .dragging & {
-            scroll-snap-type: none
+            scroll-snap-type: none !important;
         }
 
         .item {
@@ -27,7 +27,7 @@ carousel, .carousel {
             width: 100%;
             user-select: none;
             -webkit-user-drag: none;
-            scroll-snap-align: center;
+            scroll-snap-align: start;
             view-timeline: --carousel-item inline;
 
             &.auto {

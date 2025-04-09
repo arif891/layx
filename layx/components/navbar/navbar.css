@@ -70,7 +70,7 @@ navbar, .navbar {
         }
 
         /* Brand Section */
-        .brand {
+        .start {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -272,7 +272,7 @@ navbar, .navbar {
 
         @media (width < 992px) {
             &[open]:not(.left, .right, .top, .bottom, .full) {
-                .brand {
+                .start {
                     background: var(--bg);
                     z-index: 5;
                 }
@@ -282,7 +282,7 @@ navbar, .navbar {
 
         &.scrolled {
             @media (width < 992px) {
-                .brand {
+                .start {
                     backdrop-filter: blur(var(--blur));
                     background: var(--bg);
                 }
@@ -290,7 +290,7 @@ navbar, .navbar {
                 &.dock.center {
                     margin-inline: var(--edge-offset-x);
 
-                    .brand {
+                    .start {
                         translate: 0 var(--dock-top-offset);
                     }
                 }
@@ -323,7 +323,7 @@ navbar, .navbar {
         &.scrollingDown:not(.no-hide) {
             translate: 0 -100% !important;
 
-            .brand {
+            .start {
                 translate: 0 0 !important;
             }
         }

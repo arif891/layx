@@ -38,15 +38,23 @@
                 height: 200px;
                 background: rgba(255, 255, 255, 0.5);
             }
+
+            .tem {
+                position: fixed;
+                inset: 0;
+                background-color: aliceblue;
+                z-index: 10;
+                isolation: isolate;
+            }
         </style>
     </head>
 
     <body>
         <header>
 
-            <navbar class="fixed center left dock main-navbar">
+            <navbar class="fixed dock center left  main-navbar">
                 <div class="main">
-                    <div class="brand">
+                    <div class="start">
                         <h5 class="logo-text">LayX</h5>
                         <button class="toggler"></button>
                     </div>
@@ -66,7 +74,7 @@
 
             <navbar class="right other-navbar">
                 <div class="main">
-                    <div class="brand">
+                    <div class="start">
                         <h5 class="logo-text">Logo</h5>
                         <button class="toggler"></button>
                     </div>
@@ -86,7 +94,7 @@
 
             <navbar class="end full other-navbar">
                 <div class="main">
-                    <div class="brand">
+                    <div class="start">
                         <h5 class="logo-text">Logo</h5>
                         <button class="toggler"></button>
                     </div>
@@ -107,7 +115,7 @@
 
             <navbar class="center bottom other-navbar">
                 <div class="main">
-                    <div class="brand">
+                    <div class="start">
                         <h5 class="logo-text">Logo</h5>
                         <button class="toggler"></button>
                     </div>

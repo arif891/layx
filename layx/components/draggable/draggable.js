@@ -31,7 +31,7 @@ class Draggable {
             e.preventDefault();
             e.stopPropagation();
             
-            draggable.style.transition = 'none';
+            draggable.classList.add('dragging');
             isDragging = true;
 
             const rect = draggable.getBoundingClientRect();
@@ -80,7 +80,7 @@ class Draggable {
             if (!isDragging) return;
             isDragging = false;
 
-            draggable.style.transition = '';
+            draggable.classList.remove('dragging');
 
             const rect = draggable.getBoundingClientRect();
             const finalX = rect.left;

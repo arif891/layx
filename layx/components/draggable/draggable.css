@@ -21,6 +21,10 @@ draggable, .draggable {
         cursor: move;
     }
 
+    &.dragging {
+        transition: none;
+    }
+
     &.left {
         translate: var(--edge-offset, 0px) var(--edge-offset, 0px);
 

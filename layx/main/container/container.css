@@ -1,7 +1,10 @@
 container, .container {
-    --edge-offset-x: .75rem;
     display: block;
-    margin-inline: var(--edge-offset-x);
+    margin-inline: var(--edge-offset-x, 0px);
+
+    &:not(.sm, .lg, .uwd, .suwd) {
+        --edge-offset-x: .75rem;
+    }
 
     &.edge {
         display: grid;
@@ -18,15 +21,21 @@ container, .container {
     }
  
     @media (width >= 576px) {
-        --edge-offset-x: 2.5% !important;
+        &:not(.lg, .uwd, .suwd) {
+            --edge-offset-x: 2.5% !important;
+        }
     }
 
     @media (width >= 992px) {
+        &:not(.uwd, .suwd) {
         --edge-offset-x: 5% !important;
+        }
     }
 
     @media (aspect-ratio >= 21/9) and (width >= 2000px) {
+        &:not(.suwd) {
         --edge-offset-x: 15% !important;
+        }
     }
 
     @media (aspect-ratio >= 32/9) and (width >= 3000px) {

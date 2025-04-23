@@ -19,13 +19,13 @@ video, audio {
     &::-webkit-media-controls-current-time-display,
     &::-webkit-media-controls-time-remaining-display {
         font: inherit;
-        font-size: 1rem;
+        font-size: .9rem;
         font-weight: 500;
         font-variant-numeric: tabular-nums;
     }
 
     &::-webkit-media-controls-volume-control-hover-background {
-        background-color: rgba(var(--color-rgb));
+        background-color: rgb(var(--color-rgb));
     }
 
     &.no-volume::-webkit-media-controls-volume-control-container {
@@ -59,6 +59,10 @@ video {
             position: absolute;
             inset-inline: 0;
             margin-inline: auto;
+        }
+
+        &::-webkit-media-controls-volume-control-hover-background {
+            background-color: rgba(0,0,0, .5);
         }
 
     }

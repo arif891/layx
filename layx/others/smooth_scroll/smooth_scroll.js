@@ -6,20 +6,12 @@ class SmoothScroll {
         this.threshold = options.threshold || 1;
         this.isScrolling = false;
         this.rafId = null;
-        this.enableTouch = options.enableTouch || false;
-        this.touchSensitivity = options.touchSensitivity || 2;
 
         // Bind methods
         this.onWheel = this.onWheel.bind(this);
         this.onScroll = this.onScroll.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
         this.update = this.update.bind(this);
-
-        if (this.enableTouch) {
-            this.touchStart = 0;
-            this.onTouchStart = this.onTouchStart.bind(this);
-            this.onTouchMove = this.onTouchMove.bind(this);
-        }
 
         // Add event listeners
         this.addEventListeners();
@@ -32,11 +24,6 @@ class SmoothScroll {
         window.addEventListener('wheel', this.onWheel, { passive: false });
         window.addEventListener('scroll', this.onScroll, { passive: true });
         window.addEventListener('keydown', this.onKeyDown);
-
-        if (this.enableTouch) {
-            window.addEventListener('touchstart', this.onTouchStart, { passive: false });
-            window.addEventListener('touchmove', this.onTouchMove, { passive: false });
-        }
     }
 
     onWheel(event) {
@@ -68,20 +55,6 @@ class SmoothScroll {
             this.clampTargetScroll();
             this.startScrolling();
         }
-    }
-
-    onTouchStart(event) {
-        this.touchStart = event.touches[0].clientY;
-    }
-
-    onTouchMove(event) {
-        event.preventDefault();
-        const touch = event.touches[0];
-        const deltaY = this.touchStart - touch.clientY;
-        this.targetScroll += deltaY * this.touchSensitivity;
-        this.touchStart = touch.clientY;
-        this.clampTargetScroll();
-        this.startScrolling();
     }
 
     clampTargetScroll() {
@@ -123,11 +96,6 @@ class SmoothScroll {
         window.removeEventListener('wheel', this.onWheel);
         window.removeEventListener('scroll', this.onScroll);
         window.removeEventListener('keydown', this.onKeyDown);
-
-        if (this.enableTouch) {
-            window.removeEventListener('touchstart', this.onTouchStart);
-            window.removeEventListener('touchmove', this.onTouchMove);
-        }
 
         cancelAnimationFrame(this.rafId);
     }

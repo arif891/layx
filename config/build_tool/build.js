@@ -50,4 +50,3 @@ async function handleBuildFailure() {
     console.error('Failed to reset build state:', error);
   }
 }
-

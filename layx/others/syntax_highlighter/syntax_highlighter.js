@@ -4,161 +4,150 @@
  */
 
 class SyntaxHighlighter {
-    #langs = new Map();
-    #expandData = {
-        num: {
-            type: 'num',
-            match: /(\.e?|\b)\d(e-|[\d.oxa-fA-F_])*(\.|\b)/g
-        },
-        str: {
-            type: 'str',
-            match: /(["'])(\\[^]|(?!\1)[^\r\n\\])*\1?/g
-        },
-        strDouble: {
-            type: 'str',
-            match: /"((?!")[^\r\n\\]|\\[^])*"?/g
-        }
-    };
+  /* ---------- private fields ---------- */
+  #langs    = new Map();
+  #expand   = Object.freeze({
+    num:  { type: 'num',  match: /(?:\.|\b)\d(?:[eoxa-fA-F_\d.-]*\d|\b)/g },
+    str:  { type: 'str',  match: /(["'])((?!\1)[^\\\r\n]|\\.)*(\1)?/g },
+    strDQ:{ type: 'str',  match: /"([^"\\\r\n]|\\.)*(")?/g }
+  });
+  #htmlEscapes = Object.freeze({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' });
+  #escapeRx   = /[&<>"']/g;
+  #lineNumsCache = new Map();
 
-    constructor() {
-        this.highlightAll = this.highlightAll.bind(this);
-        this.init();
+  /* ---------- ctor ---------- */
+  constructor() {
+    this.highlightAll = this.highlightAll.bind(this);
+    this.init();
+  }
+
+  init() { this.highlightAll(); }
+
+  /* ---------- helpers ---------- */
+  #escaper = m => this.#htmlEscapes[m];
+  #getLineNumbers(n) {
+    if (!this.#lineNumsCache.has(n)) {
+      this.#lineNumsCache.set(n, '<div></div>'.repeat(n));
     }
+    return this.#lineNumsCache.get(n);
+  }
 
-    init() {
-        this.highlightAll();
-    }
+  /* ---------- language management ---------- */
+  async loadLanguage(name, mod) {
+    if (!mod?.default?.length) throw new TypeError(`Invalid language “${name}”`);
+    this.#langs.set(name, mod);
+  }
+  clearLanguageCache() { this.#langs.clear(); }
 
-    #sanitize(str = '') {
-        const entities = {
-            '&': '&#38;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;'
-        };
-        return str.replace(/[&<>"']/g, char => entities[char]);
-    }
-
-    #toSpan(str, token) {
-        return token ? `<span class="${token}">${str}</span>` : str;
-    }
-
-    async tokenize(src, lang, token) {
+  /* ---------- core tokenizer ---------- */
+  async tokenize(src, lang, emit) {
+    let data;
+    if (typeof lang === 'string') {
+      data = this.#langs.get(lang);
+      if (!data) {
         try {
-            let data;
-            if (typeof lang === 'string') {
-                data = this.#langs.get(lang);
-                if (!data) {
-                    data = await import(`./languages/${lang}.js`);
-                    if (!data?.default) {
-                        throw new Error(`Invalid language module for ${lang}`);
-                    }
-                }
-            } else {
-                data = lang;
-            }
-
-            let m, part, first = {}, match, cache = [], i = 0;
-            const arr = Array.isArray(data.sub) ? [...data.sub] :
-                       Array.isArray(data.default) ? [...data.default] : [];
-
-            if (arr.length === 0) {
-                token(src);
-                return;
-            }
-
-            while (i < src.length) {
-                first.index = null;
-                for (m = arr.length; m-- > 0;) {
-                    part = arr[m].expand ? this.#expandData[arr[m].expand] : arr[m];
-                    if (cache[m] === undefined || cache[m].match.index < i) {
-                        part.match.lastIndex = i;
-                        match = part.match.exec(src);
-                        if (match === null) {
-                            arr.splice(m, 1);
-                            cache.splice(m, 1);
-                            continue;
-                        }
-                        cache[m] = { match, lastIndex: part.match.lastIndex };
-                    }
-                    if (cache[m].match[0] && (cache[m].match.index <= first.index || first.index === null)) {
-                        first = {
-                            part: part,
-                            index: cache[m].match.index,
-                            match: cache[m].match[0],
-                            end: cache[m].lastIndex
-                        }
-                    }
-                }
-                if (first.index === null) break;
-                token(src.slice(i, first.index), data.type);
-                i = first.end;
-                if (first.part.sub)
-                    await this.tokenize(first.match, typeof first.part.sub === 'string' ? first.part.sub : (typeof first.part.sub === 'function' ? first.part.sub(first.match) : first.part), token);
-                else
-                    token(first.match, first.part.type);
-            }
-            token(src.slice(i, src.length), data.type);
-        } catch (error) {
-            console.error(`Tokenization error: ${error.message}`);
-            token(src);
+          data = await import(`./languages/${lang}.js`);
+          if (!data?.default) throw new Error(`Module “${lang}” lacks default export`);
+          this.#langs.set(lang, data);
+        } catch (e) {
+          console.error(`[SyntaxHighlighter] cannot load language “${lang}”`, e);
+          return emit(src);
         }
+      }
+    } else {
+      data = lang;
     }
 
-    #handleCopy(button, codeElement) {
-        navigator.clipboard.writeText(codeElement.textContent).then(() => {
-            button.classList.add('copied');
-            setTimeout(() => {
-                button.classList.remove('copied');
-            }, 2000);
-        }).catch(err => {
-            console.error('Failed to copy:', err);
-            button.classList.add('failed');
-        });
-    }
+    const rules = Array.isArray(data.sub) ? data.sub
+                : Array.isArray(data.default) ? data.default : [];
+    if (!rules.length) return emit(src);
 
-    async highlightText(src, lang, multiline = true, opt = {}) {
-        let tmp = '';
-        await this.tokenize(src, lang, (str, type) => tmp += this.#toSpan(this.#sanitize(str), type));
+    const compiled = rules.map(r => ({
+      ...r,
+      rule: r.expand ? this.#expand[r.expand] : r,
+      lastIndex: 0,
+      done: false
+    }));
 
-        const html = multiline
-            ? `<div class="header"><span class="lang">${lang}</span><button class="copy" title="Copy Code"></button></div><div class="wrapper"><div class="numbers">${'<div></div>'.repeat(opt.lineNumbers && src.split('\n').length)}</div><code class="code">${tmp}</code></div>`
-            : `<div class="wrapper"><code class="code">${tmp}</code></div><button class="copy" title="Copy Code"></button>`;
+    let pos = 0;
+    const { length } = src;
 
-        return html;
-    }
+    while (pos < length) {
+      let bestRule = null, bestIdx = Infinity, bestText = '', bestEnd = 0;
 
-    async highlightElement(elm, lang = elm.dataset.codeLang, mode, opt) {
-        let txt = elm.textContent.trim();
-        mode ??= `${(txt.split('\n').length < 2 ? 'one' : 'multi')}line`;
-        elm.className = `${[...elm.classList].filter(className => !className.startsWith('')).join(' ')}code-block ${lang} ${mode} highlighted`;
-        elm.innerHTML = await this.highlightText(txt, lang, mode == 'multiline', opt);
-        
-        const copyButton = elm.querySelector('.copy');
-        const codeElement = elm.querySelector('.code');
-        if (copyButton && codeElement) {
-            copyButton.addEventListener('click', () => this.#handleCopy(copyButton, codeElement));
+      for (const c of compiled) {
+        if (c.done) continue;
+        const rx = c.rule.match;
+        if (c.lastIndex < pos) rx.lastIndex = pos;
+        const m = rx.exec(src);
+        if (!m) { c.done = true; continue; }
+        if (m.index < bestIdx) {
+          bestRule = c; bestIdx = m.index; bestText = m[0]; bestEnd = rx.lastIndex;
         }
-    }
+      }
+      if (!bestRule) break;
 
-    async highlightAll(opt = {}) {
-        return Promise.all(
-            Array.from(document.querySelectorAll('[data-code-lang]:not(.highlighted)'))
-            .map(elm => this.highlightElement(elm, undefined, undefined, opt))
-        );
-    }
+      if (bestIdx > pos) emit(src.slice(pos, bestIdx), data.type);
 
-    async loadLanguage(languageName, language) {
-        if (!language?.default?.length) {
-            throw new Error(`Invalid language definition for ${languageName}`);
-        }
-        this.#langs.set(languageName, language);
+      if (bestRule.sub) {
+        const subLang = typeof bestRule.sub === 'function' ? bestRule.sub(bestText) : bestRule.sub;
+        await this.tokenize(bestText, subLang, emit);
+      } else {
+        emit(bestText, bestRule.rule.type);
+      }
+      pos = bestEnd;
+      bestRule.lastIndex = bestEnd;
     }
+    if (pos < length) emit(src.slice(pos), data.type);
+  }
 
-    clearLanguageCache() {
-        this.#langs.clear();
-    }
+  /* ---------- html generator ---------- */
+  async highlightText(src, lang, multiline = true, opt = {}) {
+    let html = '';
+    await this.tokenize(src, lang, (text, type) =>
+      html += type
+        ? `<span class="${type}">${text.replace(this.#escapeRx, this.#escaper)}</span>`
+        : text.replace(this.#escapeRx, this.#escaper)
+    );
+
+    const lineNums = multiline && opt.lineNumbers
+      ? `<div class="numbers">${this.#getLineNumbers(src.split('\n').length)}</div>`
+      : '';
+    const header = multiline
+      ? `<div class="header"><span class="lang">${lang}</span>`
+      + `<button class="copy" title="Copy Code" aria-label="Copy"></button></div>`
+      : '';
+
+    return multiline
+      ? `${header}<div class="wrapper">${lineNums}<code class="code">${html}</code></div>`
+      : `<div class="wrapper"><code class="code">${html}</code></div>`
+      + `<button class="copy" title="Copy Code" aria-label="Copy"></button>`;
+  }
+
+  /* ---------- dom injector ---------- */
+  async highlightElement(el, lang = el.dataset.codeLang, mode, opt) {
+    const txt = el.textContent.trim();
+    mode ??= txt.includes('\n') ? 'multiline' : 'oneline';
+    el.classList.add('code-block', lang, mode, 'highlighted');
+    el.innerHTML = await this.highlightText(txt, lang, mode === 'multiline', opt);
+    const btn = el.querySelector('.copy');
+    if (btn) btn.addEventListener('click', () => this.#copy(btn, el.querySelector('.code')));
+  }
+
+  /* ---------- batch ---------- */
+  async highlightAll(opt = {lineNumbers: true}) {
+    return Promise.all(
+      [...document.querySelectorAll('[data-code-lang]:not(.highlighted)')]
+        .map(el => this.highlightElement(el, undefined, undefined, opt))
+    );
+  }
+
+  /* ---------- clipboard ---------- */
+  #copy(btn, codeEl) {
+    navigator.clipboard.writeText(codeEl.textContent)
+      .then(() => { btn.classList.add('copied'); setTimeout(()=>btn.classList.remove('copied'),2000); })
+      .catch(() => btn.classList.add('failed'));
+  }
 }
 
 export default new SyntaxHighlighter();

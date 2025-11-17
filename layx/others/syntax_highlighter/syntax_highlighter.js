@@ -5,15 +5,15 @@
 
 class SyntaxHighlighter {
   /* ---------- private fields ---------- */
-  #langs    = new Map();
-  #expand   = Object.freeze({
+  _langs    = new Map();
+  _expand   = Object.freeze({
     num:  { type: 'num',  match: /(?:\.|\b)\d(?:[eoxa-fA-F_\d.-]*\d|\b)/g },
     str:  { type: 'str',  match: /(["'])((?!\1)[^\\\r\n]|\\.)*(\1)?/g },
     strDQ:{ type: 'str',  match: /"([^"\\\r\n]|\\.)*(")?/g }
   });
-  #htmlEscapes = Object.freeze({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' });
-  #escapeRx   = /[&<>"']/g;
-  #lineNumsCache = new Map();
+  _htmlEscapes = Object.freeze({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' });
+  _escapeRx   = /[&<>"']/g;
+  _lineNumsCache = new Map();
 
   /* ---------- ctor ---------- */
   constructor() {
@@ -24,31 +24,31 @@ class SyntaxHighlighter {
   init() { this.highlightAll(); }
 
   /* ---------- helpers ---------- */
-  #escaper = m => this.#htmlEscapes[m];
-  #getLineNumbers(n) {
-    if (!this.#lineNumsCache.has(n)) {
-      this.#lineNumsCache.set(n, '<div></div>'.repeat(n));
+  _escaper = m => this._htmlEscapes[m];
+  _getLineNumbers(n) {
+    if (!this._lineNumsCache.has(n)) {
+      this._lineNumsCache.set(n, '<div></div>'.repeat(n));
     }
-    return this.#lineNumsCache.get(n);
+    return this._lineNumsCache.get(n);
   }
 
   /* ---------- language management ---------- */
   async loadLanguage(name, mod) {
     if (!mod?.default?.length) throw new TypeError(`Invalid language “${name}”`);
-    this.#langs.set(name, mod);
+    this._langs.set(name, mod);
   }
-  clearLanguageCache() { this.#langs.clear(); }
+  clearLanguageCache() { this._langs.clear(); }
 
   /* ---------- core tokenizer ---------- */
   async tokenize(src, lang, emit) {
     let data;
     if (typeof lang === 'string') {
-      data = this.#langs.get(lang);
+      data = this._langs.get(lang);
       if (!data) {
         try {
           data = await import(`./languages/${lang}.js`);
           if (!data?.default) throw new Error(`Module “${lang}” lacks default export`);
-          this.#langs.set(lang, data);
+          this._langs.set(lang, data);
         } catch (e) {
           console.error(`[SyntaxHighlighter] cannot load language “${lang}”`, e);
           return emit(src);
@@ -64,7 +64,7 @@ class SyntaxHighlighter {
 
     const compiled = rules.map(r => ({
       ...r,
-      rule: r.expand ? this.#expand[r.expand] : r,
+      rule: r.expand ? this._expand[r.expand] : r,
       lastIndex: 0,
       done: false
     }));
@@ -106,12 +106,12 @@ class SyntaxHighlighter {
     let html = '';
     await this.tokenize(src, lang, (text, type) =>
       html += type
-        ? `<span class="${type}">${text.replace(this.#escapeRx, this.#escaper)}</span>`
-        : text.replace(this.#escapeRx, this.#escaper)
+        ? `<span class="${type}">${text.replace(this._escapeRx, this._escaper)}</span>`
+        : text.replace(this._escapeRx, this._escaper)
     );
 
     const lineNums = multiline && opt.lineNumbers
-      ? `<div class="numbers">${this.#getLineNumbers(src.split('\n').length)}</div>`
+      ? `<div class="numbers">${this._getLineNumbers(src.split('\n').length)}</div>`
       : '';
     const header = multiline
       ? `<div class="header"><span class="lang">${lang}</span>`
@@ -131,7 +131,7 @@ class SyntaxHighlighter {
     el.classList.add('code-block', lang, mode, 'highlighted');
     el.innerHTML = await this.highlightText(txt, lang, mode === 'multiline', opt);
     const btn = el.querySelector('.copy');
-    if (btn) btn.addEventListener('click', () => this.#copy(btn, el.querySelector('.code')));
+    if (btn) btn.addEventListener('click', () => this._copy(btn, el.querySelector('.code')));
   }
 
   /* ---------- batch ---------- */
@@ -143,7 +143,7 @@ class SyntaxHighlighter {
   }
 
   /* ---------- clipboard ---------- */
-  #copy(btn, codeEl) {
+  _copy(btn, codeEl) {
     navigator.clipboard.writeText(codeEl.textContent)
       .then(() => { btn.classList.add('copied'); setTimeout(()=>btn.classList.remove('copied'),2000); })
       .catch(() => btn.classList.add('failed'));

@@ -1,110 +1,115 @@
+/**************************************************************************************************
+ * Theme manager – drop-in, zero-dependency, framework-agnostic
+ * 1.  CSS-only dark / light / auto  (no FOUC)
+ * 2.  System change listener        (respects “auto”)
+ * 3.  <meta name="theme-color">     (PWA tint bar)
+ * 4.  aria-pressed on toggler       (a11y)
+ * 5.  dispatch “theme:changed”      (decouple UI)
+ * 6.  tiny public API               (Theme.get() / .set() / .toggle())
+ * 7.  guarded against double-init   (safe to import many times)
+ **************************************************************************************************/
 class Theme {
-    constructor() {
-        this.themeToggleButton = document.querySelector('.theme-toggler');
-        this.themeUpdateElements = document.querySelectorAll('.theme-update');
-        this.themeButtons = document.querySelectorAll('[data-theme-value]');
-        this.metaThemeColor = this.ensureMetaThemeColorTag();
-        this.init();
+  /* ---------- static façade --------------------------------------------------------------- */
+  static #instance = null;
+
+  static get()  { return Theme.#instance?.getStoredTheme() ?? 'auto'; }
+  static set(t) { Theme.#instance?.setTheme(t); }
+  static toggle(){ Theme.#instance?.toggleTheme(); }
+
+  /* ---------- ctor ------------------------------------------------------------------------ */
+  constructor() {
+    if (Theme.#instance) return Theme.#instance;          // singleton
+    Theme.#instance = this;
+
+    this.root   = document.documentElement;
+    this.store  = localStorage;
+    this.key    = 'theme';                                // localStorage key
+    this.themes = ['light', 'dark'];                      // allowed values
+
+    this.toggler     = document.querySelector('[data-theme-toggle]');
+    this.radioGroup  = document.querySelector('[data-theme-group]');
+    this.updatables  = document.querySelectorAll('[data-theme-update]');
+    this.metaColor   = this.#ensureMetaThemeColor();
+
+    this.#init();
+  }
+
+  /* ---------- public ---------------------------------------------------------------------- */
+  getStoredTheme() { return this.store.getItem(this.key) || 'auto'; }
+
+  setTheme(theme) {
+    if (!['light','dark','auto'].includes(theme)) return;
+
+    const applied = theme === 'auto' ? this.#systemTheme() : theme;
+    this.root.setAttribute('theme', applied);
+    this.store.setItem(this.key, theme);
+
+    this.#syncUI(theme);
+    this.#updateMeta();
+    this.#announce(theme);
+  }
+
+  toggleTheme() {
+    const stored = this.getStoredTheme();
+    const active = stored === 'auto' ? this.#systemTheme() : stored;
+    this.setTheme(active === 'light' ? 'dark' : 'light');
+  }
+
+  /* ---------- private --------------------------------------------------------------------- */
+  #init() {
+    /* 1. paint ASAP – prevents FOUC */
+    this.setTheme(this.getStoredTheme());
+
+    /* 2. listeners */
+    this.toggler?.addEventListener('click', () => this.toggleTheme());
+    this.radioGroup?.addEventListener('click', e => {
+      const btn = e.target.closest('[data-theme-value]');
+      if (btn) this.setTheme(btn.dataset.themeValue);
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)')
+          .addEventListener('change', () => {
+            if (this.getStoredTheme() === 'auto') this.setTheme('auto');
+          });
+  }
+
+  #systemTheme() {
+    return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  #syncUI(theme) {
+    /* toggler pressed state */
+    this.toggler?.setAttribute('aria-pressed', theme === 'dark');
+
+    /* radio buttons */
+    this.radioGroup
+        ?.querySelectorAll('[data-theme-value]')
+        .forEach(btn => btn.classList.toggle('active', btn.dataset.themeValue === theme));
+
+    /* generic updatable elements */
+    this.updatables.forEach(el => el.setAttribute('data-theme-update', theme));
+  }
+
+  #updateMeta() {
+    const color = getComputedStyle(this.root)
+                  .getPropertyValue('--bg-color')
+                  .trim() || (this.root.getAttribute('theme') === 'dark' ? '#000' : '#fff');
+    this.metaColor.setAttribute('content', color);
+  }
+
+  #ensureMetaThemeColor() {
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'theme-color');
+      document.head.appendChild(meta);
     }
+    return meta;
+  }
 
-    // Ensure meta[name="theme-color"] tag exists, create it if missing
-    ensureMetaThemeColorTag() {
-        let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-        if (!metaThemeColor) {
-            metaThemeColor = document.createElement('meta');
-            metaThemeColor.setAttribute('name', 'theme-color');
-            document.head.appendChild(metaThemeColor);
-            return metaThemeColor;
-        }
-    }
-
-    // Function to initialize theme and event listeners
-    init() {
-        this.setTheme(this.getStoredTheme());
-
-        if (this.themeToggleButton) {
-            this.themeToggleButton.addEventListener('click', this.toggleTheme.bind(this));
-        }
-
-        this.themeButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                this.setTheme(button.getAttribute('data-theme-value'));
-            });
-        });
-
-        this.listenToSystemThemeChange();
-    }
-
-    // Function to get stored theme or default to 'auto'
-    getStoredTheme() {
-        return localStorage.getItem('theme') || 'auto';
-    }
-
-    // Function to set the theme
-    setTheme(theme) {
-        const appliedTheme = (theme === 'auto') ? this.getSystemTheme() : theme;
-        document.documentElement.setAttribute('theme', appliedTheme);
-        localStorage.setItem('theme', theme);
-        this.updateThemeAttributes(theme);
-        this.updateMetaThemeColor();
-        this.updateActiveThemeButton(theme);
-    }
-
-    //method to update active state of theme buttons
-    updateActiveThemeButton(theme) {
-        this.themeButtons.forEach(button => {
-            if (button.getAttribute('data-theme-value') === theme) {
-                button.classList.add('active');
-            } else {
-                button.classList.remove('active');
-            }
-        });
-    }
-
-    // Function to get the system theme based on media query
-    getSystemTheme() {
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    // Function to toggle between light and dark themes
-    toggleTheme() {
-        const storedTheme = this.getStoredTheme();
-        const currentTheme = storedTheme === 'auto' 
-            ? this.getSystemTheme() 
-            : storedTheme;
-            
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        this.setTheme(newTheme);
-    }
-
-    // Function to update attributes on the buttons/elements
-    updateThemeAttributes(theme) {
-        this.themeUpdateElements.forEach(element => {
-            element.setAttribute('data-theme-update', theme);
-        });
-
-        if (this.themeToggleButton) {
-            this.themeToggleButton.setAttribute('data-theme-update', theme);
-        }
-    }
-
-    // Function to update the meta theme color based on the current --bg value
-    updateMetaThemeColor() {
-        const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim();
-        const fallbackColor = bgColor || (document.documentElement.getAttribute('theme') === 'dark' ? '#000' : '#fff');
-        this.metaThemeColor?.setAttribute('content', fallbackColor);
-    }
-
-    // Function to listen for system theme changes
-    listenToSystemThemeChange() {
-        if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if (this.getStoredTheme() === 'auto') {
-                    this.setTheme('auto');
-                }
-            });
-        }
-    }
+  #announce(theme) {
+    this.root.dispatchEvent(new CustomEvent('theme:changed', { detail: { theme } }));
+  }
 }
 
 // Initialize Theme

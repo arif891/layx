@@ -36,15 +36,15 @@
     <body>
 
         <container class="__container">
-            <button class="theme-toggler ">Toggle Theme</button> 
+            <button data-theme-toggle class="theme-toggler">Toggle Theme</button> 
 
-            <div class="wrapper">
+            <div data-theme-group class="wrapper">
                 <button data-theme-value="light">Light</button>
                 <button data-theme-value="dark">Dark</button>
                 <button data-theme-value="auto">Auto</button>
             </div>
     
-            <p>Theme Update: <span class="theme-update"></span></p>
+            <p>Theme Update: <span data-theme-update class="theme-update"></span></p>
         </container>
         
         <script type="module">

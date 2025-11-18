@@ -10,53 +10,32 @@
  **************************************************************************************************/
 class Theme {
   /* ---------- static façade --------------------------------------------------------------- */
-  static #instance = null;
+  static _instance = null;
 
-  static get()  { return Theme.#instance?.getStoredTheme() ?? 'auto'; }
-  static set(t) { Theme.#instance?.setTheme(t); }
-  static toggle(){ Theme.#instance?.toggleTheme(); }
+  static get() { return Theme._instance?.getStoredTheme() ?? 'auto'; }
+  static set(t) { Theme._instance?.setTheme(t); }
+  static toggle() { Theme._instance?.toggleTheme(); }
 
   /* ---------- ctor ------------------------------------------------------------------------ */
   constructor() {
-    if (Theme.#instance) return Theme.#instance;          // singleton
-    Theme.#instance = this;
+    if (Theme._instance) return Theme._instance;          // singleton
+    Theme._instance = this;
 
-    this.root   = document.documentElement;
-    this.store  = localStorage;
-    this.key    = 'theme';                                // localStorage key
+    this.root = document.documentElement;
+    this.store = localStorage;
+    this.key = 'theme';                                // localStorage key
     this.themes = ['light', 'dark'];                      // allowed values
 
-    this.toggler     = document.querySelector('[data-theme-toggle]');
-    this.radioGroup  = document.querySelector('[data-theme-group]');
-    this.updatables  = document.querySelectorAll('[data-theme-update]');
-    this.metaColor   = this.#ensureMetaThemeColor();
+    this.toggler = document.querySelector('[data-theme-toggle]');
+    this.radioGroup = document.querySelector('[data-theme-group]');
+    this.updatables = document.querySelectorAll('[data-theme-update]');
+    this.metaColor = this._ensureMetaThemeColor();
 
-    this.#init();
+    this.init();
   }
 
   /* ---------- public ---------------------------------------------------------------------- */
-  getStoredTheme() { return this.store.getItem(this.key) || 'auto'; }
-
-  setTheme(theme) {
-    if (!['light','dark','auto'].includes(theme)) return;
-
-    const applied = theme === 'auto' ? this.#systemTheme() : theme;
-    this.root.setAttribute('theme', applied);
-    this.store.setItem(this.key, theme);
-
-    this.#syncUI(theme);
-    this.#updateMeta();
-    this.#announce(theme);
-  }
-
-  toggleTheme() {
-    const stored = this.getStoredTheme();
-    const active = stored === 'auto' ? this.#systemTheme() : stored;
-    this.setTheme(active === 'light' ? 'dark' : 'light');
-  }
-
-  /* ---------- private --------------------------------------------------------------------- */
-  #init() {
+  init() {
     /* 1. paint ASAP – prevents FOUC */
     this.setTheme(this.getStoredTheme());
 
@@ -68,36 +47,57 @@ class Theme {
     });
 
     window.matchMedia('(prefers-color-scheme: dark)')
-          .addEventListener('change', () => {
-            if (this.getStoredTheme() === 'auto') this.setTheme('auto');
-          });
+      .addEventListener('change', () => {
+        if (this.getStoredTheme() === 'auto') this.setTheme('auto');
+      });
   }
 
-  #systemTheme() {
+  getStoredTheme() { return this.store.getItem(this.key) || 'auto'; }
+
+  setTheme(theme) {
+    if (!['light', 'dark', 'auto'].includes(theme)) return;
+
+    const applied = theme === 'auto' ? this._systemTheme() : theme;
+    this.root.setAttribute('theme', applied);
+    this.store.setItem(this.key, theme);
+
+    this._syncUI(theme);
+    this._updateMeta();
+    this._announce(theme);
+  }
+
+  toggleTheme() {
+    const stored = this.getStoredTheme();
+    const active = stored === 'auto' ? this._systemTheme() : stored;
+    this.setTheme(active === 'light' ? 'dark' : 'light');
+  }
+
+  /* ---------- private --------------------------------------------------------------------- */
+  _systemTheme() {
     return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
-  #syncUI(theme) {
+  _syncUI(theme) {
     /* toggler pressed state */
     this.toggler?.setAttribute('aria-pressed', theme === 'dark');
 
     /* radio buttons */
     this.radioGroup
-        ?.querySelectorAll('[data-theme-value]')
-        .forEach(btn => btn.classList.toggle('active', btn.dataset.themeValue === theme));
+      ?.querySelectorAll('[data-theme-value]')
+      .forEach(btn => btn.classList.toggle('active', btn.dataset.themeValue === theme));
 
     /* generic updatable elements */
     this.updatables.forEach(el => el.setAttribute('data-theme-update', theme));
   }
 
-  #updateMeta() {
+  _updateMeta() {
     const color = getComputedStyle(this.root)
-                  .getPropertyValue('--bg-color')
-                  .trim() || (this.root.getAttribute('theme') === 'dark' ? '#000' : '#fff');
+      .getPropertyValue('--bg-color')
+      .trim() || (this.root.getAttribute('theme') === 'dark' ? '#000' : '#fff');
     this.metaColor.setAttribute('content', color);
   }
 
-  #ensureMetaThemeColor() {
+  _ensureMetaThemeColor() {
     let meta = document.querySelector('meta[name="theme-color"]');
     if (!meta) {
       meta = document.createElement('meta');
@@ -107,11 +107,11 @@ class Theme {
     return meta;
   }
 
-  #announce(theme) {
+  _announce(theme) {
     this.root.dispatchEvent(new CustomEvent('theme:changed', { detail: { theme } }));
   }
 }
 
 // Initialize Theme
 export default new Theme();
-export {Theme};
+export { Theme };

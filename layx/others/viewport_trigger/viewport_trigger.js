@@ -81,7 +81,9 @@ class ViewportTrigger {
   /* ---------- helpers ---------- */
   safePlay(el) {
     if (el.tagName !== 'VIDEO' && el.tagName !== 'AUDIO') return true;
-    return el.play().catch(() => { /* autoplay blocked – ignore */ });
+    return el.play().catch(() => { 
+      console.warn('ViewportTrigger: autoplay prevented on', el, '– make sure video has "muted" attribute or user interaction may be required.');
+    });
   }
 }
 

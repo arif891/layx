@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import * as esbuild from 'esbuild';
 import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getCssContentBlock, extractClasses, extractImportUrls } from '../util/functions.mjs'
 import { layx, breakPoints, layout } from '../core/vars.mjs'
@@ -235,7 +236,8 @@ async function bundleAndWriteJs(filePath, content, scriptDir, type) {
         let esbuildConfig = {};
         try {
             const configPath = path.resolve(process.cwd(), 'config.mjs');
-            const configModule = await import(configPath);
+            const configUrl = pathToFileURL(configPath).href;
+            const configModule = await import(configUrl);
             esbuildConfig = configModule.esbuildConfig || {};
         } catch(err) {
              console.warn('esbuildConfig not found, proceeding with default settings.',err);

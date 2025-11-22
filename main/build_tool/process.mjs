@@ -1,6 +1,6 @@
 import path from 'node:path';
 import * as esbuild from 'esbuild';
-import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getCssContentBlock, extractClasses, extractImportUrls } from '../util/functions.js'
+import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getCssContentBlock, extractClasses, extractImportUrls } from '../util/functions.mjs'
 import { layx, breakPoints, layout } from '../core/vars.mjs'
 import { esbuildConfig } from '../../config.mjs'
 

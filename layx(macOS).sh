@@ -24,6 +24,9 @@ COLOR_RESET='\033[0m'
 # *********************
 STRING_NODE_FAIL="${COLOR_RED}Failed to execute Node.js. Please check the path and installation.${COLOR_RESET}"
 STRING_DIR_ERROR="${COLOR_RED}Cannot perform this action in ${PWD}${COLOR_RESET}"
+STRING_NPM_INSTALLING="${COLOR_CYAN}Installing dependencies...${COLOR_RESET}"
+STRING_NPM_FAIL="${COLOR_RED}Failed to install dependencies. Please check your Node.js installation and internet connection.${COLOR_RESET}"
+STRING_NPM_SUCCESS="${COLOR_GREEN}Dependencies installed successfully!${COLOR_RESET}"
 
 # *********************
 # * Initialize Paths  *
@@ -147,6 +150,8 @@ install() {
         return
     }
 
+    validate_node
+
     check_permissions "/Applications" || return 1
 
     if [ -d "$PROGRAM_DIR" ]; then
@@ -160,6 +165,18 @@ install() {
     # Create program directory with sudo if needed
     sudo mkdir -p "$PROGRAM_DIR"
     sudo copy_safe "$SCRIPT_DIR" "$PROGRAM_DIR"
+
+    echo -e "$STRING_NPM_INSTALLING"
+    (
+        cd "$PROGRAM_DIR" || exit 1
+        # Run npm install with sudo if needed, but change ownership first
+        sudo chown -R $(whoami) .
+        if npm install; then
+            echo -e "$STRING_NPM_SUCCESS"
+        else
+            echo -e "$STRING_NPM_FAIL"
+        fi
+    )
 
     # Set executable permissions
     echo -e "${COLOR_CYAN}Setting executable permissions...${COLOR_RESET}"

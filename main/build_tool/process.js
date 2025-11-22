@@ -1,6 +1,8 @@
 import path from 'node:path';
+import * as esbuild from 'esbuild';
 import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getCssContentBlock, extractClasses, extractImportUrls } from '../util/functions.js'
 import { layx, breakPoints, layout } from '../core/vars.js'
+import { esbuildConfig } from '../../config.mjs'
 
 
 export { processFiles };
@@ -61,7 +63,9 @@ async function processFiles(optimize) {
             await Promise.all([
                 writeFile(config.output, `/* layx ${type} code */\n${finalContent}`),
                 writeFile(config.baseOutput, `/* User base ${type} code */\n${baseContent}`),
-                writeFile(config.base, minify(finalContent + baseContent, type))
+                type === 'js' 
+                    ? bundleAndWriteJs(config.base, finalContent + baseContent)
+                    : writeFile(config.base, minify(finalContent + baseContent, type))
             ]);
             console.log(`Processed LayX base ${type}`);
 
@@ -85,7 +89,12 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize) {
         const finalContent = await processContent(content, file, type, optimize, true);
 
         await writeFile(outPath, content);
-        await writeFile(file, minify(finalContent, type));
+        
+        if (type === 'js') {
+            await bundleAndWriteJs(file, finalContent);
+        } else {
+            await writeFile(file, minify(finalContent, type));
+        }
         console.log(`Processed ${path.basename(file)}`);
     }
 }
@@ -218,6 +227,31 @@ function removeExportAndDefault(content) {
     content = content.replace(/export\s+default\s+/g, '');
     content = content.replace(/^export\s+/gm, '');
     return content;
+}
+
+async function bundleAndWriteJs(filePath, content) {
+    try {
+        // Create a temporary entry point file with the processed content
+        const tempFile = filePath + '.tmp.js';
+        await writeFile(tempFile, content);
+        
+        // Bundle with esbuild
+        await esbuild.build({
+            entryPoints: [tempFile],
+            outfile: filePath,
+            ...esbuildConfig.base,
+            bundle: false,
+        });
+        
+        // Clean up temp file
+        import('node:fs/promises').then(fs => fs.unlink(tempFile).catch(() => {}));
+        
+        console.log(`ESBuild processed: ${filePath}`);
+    } catch (error) {
+        console.error(`ESBuild error for ${filePath}:`, error);
+        // Fallback to minify if esbuild fails
+        await writeFile(filePath, minify(content, 'js'));
+    }
 }
 
 function removeImportStatements(content) {

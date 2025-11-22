@@ -44,7 +44,7 @@ SNIPPETS_DIR="$HOME/Library/Application Support/Code/User/snippets/"
 # *********************
 validate_node() {
     if ! command -v node >/dev/null 2>&1; then
-        echo -e "${COLOR_RED}Node.js not found! Please install Node.js.${COLOR_RESET}"
+        echo -e "${COLOR_RED}Node.js not found! It is required for build and other operations. Download and install it from https://nodejs.org/en/download${COLOR_RESET}"
         exit 1
     fi
 }

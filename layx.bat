@@ -175,7 +175,7 @@ GOTO end_with_pause
 :validate_node
 where node >NUL 2>&1
 IF ERRORLEVEL 1 (
-        ECHO %COLOR_red%Node.js not found!%COLOR_RESET%
+        ECHO %COLOR_red%Node.js not found! It is required for build and other operations. Download and install it from https://nodejs.org/en/download%COLOR_RESET%
         EXIT /B 1
 )
 EXIT /B 0

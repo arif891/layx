@@ -5,8 +5,8 @@
 # **********************
 VERSION="0.1.0 alpha"
 PROGRAM_DIR="/Applications/LayX/"
-CONFIG_DIR="config/"
-CONFIG_FILE="config.mjs"
+MAIN_DIR="main/"
+MAIN_FILE="main.mjs"
 IMAGES_DIR="assets/image/"
 ARGS=""
 
@@ -33,12 +33,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
 SCRIPT_PATH="${SCRIPT_DIR}$(basename "${BASH_SOURCE[0]}")"
 
 # Derive executable paths
-NODE_EXE="${SCRIPT_DIR}${CONFIG_DIR}node"
-WEBP_EXE="${SCRIPT_DIR}${CONFIG_DIR}webp"
-AVIF_EXE="${SCRIPT_DIR}${CONFIG_DIR}avif"
+NODE_EXE="${SCRIPT_DIR}${MAIN_DIR}node"
+WEBP_EXE="${SCRIPT_DIR}${MAIN_DIR}webp"
+AVIF_EXE="${SCRIPT_DIR}${MAIN_DIR}avif"
 
 # Snippets path
-SNIPPETS_PATH="${SCRIPT_DIR}${CONFIG_DIR}syntax/layx.code-snippets"
+SNIPPETS_PATH="${SCRIPT_DIR}${MAIN_DIR}syntax/layx.code-snippets"
 SNIPPETS_DIR="$HOME/Library/Application Support/Code/User/snippets/"
 
 
@@ -89,7 +89,7 @@ check_permissions() {
 build() {
     validate_node
     if [ "$CURRENT_DIR" != "$PROGRAM_DIR" ]; then
-        "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" build
+        "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" build
     else
         echo -e "$STRING_DIR_ERROR"
     fi
@@ -98,7 +98,7 @@ build() {
 unbuild() {
     validate_node
     if [ "$CURRENT_DIR" != "$PROGRAM_DIR" ]; then
-        "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" unbuild
+        "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" unbuild
     else
         echo -e "$STRING_DIR_ERROR"
     fi
@@ -138,7 +138,7 @@ create() {
 optimize_images() {
     validate_node
     echo -e "${COLOR_CYAN}Checking if any images are available to optimize...${COLOR_RESET}"
-    "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" optimizeImages
+    "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" optimizeImages
     echo -e "${COLOR_GREEN}Optimization completed successfully!${COLOR_RESET}"
 }
 
@@ -165,9 +165,9 @@ install() {
     # Set executable permissions
     echo -e "${COLOR_CYAN}Setting executable permissions...${COLOR_RESET}"
     sudo chmod +x "${PROGRAM_DIR}layx.sh"
-    sudo chmod +x "${PROGRAM_DIR}${CONFIG_DIR}node"
-    sudo chmod +x "${PROGRAM_DIR}${CONFIG_DIR}webp"
-    sudo chmod +x "${PROGRAM_DIR}${CONFIG_DIR}avif"
+    sudo chmod +x "${PROGRAM_DIR}${MAIN_DIR}node"
+    sudo chmod +x "${PROGRAM_DIR}${MAIN_DIR}webp"
+    sudo chmod +x "${PROGRAM_DIR}${MAIN_DIR}avif"
 
     # Handle aliases for both zsh and bash
     echo -e "${COLOR_CYAN}Creating alias...${COLOR_RESET}"
@@ -241,7 +241,7 @@ if [ $# -gt 0 ]; then
         "build") build ;;
         "unbuild") unbuild ;;
         "create") create ;;
-        "add") "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" "$@" ;;
+        "add") "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" "$@" ;;
         "setup") 
             validate_node
             "$NODE_EXE" "create-setup.mjs"

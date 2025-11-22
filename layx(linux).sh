@@ -5,8 +5,8 @@
 # **********************
 VERSION="0.1.0 alpha"
 PROGRAM_DIR="/opt/layx/"
-CONFIG_DIR="config/"
-CONFIG_FILE="config.mjs"
+MAIN_DIR="main/"
+MAIN_FILE="main.mjs"
 IMAGES_DIR="assets/image/"
 ARGS=""
 
@@ -33,13 +33,13 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")/"
 SCRIPT_PATH="$(readlink -f "$0")"
 
 # Derive executable paths
-NODE_EXE="${SCRIPT_DIR}${CONFIG_DIR}node"
-WEBP_EXE="${SCRIPT_DIR}${CONFIG_DIR}webp"
-AVIF_EXE="${SCRIPT_DIR}${CONFIG_DIR}avif"
+NODE_EXE="${SCRIPT_DIR}${MAIN_DIR}node"
+WEBP_EXE="${SCRIPT_DIR}${MAIN_DIR}webp"
+AVIF_EXE="${SCRIPT_DIR}${MAIN_DIR}avif"
 
 # Snippets path
-SNIPPETS_PATH="${SCRIPT_DIR}${CONFIG_DIR}syntax/layx.code-snippets"
-SNIPPETS_DIR="$HOME/.config/Code/User/snippets/"
+SNIPPETS_PATH="${SCRIPT_DIR}${MAIN_DIR}syntax/layx.code-snippets"
+SNIPPETS_DIR="$HOME/.main/Code/User/snippets/"
 
 
 
@@ -77,7 +77,7 @@ copy_safe() {
 build() {
     validate_node
     if [ "$CURRENT_DIR" != "$PROGRAM_DIR" ]; then
-        "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" build
+        "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" build
     else
         echo -e "$STRING_DIR_ERROR"
     fi
@@ -86,7 +86,7 @@ build() {
 unbuild() {
     validate_node
     if [ "$CURRENT_DIR" != "$PROGRAM_DIR" ]; then
-        "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" unbuild
+        "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" unbuild
     else
         echo -e "$STRING_DIR_ERROR"
     fi
@@ -126,7 +126,7 @@ create() {
 optimize_images() {
     validate_node
     echo -e "${COLOR_CYAN}Checking if any images are available to optimize...${COLOR_RESET}"
-    "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" optimizeImages
+    "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" optimizeImages
     echo -e "${COLOR_GREEN}Optimization completed successfully!${COLOR_RESET}"
 }
 
@@ -155,9 +155,9 @@ install() {
     # Set executable permissions
     echo -e "${COLOR_CYAN}Setting executable permissions...${COLOR_RESET}"
     chmod +x "${PROGRAM_DIR}layx.sh"
-    chmod +x "${PROGRAM_DIR}${CONFIG_DIR}node"
-    chmod +x "${PROGRAM_DIR}${CONFIG_DIR}webp"
-    chmod +x "${PROGRAM_DIR}${CONFIG_DIR}avif"
+    chmod +x "${PROGRAM_DIR}${MAIN_DIR}node"
+    chmod +x "${PROGRAM_DIR}${MAIN_DIR}webp"
+    chmod +x "${PROGRAM_DIR}${MAIN_DIR}avif"
 
     # Create alias
     echo -e "${COLOR_CYAN}Creating alias...${COLOR_RESET}"
@@ -224,7 +224,7 @@ if [ $# -gt 0 ]; then
         "build") build ;;
         "unbuild") unbuild ;;
         "create") create ;;
-        "add") "$NODE_EXE" "${SCRIPT_DIR}${CONFIG_DIR}${CONFIG_FILE}" "$@" ;;
+        "add") "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" "$@" ;;
         "setup") 
             validate_node
             "$NODE_EXE" "create-setup.mjs"

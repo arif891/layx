@@ -6,8 +6,8 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 :: **********************
 SET "VERSION=0.1.0 alpha"
 SET "PROGRAM_DIR=C:\Program Files\LayX\"
-SET "CONFIG_DIR=config\"
-SET "CONFIG_FILE=config.mjs"
+SET "MAIN_DIR=main\"
+SET "MAIN_FILE=main.mjs"
 SET "IMAGES_DIR=assets\image\"
 SET "ARGS="
 
@@ -34,12 +34,12 @@ SET "SCRIPT_DIR=%~dp0"
 SET "SCRIPT_PATH=%~f0"
 
 :: Derive executable paths
-SET "NODE_EXE=%SCRIPT_DIR%%CONFIG_DIR%node.exe"
-SET "WEBP_EXE=%SCRIPT_DIR%%CONFIG_DIR%webp.exe"
-SET "AVIF_EXE=%SCRIPT_DIR%%CONFIG_DIR%avif.exe"
+SET "NODE_EXE=%SCRIPT_DIR%%MAIN_DIR%node.exe"
+SET "WEBP_EXE=%SCRIPT_DIR%%MAIN_DIR%webp.exe"
+SET "AVIF_EXE=%SCRIPT_DIR%%MAIN_DIR%avif.exe"
 
 :: Snippets path
-SET "SNIPPETS_PATH=%SCRIPT_DIR%%CONFIG_DIR%syntax\layx.code-snippets"
+SET "SNIPPETS_PATH=%SCRIPT_DIR%%MAIN_DIR%syntax\layx.code-snippets"
 SET "SNIPPETS_DIR=C:\Users\%username%\AppData\Roaming\Code\User\snippets\"
 
 
@@ -83,14 +83,14 @@ GOTO interactive_menu
 :build
 CALL :validate_node
 IF NOT "%CURRENT_DIR%"=="%PROGRAM_DIR%" (
-    "%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%%CONFIG_FILE%" build
+    "%NODE_EXE%" "%SCRIPT_DIR%%MAIN_DIR%%MAIN_FILE%" build
 ) ELSE (ECHO %STRING_dir_error%)
 GOTO end
 
 :unbuild
 CALL :validate_node
 IF NOT "%CURRENT_DIR%"=="%PROGRAM_DIR%" (
-    "%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%%CONFIG_FILE%" unbuild
+    "%NODE_EXE%" "%SCRIPT_DIR%%MAIN_DIR%%MAIN_FILE%" unbuild
 ) ELSE (ECHO %STRING_dir_error%)
 GOTO end
 
@@ -126,7 +126,7 @@ GOTO end
 :optimizeImages
 CALL :validate_node
 ECHO %COLOR_cyan%Checking if any images are available to optimize...%COLOR_RESET%
-"%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%%CONFIG_FILE%" optimizeImages
+"%NODE_EXE%" "%SCRIPT_DIR%%MAIN_DIR%%MAIN_FILE%" optimizeImages
 ECHO %COLOR_green%Optimization completed successfully!%COLOR_RESET%
 GOTO end
 
@@ -193,7 +193,7 @@ EXIT /B 0
 SET "cmd=%~1"
 SHIFT
 IF /I "%cmd%"=="add" (
-    "%NODE_EXE%" "%SCRIPT_DIR%%CONFIG_DIR%%CONFIG_FILE%" %*
+    "%NODE_EXE%" "%SCRIPT_DIR%%MAIN_DIR%%MAIN_FILE%" %*
     EXIT /B
 )
 

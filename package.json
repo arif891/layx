@@ -1,21 +1,4 @@
 {
-  "name": "layx",
-  "version": "0.1.0",
-  "description": "",
-  "homepage": "https://github.com/arif891/Layx#readme",
-  "bugs": {
-    "url": "https://github.com/arif891/Layx/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/arif891/Layx.git"
-  },
-  "license": "MIT",
-  "author": "",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node main/main.mjs build"
-  },
   "devDependencies": {
     "esbuild": "^0.27.0",
     "sharp": "^0.34.5"

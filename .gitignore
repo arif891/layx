@@ -1,1 +1,3 @@
-setup/
+/node_modules
+/setup
+package-lock.json

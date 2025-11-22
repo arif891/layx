@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { exec } from 'node:child_process';
+import sharp from 'sharp';
 
 import { layx } from '../../core/vars.js';
 import { getFilesWithExtension, readFile, writeFile, moveFile } from '../../util/functions.js';
@@ -8,7 +8,6 @@ export { optimizeImages };
 
 async function optimizeImages(scriptDir, optimizer = 'avif') {
     const imagesDir = layx.directories.images;
-    const optimizerExe = path.join(scriptDir, optimizer);
     const imageExtensions = ['jpg', 'jpeg', 'png'];
     let images = [];
 
@@ -25,7 +24,7 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
     }
 
     for (const image of images) {
-        await optimizeImage(image, optimizerExe, optimizer);
+        await optimizeImage(image, optimizer);
     }
 
     await updateUrls(optimizer);
@@ -33,16 +32,28 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
     console.log(`Optimized images with ${optimizer}`);
 }
 
-async function optimizeImage(image, optimizerExe, optimizer) {
-    const optimizedImage = image.replace(path.extname(image), `.${optimizer}`);
-    exec(`"${optimizerExe}" "${image}" -o "${optimizedImage}"`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error optimizing image: ${image}`, error);
+async function optimizeImage(image, optimizer) {
+    try {
+        const optimizedImage = image.replace(path.extname(image), `.${optimizer}`);
+        
+        if (optimizer === 'avif') {
+            await sharp(image)
+                .avif({ quality: 80 })
+                .toFile(optimizedImage);
+        } else if (optimizer === 'webp') {
+            await sharp(image)
+                .webp({ quality: 80 })
+                .toFile(optimizedImage);
+        } else {
+            console.warn(`Unsupported optimizer: ${optimizer}`);
             return;
-        } 
-
-       moveFile(image, `${path.dirname(image)}/orginal_images_dir/${path.basename(image)}`);
-    });
+        }
+        
+        moveFile(image, `${path.dirname(image)}/original_images_dir/${path.basename(image)}`);
+        console.log(`Optimized: ${image} -> ${optimizedImage}`);
+    } catch (error) {
+        console.error(`Error optimizing image: ${image}`, error);
+    }
 }
 
 async function updateUrls(optimizer) {

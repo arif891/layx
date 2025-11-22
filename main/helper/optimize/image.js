@@ -38,11 +38,11 @@ async function optimizeImage(image, optimizer) {
         
         if (optimizer === 'avif') {
             await sharp(image)
-                .avif({ quality: 80 })
+                .avif()
                 .toFile(optimizedImage);
         } else if (optimizer === 'webp') {
             await sharp(image)
-                .webp({ quality: 80 })
+                .webp()
                 .toFile(optimizedImage);
         } else {
             console.warn(`Unsupported optimizer: ${optimizer}`);

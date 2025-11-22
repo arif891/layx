@@ -105,18 +105,23 @@ IF EXIST "%CURRENT_DIR%\layx" (
 )
 
 
-FOR /F "delims=" %%F IN ('DIR /B /A "%PROGRAM_DIR%"') DO (
-    IF /I NOT "%%F"=="main" IF /I NOT "%%F"=="layx.bat" (
-        IF EXIST "%PROGRAM_DIR%%%F\*" (
-            XCOPY /Y /E /Q "%PROGRAM_DIR%%%F" "%CURRENT_DIR%%%F\" >NUL
+FOR /F "DELIMS=" %%F IN ('DIR /B /A "%PROGRAM_DIR%"') DO (
+    IF /I NOT "%%F"=="main" (
+    IF /I NOT "%%F"=="layx.bat" (
+
+        IF "%~1"=="-bt" (
+            CALL :CopyItem "%%F"
         ) ELSE (
-            COPY /Y "%PROGRAM_DIR%%%F" "%CURRENT_DIR%%%F" >NUL
-        )
-    )
+            IF /I NOT "%%F"=="node_modules" (
+            IF /I NOT "%%F"=="package.json" (
+            IF /I NOT "%%F"=="package-lock.json" (
+                CALL :CopyItem "%%F"
+            ))))
+    ))
 )
 
-ECHO %COLOR_green%Project created successfully!%COLOR_RESET%
-GOTO end
+ECHO %COLOR_GREEN%Project created successfully!%COLOR_RESET%
+GOTO END
 
 :optimizeImages
 CALL :validate_node
@@ -175,7 +180,7 @@ GOTO end_with_pause
 :validate_node
 where node >NUL 2>&1
 IF ERRORLEVEL 1 (
-        ECHO %COLOR_red%Node.js not found! It is required for build and other operations. Download and install it from https://nodejs.org/en/download%COLOR_RESET%
+        ECHO %COLOR_red%Node.js not found! It required for build and other operations. Download and install it from https://nodejs.org/en/download%COLOR_RESET%
         EXIT /B 1
 )
 EXIT /B 0

@@ -234,8 +234,8 @@ async function bundleAndWriteJs(filePath, content, scriptDir, type) {
         // Check if esbuildConfig is exists and then import it
         let esbuildConfig = {};
         try {
-            const path = path.resolve(process.cwd(), 'config.mjs');
-            const configModule = await import(path);
+            const configPath = path.resolve(process.cwd(), 'config.mjs');
+            const configModule = await import(configPath);
             esbuildConfig = configModule.esbuildConfig || {};
         } catch(err) {
              console.warn('esbuildConfig not found, proceeding with default settings.',err);
@@ -254,7 +254,8 @@ async function bundleAndWriteJs(filePath, content, scriptDir, type) {
         });
         
         // Clean up temp file
-        import('node:fs/promises').then(fs => fs.unlink(tempFile).catch(() => {}));
+        const { unlink } = await import('node:fs/promises');
+        await unlink(tempFile).catch(() => {});
         
         console.log(`ESBuild processed: ${filePath}`);
     } catch (error) {

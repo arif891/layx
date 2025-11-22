@@ -25,6 +25,9 @@ SET "COLOR_RESET=[0m"
 :: *********************
 SET "STRING_node_fail=!COLOR_red!Failed to execute Node.js. Please check the path and installation.!COLOR_RESET!"
 SET "STRING_dir_error=!COLOR_red!Cannot perform this action in "%FR_CURRENT_DIR%"!COLOR_RESET!"
+SET "STRING_npm_installing=!COLOR_cyan!Installing dependencies...!COLOR_RESET!"
+SET "STRING_npm_fail=!COLOR_red!Failed to install dependencies. Please check your Node.js installation and internet connection.!COLOR_RESET!"
+SET "STRING_npm_success=!COLOR_green!Dependencies installed successfully!COLOR_RESET!"
 
 :: *********************
 :: * Initialize Paths  *
@@ -139,6 +142,8 @@ IF "%SCRIPT_DIR%"=="%PROGRAM_DIR%" (
     GOTO end
 )
 
+CALL :validate_node
+
 NET SESSION >NUL 2>&1 || (
     ECHO %COLOR_yellow%Elevating privileges...%COLOR_RESET%
     PowerShell -Command "Start-Process -Verb RunAs -FilePath '%SCRIPT_PATH%' -ArgumentList 'install' -Wait"
@@ -151,6 +156,16 @@ IF EXIST "%PROGRAM_DIR%" (
 )
 
 CALL :xcopy_safe "%SCRIPT_DIR%" "%PROGRAM_DIR%"
+
+ECHO %STRING_npm_installing%
+CD /D "%PROGRAM_DIR%"
+CALL npm install
+IF ERRORLEVEL 1 (
+    ECHO %STRING_npm_fail%
+    GOTO end_with_pause
+)
+CD /D "%CURRENT_DIR%"
+ECHO %STRING_npm_success%
 
 :: Check if path already exists in system PATH
 PowerShell -Command "$currentPath = [Environment]::GetEnvironmentVariable('Path', 'Machine'); if ($currentPath -notlike '*%PROGRAM_DIR%*') { [Environment]::SetEnvironmentVariable('Path', $currentPath + ';%PROGRAM_DIR%', 'Machine'); Write-Host '%COLOR_green%Added to system PATH%COLOR_RESET%' } else { Write-Host '%COLOR_cyan%Path already exists in system PATH%COLOR_RESET%' }"

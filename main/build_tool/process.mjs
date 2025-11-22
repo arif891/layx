@@ -69,7 +69,7 @@ async function processFiles(scriptDir,optimize) {
             ]);
             console.log(`Processed LayX base ${type}`);
 
-            await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir, optimize);
+            await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir, optimize, scriptDir);
 
         } catch (error) {
             console.error(`Error processing ${type} files:`, error);
@@ -79,7 +79,7 @@ async function processFiles(scriptDir,optimize) {
 
 }
 
-async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize) {
+async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize, scriptDir) {
     const pageFiles = await getFilesWithExtension(pageFilesDir, type);
 
     for (const file of pageFiles) {

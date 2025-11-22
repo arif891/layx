@@ -112,11 +112,14 @@ FOR /F "DELIMS=" %%F IN ('DIR /B /A "%PROGRAM_DIR%"') DO (
             CALL :CopyItem "%%F"
         ) ELSE (
             IF /I NOT "%%F"=="main" (
-            IF /I NOT "%%F"=="node_modules" (
-            IF /I NOT "%%F"=="package.json" (
-            IF /I NOT "%%F"=="package-lock.json" (
-                CALL :CopyItem "%%F"
-            ))))
+                IF /I NOT "%%F"=="node_modules" (
+                    IF /I NOT "%%F"=="package.json" (
+                        IF /I NOT "%%F"=="package-lock.json" (
+                            CALL :CopyItem "%%F"
+                        )
+                    )
+                )
+            )
         )
     )
 )
@@ -185,6 +188,14 @@ IF ERRORLEVEL 1 (
         EXIT /B 1
 )
 EXIT /B 0
+
+:CopyItem
+IF EXIST "%PROGRAM_DIR%%~1\*" (
+    XCOPY /Y /E /Q "%PROGRAM_DIR%%~1" "%CURRENT_DIR%%~1\" >NUL
+) ELSE (
+    COPY  /Y "%PROGRAM_DIR%%~1" "%CURRENT_DIR%%~1" >NUL
+)
+EXIT /B 1
 
 :process_arguments
 SET "cmd=%~1"

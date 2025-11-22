@@ -1,4 +1,4 @@
-import { readFile, writeFile, extractImportUrls } from '../../util/functions.js';
+import { readFile, writeFile, extractImportUrls } from '../../util/functions.mjs';
 
 export {processDependencies };
 

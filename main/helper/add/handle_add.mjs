@@ -1,8 +1,8 @@
 import { parseArgs } from 'util';
-import { componentAdd } from './component.js';
-import { templateAdd } from './template.js';
-import { blockAdd } from './block.js';
-import { fontAdd } from './font.js';
+import { componentAdd } from './component.mjs';
+import { templateAdd } from './template.mjs';
+import { blockAdd } from './block.mjs';
+import { fontAdd } from './font.mjs';
 
 export { handleAdd, argsObj };
 

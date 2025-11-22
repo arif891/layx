@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { readFile, writeFile, getFilesWithExtension } from '../util/functions.js'
-import { layx } from '../core/vars.js'
+import { readFile, writeFile, getFilesWithExtension } from '../util/functions.mjs'
+import { layx } from '../core/vars.mjs'
 
 export {restoreFiles};
 

@@ -1,5 +1,5 @@
-import { readFile, writeFile } from '../util/functions.js'
-import { layx } from "../core/vars.js";
+import { readFile, writeFile } from '../util/functions.mjs'
+import { layx } from "../core/vars.mjs";
 
 async function genBuildInfo(newBuildInfo = {}) {
     let previousBuildInfo = {};

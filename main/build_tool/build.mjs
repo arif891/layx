@@ -1,9 +1,9 @@
-import CommandLineInterface from '../cli/cli.js';
-import { processFiles } from './process.js';
-import { processHtmlFiles } from './process_html.js';
-import { genBuildInfo, getBuildInfo } from './functions.js';
-import { unbuild } from './un_build.js';
-import { optimizeImages } from '../helper/optimize/image.js';
+import CommandLineInterface from '../cli/cli.mjs';
+import { processFiles } from './process.mjs';
+import { processHtmlFiles } from './process_html.mjs';
+import { genBuildInfo, getBuildInfo } from './functions.mjs';
+import { unbuild } from './un_build.mjs';
+import { optimizeImages } from '../helper/optimize/image.mjs';
 
 const cli = new CommandLineInterface();
 const { fg, bg } = cli;

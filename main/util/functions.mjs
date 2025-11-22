@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from "node:fs/promises";
-import { breakPoints } from "../core/vars.js";
+import { breakPoints } from "../core/vars.mjs";
 
 
 export { getFilesContent, ensureDirectoryExists,  getCssContentBlock, getFilesWithExtension, minify, extractClasses, extractImportUrls, readFile, writeFile, copyFile, moveFile, deleteFile };

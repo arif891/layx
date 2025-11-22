@@ -1,8 +1,8 @@
-import { argsObj } from './handle_add.js';
-import { downloadFile } from '../download/download.js';
-import { layx } from '../../core/vars.js';
+import { argsObj } from './handle_add.mjs';
+import { downloadFile } from '../download/download.mjs';
+import { layx } from '../../core/vars.mjs';
 
-import { processDependencies } from './function.js';
+import { processDependencies } from './function.mjs';
 
 export { templateAdd };
 

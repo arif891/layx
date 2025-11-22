@@ -1,8 +1,8 @@
 import path from 'node:path';
 import sharp from 'sharp';
 
-import { layx } from '../../core/vars.js';
-import { getFilesWithExtension, readFile, writeFile, moveFile } from '../../util/functions.js';
+import { layx } from '../../core/vars.mjs';
+import { getFilesWithExtension, readFile, writeFile, moveFile } from '../../util/functions.mjs';
 
 export { optimizeImages };
 

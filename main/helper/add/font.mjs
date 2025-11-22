@@ -1,9 +1,9 @@
 import path from 'node:path';
-import CommandLineInterface from '../../cli/cli.js';
-import { ensureDirectoryExists, readFile, writeFile } from '../../util/functions.js';
-import { downloadFile } from '../download/download.js';
-import { argsObj } from './handle_add.js';
-import { layx } from '../../core/vars.js';
+import CommandLineInterface from '../../cli/cli.mjs';
+import { ensureDirectoryExists, readFile, writeFile } from '../../util/functions.mjs';
+import { downloadFile } from '../download/download.mjs';
+import { argsObj } from './handle_add.mjs';
+import { layx } from '../../core/vars.mjs';
 
 export { fontAdd };
 

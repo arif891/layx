@@ -1,7 +1,7 @@
 // js code
 import { build, unbuild } from './build_tool/build_tool.mjs';
-import { handleAdd } from './helper/add/handle_add.js';
-import { optimizeImages } from './helper/optimize/image.js';
+import { handleAdd } from './helper/add/handle_add.mjs';
+import { optimizeImages } from './helper/optimize/image.mjs';
 
 const scriptDir = import.meta.dirname;
 

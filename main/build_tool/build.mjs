@@ -27,7 +27,7 @@ async function build(scriptDir, isRebuild = false, optimize = true) {
       }
     }
 
-    await processFiles(optimize);
+    await processFiles(scriptDir,optimize);
 
     if (!isRebuild) {
       await processHtmlFiles('./');

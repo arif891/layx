@@ -2,7 +2,7 @@ import path from 'node:path';
 import * as esbuild from 'esbuild';
 import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getCssContentBlock, extractClasses, extractImportUrls } from '../util/functions.mjs'
 import { layx, breakPoints, layout } from '../core/vars.mjs'
-import { esbuildConfig } from '../../config.mjs'
+
 
 
 export { processFiles };
@@ -46,7 +46,7 @@ const optimizableFiles = [
     }
 ];
 
-async function processFiles(optimize) {
+async function processFiles(scriptDir,optimize) {
     const types = ['css', 'js'];
 
     for (const type of types) {
@@ -64,7 +64,7 @@ async function processFiles(optimize) {
                 writeFile(config.output, `/* layx ${type} code */\n${finalContent}`),
                 writeFile(config.baseOutput, `/* User base ${type} code */\n${baseContent}`),
                 type === 'js' 
-                    ? bundleAndWriteJs(config.base, finalContent + baseContent)
+                    ? bundleAndWriteJs(config.base, finalContent + baseContent, scriptDir, type='base')
                     : writeFile(config.base, minify(finalContent + baseContent, type))
             ]);
             console.log(`Processed LayX base ${type}`);
@@ -91,7 +91,7 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize) {
         await writeFile(outPath, content);
         
         if (type === 'js') {
-            await bundleAndWriteJs(file, finalContent);
+            await bundleAndWriteJs(file, finalContent, scriptDir, type='page');
         } else {
             await writeFile(file, minify(finalContent, type));
         }
@@ -229,8 +229,17 @@ function removeExportAndDefault(content) {
     return content;
 }
 
-async function bundleAndWriteJs(filePath, content) {
+async function bundleAndWriteJs(filePath, content, scriptDir, type) {
     try {
+        // Check if esbuildConfig is exists and then import it
+        let esbuildConfig = {};
+        try {
+            const configModule = await import(path.join(scriptDir, 'config.mjs'));
+            esbuildConfig = configModule.esbuildConfig || {};
+        } catch {
+            console.warn('esbuildConfig not found, proceeding with default settings.');
+        }
+
         // Create a temporary entry point file with the processed content
         const tempFile = filePath + '.tmp.js';
         await writeFile(tempFile, content);
@@ -239,7 +248,7 @@ async function bundleAndWriteJs(filePath, content) {
         await esbuild.build({
             entryPoints: [tempFile],
             outfile: filePath,
-            ...esbuildConfig.base,
+            ...esbuildConfig?.[type],
             bundle: false,
         });
         

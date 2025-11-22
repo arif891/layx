@@ -106,8 +106,7 @@ IF EXIST "%CURRENT_DIR%\layx" (
 
 
 FOR /F "DELIMS=" %%F IN ('DIR /B /A "%PROGRAM_DIR%"') DO (
-    IF /I "%%F"=="layx.bat" (
-    ) ELSE (
+    IF /I NOT "%%F"=="layx.bat" (
         IF "%~1"=="-bt" (
             CALL :CopyItem "%%F"
         ) ELSE (

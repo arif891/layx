@@ -111,7 +111,7 @@ create() {
 
     for item in "$PROGRAM_DIR"*; do
         base_name=$(basename "$item")
-        if [ "$base_name" != "config" ] && [ "$base_name" != "layx.sh" ]; then
+        if [ "$base_name" != "main" ] && [ "$base_name" != "layx.sh" ]; then
             if [ -d "$item" ]; then
                 cp -r "$item" "${CURRENT_DIR}${base_name}"
             else

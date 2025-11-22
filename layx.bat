@@ -111,7 +111,7 @@ IF EXIST "%CURRENT_DIR%\layx" (
 
 
 FOR /F "delims=" %%F IN ('DIR /B /A "%PROGRAM_DIR%"') DO (
-    IF /I NOT "%%F"=="config" IF /I NOT "%%F"=="layx.bat" (
+    IF /I NOT "%%F"=="main" IF /I NOT "%%F"=="layx.bat" (
         IF EXIST "%PROGRAM_DIR%%%F\*" (
             XCOPY /Y /E /Q "%PROGRAM_DIR%%%F" "%CURRENT_DIR%%%F\" >NUL
         ) ELSE (

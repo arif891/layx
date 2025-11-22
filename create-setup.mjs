@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 
 const version = '0.1.0 alpha';
 const exclude = [
-    'LICENSE', 'README.md', 'create-setup.mjs', 'setup',
+    'LICENSE', 'README.md', 'create-setup.mjs', 'setup', 'package-lock.json', 'node_modules'
 
     // 'accordion', 'alert', 'breadcrumb', 'card', 'carousel', 'chart', 'dialog', 'draggable', 'media',
     // 'pagination', 'popover', 'section', 'sheet', 'tab', 'tooltip', 'window',

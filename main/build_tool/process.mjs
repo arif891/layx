@@ -234,6 +234,7 @@ async function bundleAndWriteJs(filePath, content, scriptDir, type) {
         // Check if esbuildConfig is exists and then import it
         let esbuildConfig = {};
         try {
+            console.log(path.join(process.cwd(), 'config.mjs'));
             const configModule = await import(path.join(process.cwd(), 'config.mjs'));
             esbuildConfig = configModule.esbuildConfig || {};
         } catch {

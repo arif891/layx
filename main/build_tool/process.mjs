@@ -64,7 +64,7 @@ async function processFiles(scriptDir,optimize) {
                 writeFile(config.output, `/* layx ${type} code */\n${finalContent}`),
                 writeFile(config.baseOutput, `/* User base ${type} code */\n${baseContent}`),
                 type === 'js' 
-                    ? bundleAndWriteJs(config.base, finalContent + baseContent, scriptDir, type='base')
+                    ? bundleAndWriteJs(config.base, finalContent + baseContent, scriptDir, 'base')
                     : writeFile(config.base, minify(finalContent + baseContent, type))
             ]);
             console.log(`Processed LayX base ${type}`);
@@ -91,7 +91,7 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize) {
         await writeFile(outPath, content);
         
         if (type === 'js') {
-            await bundleAndWriteJs(file, finalContent, scriptDir, type='page');
+            await bundleAndWriteJs(file, finalContent, scriptDir, 'page');
         } else {
             await writeFile(file, minify(finalContent, type));
         }

@@ -113,10 +113,20 @@ create() {
     for item in "$PROGRAM_DIR"*; do
         base_name=$(basename "$item")
         if [ "$base_name" != "main" ] && [ "$base_name" != "layx.sh" ]; then
-            if [ -d "$item" ]; then
-                cp -R "$item" "${CURRENT_DIR}${base_name}"
+            if [ "$1" == "-bt" ]; then
+                if [ -d "$item" ]; then
+                    cp -R "$item" "${CURRENT_DIR}${base_name}"
+                else
+                    cp "$item" "${CURRENT_DIR}${base_name}"
+                fi
             else
-                cp "$item" "${CURRENT_DIR}${base_name}"
+                if [ "$base_name" != "node_modules" ] && [ "$base_name" != "package.json" ] && [ "$base_name" != "package-lock.json" ]; then
+                    if [ -d "$item" ]; then
+                        cp -R "$item" "${CURRENT_DIR}${base_name}"
+                    else
+                        cp "$item" "${CURRENT_DIR}${base_name}"
+                    fi
+                fi
             fi
         fi
     done

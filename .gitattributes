@@ -1,2 +1,0 @@
-node(linux) filter=lfs diff=lfs merge=lfs -text
-node(macOS) filter=lfs diff=lfs merge=lfs -text

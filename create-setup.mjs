@@ -4,7 +4,8 @@ import { existsSync } from 'node:fs';
 
 const version = '0.1.0 alpha';
 const exclude = [
-    'LICENSE', 'README.md', 'create-setup.mjs', 'setup', 'package-lock.json', 'node_modules'
+    'LICENSE', 'README.md', 'create-setup.mjs', 'setup', 'package-lock.json', 'node_modules',
+    '.git','.github'
 
     // 'accordion', 'alert', 'breadcrumb', 'card', 'carousel', 'chart', 'dialog', 'draggable', 'media',
     // 'pagination', 'popover', 'section', 'sheet', 'tab', 'tooltip', 'window',
@@ -58,7 +59,7 @@ async function copyDir(src, dest, platformName) {
         const entries = await fs.readdir(src, { withFileTypes: true });
 
         for (const entry of entries) {
-            if (entry.name.startsWith('.') || exclude.includes(entry.name)) continue;
+            if (exclude.includes(entry.name)) continue;
 
             const srcPath = path.join(src, entry.name);
             const destPath = path.join(dest, entry.name);

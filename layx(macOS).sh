@@ -32,11 +32,6 @@ CURRENT_DIR="$(pwd)/"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
 SCRIPT_PATH="${SCRIPT_DIR}$(basename "${BASH_SOURCE[0]}")"
 
-# Derive executable paths
-NODE_EXE="${SCRIPT_DIR}${MAIN_DIR}node"
-WEBP_EXE="${SCRIPT_DIR}${MAIN_DIR}webp"
-AVIF_EXE="${SCRIPT_DIR}${MAIN_DIR}avif"
-
 # Snippets path
 SNIPPETS_PATH="${SCRIPT_DIR}${MAIN_DIR}syntax/layx.code-snippets"
 SNIPPETS_DIR="$HOME/Library/Application Support/Code/User/snippets/"
@@ -48,16 +43,10 @@ SNIPPETS_DIR="$HOME/Library/Application Support/Code/User/snippets/"
 # * Helper Functions  *
 # *********************
 validate_node() {
-    if [ ! -f "$NODE_EXE" ]; then
-        if command -v node &> /dev/null; then
-            NODE_EXE="node"
-            echo -e "${COLOR_CYAN}Program node.js not found. Using system Node.js installation${COLOR_RESET}"
-        else
-            echo -e "${COLOR_RED}Node.js not found!${COLOR_RESET}"
-            return 1
-        fi
+    if ! command -v node >/dev/null 2>&1; then
+        echo -e "${COLOR_RED}Node.js not found! Please install Node.js.${COLOR_RESET}"
+        exit 1
     fi
-    return 0
 }
 
 copy_safe() {
@@ -89,7 +78,7 @@ check_permissions() {
 build() {
     validate_node
     if [ "$CURRENT_DIR" != "$PROGRAM_DIR" ]; then
-        "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" build
+        node "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" build
     else
         echo -e "$STRING_DIR_ERROR"
     fi
@@ -98,7 +87,7 @@ build() {
 unbuild() {
     validate_node
     if [ "$CURRENT_DIR" != "$PROGRAM_DIR" ]; then
-        "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" unbuild
+        node "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" unbuild
     else
         echo -e "$STRING_DIR_ERROR"
     fi
@@ -138,7 +127,7 @@ create() {
 optimize_images() {
     validate_node
     echo -e "${COLOR_CYAN}Checking if any images are available to optimize...${COLOR_RESET}"
-    "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" optimizeImages
+    node "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" optimizeImages
     echo -e "${COLOR_GREEN}Optimization completed successfully!${COLOR_RESET}"
 }
 
@@ -241,10 +230,10 @@ if [ $# -gt 0 ]; then
         "build") build ;;
         "unbuild") unbuild ;;
         "create") create ;;
-        "add") "$NODE_EXE" "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" "$@" ;;
+        "add") node "${SCRIPT_DIR}${MAIN_DIR}${MAIN_FILE}" "$@" ;;
         "setup") 
             validate_node
-            "$NODE_EXE" "create-setup.mjs"
+            node "create-setup.mjs"
             ;;
         "optimizeImages") optimize_images ;;
         "install") install ;;

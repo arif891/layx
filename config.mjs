@@ -9,16 +9,6 @@ export const esbuildConfig = {
     charset: 'utf8',
     legalComments: 'none',
   },
-  
-  // Page-level JS bundling
-  pages: {
-    minify: true,
-    sourcemap: false,
-    format: 'esm',
-    target: 'esnext',
-    charset: 'utf8',
-    legalComments: 'none',
-  },
 
   // Add custom bundles below (users can modify here)
   // Example:

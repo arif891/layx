@@ -23,7 +23,8 @@ const dirConfig = {
         output: layx.files.layxJsOut,
         baseOutput: layx.files.baseJsOut,
         pageFilesDir: layx.directories.pagesJs,
-        pageFilesOutDir: layx.directories.pagesJsOut
+        pageFilesOutDir: layx.directories.pagesJsOut,
+        mainDir: layx.directories.js
     }
 }
 
@@ -118,21 +119,15 @@ async function runEsbuild() {
 
         // Bundle with esbuild
         await esbuild.build({
-            entryPoints: [dirConfig.js.base],
-            outfile: dirConfig.js.base,
-            ...esbuildConfig.base,
+            entryPoints: [dirConfig.js.base,`${dirConfig.js.pageFilesDir}/**/*.js`],
+            outbase: dirConfig.js.mainDir,
+            outdir: dirConfig.js.mainDir,
+            ...esbuildConfig?.layx,
             allowOverwrite: true,
-            bundle: false,
-            assetNames: '[path]/[name]',
-            chunkNames: '[name]'
-        });
-
-        await esbuild.build({
-            entryPoints: [`${dirConfig.js.pageFilesDir}/**/*.js`],
-            outdir: dirConfig.js.pageFilesDir,
-            ...esbuildConfig.pages,
-            allowOverwrite: true,
-            bundle: false,
+            bundle: true,
+            splitting: true,
+            treeShaking: true,
+            format: 'esm',
             assetNames: '[path]/[name]',
             chunkNames: '[name]'
         });

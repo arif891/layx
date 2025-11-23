@@ -1,7 +1,7 @@
 // ESBuild configuration for JavaScript processing
 export const esbuildConfig = {
   // Base/main application JS bundling
-  base: {
+  layx: {
     minify: true,
     sourcemap: false,
     format: 'esm',

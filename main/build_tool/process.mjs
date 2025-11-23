@@ -47,7 +47,7 @@ const optimizableFiles = [
     }
 ];
 
-async function processFiles(scriptDir,optimize) {
+async function processFiles(scriptDir, optimize) {
     const types = ['css', 'js'];
 
     for (const type of types) {
@@ -64,13 +64,15 @@ async function processFiles(scriptDir,optimize) {
             await Promise.all([
                 writeFile(config.output, `/* layx ${type} code */\n${finalContent}`),
                 writeFile(config.baseOutput, `/* User base ${type} code */\n${baseContent}`),
-                type === 'js' 
-                    ? bundleAndWriteJs(config.base, finalContent + baseContent, scriptDir, 'base')
+                type === 'js'
+                    ? writeFile(config.base, finalContent + baseContent)
                     : writeFile(config.base, minify(finalContent + baseContent, type))
             ]);
             console.log(`Processed LayX base ${type}`);
 
             await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir, optimize, scriptDir);
+
+            await runEsbuild();
 
         } catch (error) {
             console.error(`Error processing ${type} files:`, error);
@@ -90,13 +92,56 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize, s
         const finalContent = await processContent(content, file, type, optimize, true);
 
         await writeFile(outPath, content);
-        
+
         if (type === 'js') {
-            await bundleAndWriteJs(file, finalContent, scriptDir, 'page');
+            await writeFile(file, finalContent)
         } else {
             await writeFile(file, minify(finalContent, type));
         }
         console.log(`Processed ${path.basename(file)}`);
+    }
+}
+
+async function runEsbuild() {
+    try {
+        // Check if esbuildConfig is exists and then import it
+        let esbuildConfig = {};
+        try {
+            const configPath = path.resolve(process.cwd(), 'config.mjs');
+            const configUrl = pathToFileURL(configPath).href;
+            const configModule = await import(configUrl);
+            esbuildConfig = configModule.esbuildConfig || {};
+        } catch (err) {
+            console.warn('esbuildConfig not found, proceeding with default settings.', err);
+        }
+
+
+        // Bundle with esbuild
+        await esbuild.build({
+            entryPoints: [dirConfig.js.base],
+            outfile: dirConfig.js.base,
+            ...esbuildConfig?.[base],
+            allowOverwrite: true,
+            bundle: false,
+            assetNames: '[path]/[name]',
+            chunkNames: '[name]'
+        });
+
+        await esbuild.build({
+            entryPoints: [`{${dirConfig.js.pageFilesDir}**/*.js}`],
+            outdir: [dirConfig.js.pageFilesDir],
+            ...esbuildConfig?.[pages],
+            allowOverwrite: true,
+            bundle: false,
+            assetNames: '[path]/[name]',
+            chunkNames: '[name]'
+        });
+
+
+        console.log(`ESBuild processed`);
+    } catch (error) {
+        console.error(`ESBuild error`, error);
+        throw error;
     }
 }
 
@@ -108,7 +153,7 @@ async function processContent(content, filePath, type, optimize, isPageFile = fa
 
 async function processImports(content, filePath, type, optimize, isPageFile) {
     const importUrls = extractImportUrls(content, type);
-    
+
     // Check base file imports for page files
     let baseImportPaths = new Set();
     if (isPageFile) {
@@ -116,9 +161,9 @@ async function processImports(content, filePath, type, optimize, isPageFile) {
         try {
             const baseContent = await readFile(baseFilePath);
             const baseImports = extractImportUrls(baseContent, type);
-            
+
             // Resolve base imports to absolute paths
-            baseImportPaths = new Set(baseImports.map(url => 
+            baseImportPaths = new Set(baseImports.map(url =>
                 path.resolve(path.dirname(baseFilePath), url)
             ));
         } catch (error) {
@@ -137,7 +182,7 @@ async function processImports(content, filePath, type, optimize, isPageFile) {
 
         try {
             if (type === 'css' && optimize) {
-                const optimizableFile = optimizableFiles.find(file => 
+                const optimizableFile = optimizableFiles.find(file =>
                     path.resolve(path.dirname(filePath), file.url) === importedFilePath
                 );
                 if (optimizableFile) {
@@ -230,42 +275,6 @@ function removeExportAndDefault(content) {
     return content;
 }
 
-async function bundleAndWriteJs(filePath, content, scriptDir, type) {
-    try {
-        // Check if esbuildConfig is exists and then import it
-        let esbuildConfig = {};
-        try {
-            const configPath = path.resolve(process.cwd(), 'config.mjs');
-            const configUrl = pathToFileURL(configPath).href;
-            const configModule = await import(configUrl);
-            esbuildConfig = configModule.esbuildConfig || {};
-        } catch(err) {
-             console.warn('esbuildConfig not found, proceeding with default settings.',err);
-        }
-
-        // Create a temporary entry point file with the processed content
-        const tempFile = filePath + '.tmp.js';
-        await writeFile(tempFile, content);
-        
-        // Bundle with esbuild
-        await esbuild.build({
-            entryPoints: [tempFile],
-            outfile: filePath,
-            ...esbuildConfig?.[type],
-            bundle: false,
-        });
-        
-        // Clean up temp file
-        const { unlink } = await import('node:fs/promises');
-        await unlink(tempFile).catch(() => {});
-        
-        console.log(`ESBuild processed: ${filePath}`);
-    } catch (error) {
-        console.error(`ESBuild error for ${filePath}:`, error);
-        // Fallback to minify if esbuild fails
-        await writeFile(filePath, minify(content, 'js'));
-    }
-}
 
 function removeImportStatements(content) {
     return content.split('\n').filter(line => !line.trim().startsWith('@import') && !line.trim().startsWith('import')).join('\n');

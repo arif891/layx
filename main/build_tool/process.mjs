@@ -109,7 +109,7 @@ async function runJsBundler() {
             const configPath = path.resolve(process.cwd(), 'config.mjs');
             const configUrl = pathToFileURL(configPath).href;
             const configModule = await import(configUrl);
-            buildConfig = configModule.buildConfig || {};
+            buildConfig = configModule.config.build.layx || {};
         } catch (err) {
             console.warn('buildConfig not found, proceeding with default settings.', err);
         }
@@ -120,7 +120,6 @@ async function runJsBundler() {
             entryPoints: [dirConfig.js.base,`${dirConfig.js.pageFilesDir}/**/*.js`],
             outbase: dirConfig.js.mainDir,
             outdir: dirConfig.js.mainDir,
-            ...buildConfig?.layx,
             allowOverwrite: true,
             bundle: true,
             splitting: true,
@@ -128,7 +127,8 @@ async function runJsBundler() {
             minify: true,
             format: 'esm',
             assetNames: '[path]/[name]',
-            chunkNames: 'chunks/[name]-[hash]'
+            chunkNames: 'chunks/[name]-[hash]',
+            ...buildConfig,
         });
 
 

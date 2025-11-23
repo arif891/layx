@@ -73,14 +73,13 @@ async function processFiles(scriptDir, optimize) {
 
             await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir, optimize, scriptDir);
 
-            await runJsBundler();
-
         } catch (error) {
             console.error(`Error processing ${type} files:`, error);
             throw error;
         }
     }
 
+    await runJsBundler();
 }
 
 async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize, scriptDir) {
@@ -90,11 +89,10 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize, s
         const outPath = path.join(pageFilesOutDir, path.basename(file));
         const content = await readFile(file);
 
-        const finalContent = await processContent(content, file, type, optimize, true);
-
         await writeFile(outPath, content);
 
         if (type !== 'js')  {
+            const finalContent = await processContent(content, file, type, optimize, true);
             await writeFile(file, minify(finalContent, type));
         }
         console.log(`Processed ${path.basename(file)}`);

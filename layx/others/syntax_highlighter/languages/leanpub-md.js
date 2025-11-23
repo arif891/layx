@@ -1,5 +1,5 @@
 import markdown from './markdown.js'
-import { detectLanguage } from '../detect.js'
+import { detectLanguage } from '../helper/language_detector.js';
 
 export default [
 	{

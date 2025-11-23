@@ -94,7 +94,7 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize, s
 
         await writeFile(outPath, content);
 
-        if (!type === 'js')  {
+        if (type !== 'js')  {
             await writeFile(file, minify(finalContent, type));
         }
         console.log(`Processed ${path.basename(file)}`);

@@ -66,7 +66,7 @@ async function processFiles(scriptDir, optimize) {
                 writeFile(config.output, `/* layx ${type} code */\n${finalContent}`),
                 writeFile(config.baseOutput, `/* User base ${type} code */\n${baseContent}`),
                 type === 'js'
-                    ? writeFile(config.base, `import '../../layx/layx.js';` + baseContent)
+                    ? writeFile(config.base, `import '../../${dirConfig.js.source}';` + baseContent)
                     : writeFile(config.base, minify(finalContent + baseContent, type))
             ]);
             console.log(`Processed LayX base ${type}`);

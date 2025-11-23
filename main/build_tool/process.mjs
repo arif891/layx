@@ -73,7 +73,7 @@ async function processFiles(scriptDir, optimize) {
 
             await processPageFiles(type, config.pageFilesDir, config.pageFilesOutDir, optimize, scriptDir);
 
-            await runEsbuild();
+            await runJsBundler();
 
         } catch (error) {
             console.error(`Error processing ${type} files:`, error);
@@ -101,17 +101,17 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize, s
     }
 }
 
-async function runEsbuild() {
+async function runJsBundler() {
     try {
-        // Check if esbuildConfig is exists and then import it
-        let esbuildConfig = {};
+        // Check if buildConfig is exists and then import it
+        let buildConfig = {};
         try {
             const configPath = path.resolve(process.cwd(), 'config.mjs');
             const configUrl = pathToFileURL(configPath).href;
             const configModule = await import(configUrl);
-            esbuildConfig = configModule.esbuildConfig || {};
+            buildConfig = configModule.buildConfig || {};
         } catch (err) {
-            console.warn('esbuildConfig not found, proceeding with default settings.', err);
+            console.warn('buildConfig not found, proceeding with default settings.', err);
         }
 
 
@@ -120,7 +120,7 @@ async function runEsbuild() {
             entryPoints: [dirConfig.js.base,`${dirConfig.js.pageFilesDir}/**/*.js`],
             outbase: dirConfig.js.mainDir,
             outdir: dirConfig.js.mainDir,
-            ...esbuildConfig?.layx,
+            ...buildConfig?.layx,
             allowOverwrite: true,
             bundle: true,
             splitting: true,

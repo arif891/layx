@@ -120,7 +120,7 @@ async function runEsbuild() {
         await esbuild.build({
             entryPoints: [dirConfig.js.base],
             outfile: dirConfig.js.base,
-            ...esbuildConfig?.[base],
+            ...esbuildConfig.base,
             allowOverwrite: true,
             bundle: false,
             assetNames: '[path]/[name]',
@@ -128,9 +128,9 @@ async function runEsbuild() {
         });
 
         await esbuild.build({
-            entryPoints: [`{${dirConfig.js.pageFilesDir}**/*.js}`],
-            outdir: [dirConfig.js.pageFilesDir],
-            ...esbuildConfig?.[pages],
+            entryPoints: [`${dirConfig.js.pageFilesDir}/**/*.js`],
+            outdir: dirConfig.js.pageFilesDir,
+            ...esbuildConfig.pages,
             allowOverwrite: true,
             bundle: false,
             assetNames: '[path]/[name]',

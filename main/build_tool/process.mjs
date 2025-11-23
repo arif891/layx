@@ -94,9 +94,7 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize, s
 
         await writeFile(outPath, content);
 
-        if (type === 'js') {
-            
-        } else {
+        if (!type === 'js')  {
             await writeFile(file, minify(finalContent, type));
         }
         console.log(`Processed ${path.basename(file)}`);
@@ -127,6 +125,7 @@ async function runEsbuild() {
             bundle: true,
             splitting: true,
             treeShaking: true,
+            minify: true,
             format: 'esm',
             assetNames: '[path]/[name]',
             chunkNames: 'chunks/[name]-[hash]'

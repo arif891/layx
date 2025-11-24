@@ -64,8 +64,8 @@ async function optimizeSVG(imagesDir) {
         if (foundSVGImages.length > 0) {
         try {
             foundSVGImages.forEach(async (image) => {
-                await copyFile(image, path.join(layx.directories.layx, image));
                 const content = await readFile(image);
+                await writeFile(path.join(layx.directories.layx, image), content);
                 const optimizedImage = await minify(content, 'xml');
                 await writeFile(image,optimizedImage);
         

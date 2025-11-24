@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile, writeFile, getFilesWithExtension, copyFile } from '../util/functions.mjs'
+import { readFile, writeFile, getFilesWithExtension } from '../util/functions.mjs'
 import { layx } from '../core/vars.mjs'
 
 export {restoreFiles};
@@ -53,6 +53,9 @@ async function restorePageFiles(type, fromDir, toDir) {
 async function restoreSVGimages() {
   const Files = await getFilesWithExtension(layx.directories.layxImages, 'svg', true);
   for (const file of Files) {
-    await copyFile(file, path.join(layx.directories.base, file));
+    const content = await readFile(file);
+    await writeFile(path.join(layx.directories.base, file), content);
+    console.log(`Restored ${path.basename(file)} file.`);
+  
   }
 }

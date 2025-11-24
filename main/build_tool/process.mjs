@@ -83,7 +83,7 @@ async function processFiles(scriptDir, optimize) {
 }
 
 async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize, scriptDir) {
-    const pageFiles = await getFilesWithExtension(pageFilesDir, type);
+    const pageFiles = await getFilesWithExtension(pageFilesDir, type, true);
 
     for (const file of pageFiles) {
         const outPath = path.join(pageFilesOutDir, path.basename(file));

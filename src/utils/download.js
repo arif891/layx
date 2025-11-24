@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-export {downloadFile};
+export { downloadFile };
 
 async function downloadFile(url, outputPath, options = {}) {
     const {

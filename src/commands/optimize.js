@@ -1,8 +1,9 @@
 import path from 'node:path';
 import sharp from 'sharp';
 
-import { layx } from '../../core/vars.mjs';
-import { getFilesWithExtension, readFile, writeFile, moveFile, copyFile, minify } from '../../util/functions.mjs';
+import { layx } from '../core/config.js';
+import { getFilesWithExtension, readFile, writeFile, moveFile } from '../utils/fs.js';
+import { minify } from '../utils/helpers.js';
 
 export { optimizeImages };
 
@@ -61,18 +62,18 @@ async function optimizeImage(image, optimizer) {
 async function optimizeSVG(imagesDir) {
     console.log(`Optimizing SVG images.`);
     const foundSVGImages = await getFilesWithExtension(imagesDir, 'svg', true);
-        if (foundSVGImages.length > 0) {
+    if (foundSVGImages.length > 0) {
         try {
             foundSVGImages.forEach(async (image) => {
                 const content = await readFile(image);
                 await writeFile(path.join(layx.directories.layx, image), content);
                 const optimizedImage = await minify(content, 'xml');
-                await writeFile(image,optimizedImage);
-        
+                await writeFile(image, optimizedImage);
+
                 console.log(`Optimized svg: ${image}.`);
             });
         } catch (error) {
-            
+
         }
     }
 }

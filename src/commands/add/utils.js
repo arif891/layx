@@ -1,6 +1,7 @@
-import { readFile, writeFile, extractImportUrls } from '../../util/functions.mjs';
+import { readFile, writeFile } from '../../utils/fs.js';
+import { extractImportUrls } from '../../utils/helpers.js';
 
-export {processDependencies };
+export { processDependencies };
 
 async function processDependencies(info, type, filePath) {
     const deps = info.dependencies?.[type];

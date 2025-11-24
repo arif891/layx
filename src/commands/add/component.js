@@ -1,14 +1,12 @@
-import { argsObj } from './handle_add.mjs';
-import { downloadFile } from '../download/download.mjs';
-import { layx } from '../../core/vars.mjs';
-
-import { processDependencies } from './function.mjs';
+import { downloadFile } from '../../utils/download.js';
+import { layx } from '../../core/config.js';
+import { processDependencies } from './utils.js';
 
 export { componentAdd }
 
 const componentUrl = 'https://raw.githubusercontent.com/arif891/layx_components/main/';
 
-async function componentAdd(scriptDir) {
+async function componentAdd(components) {
 
     try {
         const info = await fetch(componentUrl + 'info.json').catch(() => {
@@ -16,7 +14,7 @@ async function componentAdd(scriptDir) {
         });
         const infoObj = await info.json();
 
-        const componentNames = argsObj.values.component.map(t => t.toLowerCase());
+        const componentNames = components.map(t => t.toLowerCase());
 
         console.log('\nAdding components...\n\n');
 

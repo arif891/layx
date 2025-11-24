@@ -4,10 +4,10 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 :: **********************
 :: * Configuration Zone *
 :: **********************
-SET "VERSION=0.1.0 alpha"
+SET "VERSION=0.2.0 beta"
 SET "PROGRAM_DIR=C:\Program Files\LayX\"
-SET "MAIN_DIR=main\"
-SET "MAIN_FILE=main.mjs"
+SET "SRC_DIR=src\"
+SET "CLI_FILE=cli.js"
 SET "IMAGES_DIR=assets\image\"
 SET "ARGS="
 
@@ -37,7 +37,7 @@ SET "SCRIPT_DIR=%~dp0"
 SET "SCRIPT_PATH=%~f0"
 
 :: Snippets path
-SET "SNIPPETS_PATH=%SCRIPT_DIR%%MAIN_DIR%syntax\layx.code-snippets"
+SET "SNIPPETS_PATH=%SCRIPT_DIR%src\config\syntax\layx.code-snippets"
 SET "SNIPPETS_DIR=C:\Users\%username%\AppData\Roaming\Code\User\snippets\"
 
 
@@ -81,14 +81,14 @@ GOTO interactive_menu
 :build
 CALL :validate_node
 IF NOT "%CURRENT_DIR%"=="%PROGRAM_DIR%" (
-    node "%SCRIPT_DIR%%MAIN_DIR%%MAIN_FILE%" build
+    node "%SCRIPT_DIR%%SRC_DIR%%CLI_FILE%" build
 ) ELSE (ECHO %STRING_dir_error%)
 GOTO end
 
 :unbuild
 CALL :validate_node
 IF NOT "%CURRENT_DIR%"=="%PROGRAM_DIR%" (
-    node "%SCRIPT_DIR%%MAIN_DIR%%MAIN_FILE%" unbuild
+    node "%SCRIPT_DIR%%SRC_DIR%%CLI_FILE%" unbuild
 ) ELSE (ECHO %STRING_dir_error%)
 GOTO end
 
@@ -113,7 +113,7 @@ FOR /F "DELIMS=" %%F IN ('DIR /B /A "%PROGRAM_DIR%"') DO (
         IF "%~1"=="-bt" (
             CALL :CopyItem "%%F"
         ) ELSE (
-            IF /I NOT "%%F"=="main" (
+            IF /I NOT "%%F"=="src" (
                 IF /I NOT "%%F"=="node_modules" (
                     IF /I NOT "%%F"=="package.json" (
                         IF /I NOT "%%F"=="package-lock.json" (
@@ -132,7 +132,7 @@ GOTO END
 :optimizeImages
 CALL :validate_node
 ECHO %COLOR_cyan%Checking if any images are available to optimize...%COLOR_RESET%
-node "%SCRIPT_DIR%%MAIN_DIR%%MAIN_FILE%" optimizeImages
+node "%SCRIPT_DIR%%SRC_DIR%%CLI_FILE%" optimizeImages
 ECHO %COLOR_green%Optimization completed successfully!%COLOR_RESET%
 GOTO end
 
@@ -215,7 +215,7 @@ EXIT /B 1
 SET "cmd=%~1"
 SHIFT
 IF /I "%cmd%"=="add" (
-    node "%SCRIPT_DIR%%MAIN_DIR%%MAIN_FILE%" %*
+    node "%SCRIPT_DIR%%SRC_DIR%%CLI_FILE%" add %*
     EXIT /B
 )
 

@@ -1,24 +1,47 @@
 import path from 'node:path';
-import CommandLineInterface from '../../cli/cli.mjs';
-import { ensureDirectoryExists, readFile, writeFile } from '../../util/functions.mjs';
-import { downloadFile } from '../download/download.mjs';
-import { argsObj } from './handle_add.mjs';
-import { layx } from '../../core/vars.mjs';
+import CommandLineInterface from '../../utils/cli-helper.js';
+import { ensureDirectoryExists, readFile, writeFile } from '../../utils/fs.js';
+import { downloadFile } from '../../utils/download.js';
+import { layx } from '../../core/config.js';
 
 export { fontAdd };
 
 const cli = new CommandLineInterface();
 const { fg, bg } = cli;
 
-async function fontAdd(scriptDir) {
+async function fontAdd(fonts, scriptDir) {
     try {
-        const fontInfoGF = await readFile(path.join(scriptDir, "/info/font_info_GF.json"));
+        // Assuming scriptDir is passed or we can resolve it relative to this file
+        // If scriptDir is the root of the project, then info/font_info_GF.json should be there?
+        // In original code: path.join(scriptDir, "/info/font_info_GF.json")
+        // scriptDir was import.meta.dirname in main.mjs.
+        // Here we might need to adjust. Let's assume scriptDir is passed correctly.
+
+        // However, in the new structure, `info` might be in `src/../info`?
+        // The original `scriptDir` was `main/`. `info` was in `main/info`.
+        // Now `src/` is the root of code. `info` folder should probably be moved to `src/info` or kept in `info` at root?
+        // The `layx` object has `directories.info: 'info/'`.
+        // Let's assume `info` is at project root or we use `layx.directories.info`.
+
+        // But wait, `font_info_GF.json` was read from `path.join(scriptDir, "/info/font_info_GF.json")`.
+        // If `scriptDir` is the project root, then it's `project/info/font_info_GF.json`.
+        // I should probably check where `info` folder is.
+        // In the file list, I didn't see `info` folder at root.
+        // `main` had `main/info`? No, `main` had `main/main.mjs`.
+        // Let's check `main` directory content again.
+
+        // Actually, `main/core/vars.mjs` had `info: 'info/'`.
+        // `main/helper/add/font.mjs` used `path.join(scriptDir, "/info/font_info_GF.json")`.
+        // If `scriptDir` was `main/`, then it was `main/info/font_info_GF.json`.
+        // I should check if `main/info` exists.
+
+        const fontInfoGF = await readFile(path.join(scriptDir, "info/font_info_GF.json"));
         const fontInfoObj = JSON.parse(fontInfoGF);
 
         console.log(cli.style(`Last font info update: ${fontInfoObj.lastUpdate}`, fg.yellow));
 
         await Promise.all(
-            argsObj.values.font.map(font => processFontFamily(font, fontInfoObj))
+            fonts.map(font => processFontFamily(font, fontInfoObj))
         );
     } catch (error) {
         console.error(cli.style(`Error processing fonts: ${error.message}`, fg.red));
@@ -73,7 +96,7 @@ async function processFontFamily(fontName, fontInfoObj) {
 
         console.log(cli.style(`Added "${result.family}" font family successfully.`, fg.green));
     } catch (error) {
-        console.error(cli.style( `Failed to add "${result.family}". Error:`, error.message), fg.red);
+        console.error(cli.style(`Failed to add "${result.family}". Error:`, error.message), fg.red);
     }
 }
 

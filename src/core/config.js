@@ -3,9 +3,9 @@ const layx = {
 
     directories: {
         base: './',
-        config: 'config/',
-        info: 'info/',
-        syntax: 'config/syntax/',
+        config: 'src/config/',
+        info: 'src/info/',
+        syntax: 'src/config/syntax/',
         assets: 'assets/',
         css: 'assets/css/',
         js: 'assets/js/',
@@ -33,7 +33,7 @@ const layx = {
         layxCssOut: 'layx/assets/css/base.css',
         layxJsOut: 'layx/assets/js/base.js',
         buildInfo: 'layx/assets/build_info.json',
-        fontInfo: 'config/info/font_info_GF.js'
+        fontInfo: 'src/info/font_info_GF.json'
     },
 
     main: {
@@ -97,7 +97,7 @@ const layx = {
     },
 
     helpers: {
-        layout: {}, 
+        layout: {},
     }
 };
 

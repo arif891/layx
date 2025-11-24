@@ -26,7 +26,7 @@ class CommandLineInterface {
                 hidden: "\x1b[8m",
                 strikethrough: "\x1b[9m"
             },
-        
+
             // Foreground colors (standard)
             fg: {
                 black: "\x1b[30m",
@@ -46,8 +46,17 @@ class CommandLineInterface {
                 brightMagenta: "\x1b[95m",
                 brightCyan: "\x1b[96m",
                 brightWhite: "\x1b[97m",
+                // Bright variants
+                brightBlack: "\x1b[100m",
+                brightRed: "\x1b[101m",
+                brightGreen: "\x1b[102m",
+                brightYellow: "\x1b[103m",
+                brightBlue: "\x1b[104m",
+                brightMagenta: "\x1b[105m",
+                brightCyan: "\x1b[106m",
+                brightWhite: "\x1b[107m",
             },
-        
+
             // Background colors (standard)
             bg: {
                 black: "\x1b[40m",
@@ -253,68 +262,3 @@ class CommandLineInterface {
 }
 
 export default CommandLineInterface;
-
-// Example usage
-async function example() {
-    const cli = new CommandLineInterface();
-
-    try {
-        // Basic information with defaults
-        const answers = await cli.askMultipleQuestions([
-            {
-                question: 'What is your name?',
-                key: 'name',
-                default: 'Guest',
-                validator: name => name.length > 0 || 'Name cannot be empty'
-            },
-            {
-                question: 'What is your age?',
-                key: 'age',
-                default: '25',
-                validator: age => parseInt(age) > 0 || 'Please enter a valid age'
-            }
-        ]);
-
-        // Multiple choice with default
-        const favoriteColor = await cli.askMultipleChoice(
-            'What is your favorite color?',
-            ['Red', 'Blue', 'Green', 'Yellow'],
-            { default: 'Blue' }
-        );
-
-        // Multiple choice with objects and default
-        const programmingLanguage = await cli.askMultipleChoice(
-            'What is your preferred programming language?',
-            [
-                { value: 'js', label: 'JavaScript' },
-                { value: 'py', label: 'Python' },
-                { value: 'java', label: 'Java' },
-                { value: 'cpp', label: 'C++' }
-            ],
-            {
-                returnObject: true,
-                default: 'py'
-            }
-        );
-
-        // Yes/No with default
-        const wantsNewsletter = await cli.askYesNo('Would you like to subscribe to our newsletter?', {
-            default: true
-        });
-
-        // Display results
-        console.log('\nResults:');
-        console.log('-----------------');
-        console.log(`Name: ${answers.name}`);
-        console.log(`Age: ${answers.age}`);
-        console.log(`Favorite Color: ${favoriteColor}`);
-        console.log(`Preferred Programming Language: ${programmingLanguage.label} (${programmingLanguage.value})`);
-        console.log(`Newsletter Subscription: ${wantsNewsletter ? 'Yes' : 'No'}`);
-
-    } catch (error) {
-        console.error('An error occurred:', error.message);
-    } finally {
-        cli.close();
-    }
-
-}

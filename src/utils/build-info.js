@@ -1,5 +1,8 @@
-import { readFile, writeFile } from '../util/functions.mjs'
-import { layx } from "../core/vars.mjs";
+import { readFile, writeFile } from './fs.js';
+import { layx } from "../core/config.js";
+import fs from "node:fs/promises";
+
+export { genBuildInfo, getBuildInfo, validateDirectories };
 
 async function genBuildInfo(newBuildInfo = {}) {
     let previousBuildInfo = {};
@@ -44,5 +47,3 @@ async function validateDirectories() {
         throw new Error(`Failed to create directories: ${error.message}`);
     }
 }
-
-export { genBuildInfo, getBuildInfo, validateDirectories };

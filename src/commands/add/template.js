@@ -1,21 +1,19 @@
-import { argsObj } from './handle_add.mjs';
-import { downloadFile } from '../download/download.mjs';
-import { layx } from '../../core/vars.mjs';
-
-import { processDependencies } from './function.mjs';
+import { downloadFile } from '../../utils/download.js';
+import { layx } from '../../core/config.js';
+import { processDependencies } from './utils.js';
 
 export { templateAdd };
 
 const templateUrl = 'https://raw.githubusercontent.com/arif891/layx_templates/main/';
 
-async function templateAdd(scriptDir) {
+async function templateAdd(templates) {
     try {
         const info = await fetch(templateUrl + 'info.json').catch(() => {
             throw new Error('Failed to fetch template information');
         });
         const infoObj = await info.json();
 
-        const templateNames = argsObj.values.template.map(t => t.toLowerCase());
+        const templateNames = templates.map(t => t.toLowerCase());
 
         console.log('\nAdding templates...\n\n');
 
@@ -38,7 +36,7 @@ async function templateAdd(scriptDir) {
                                 console.warn(`Skipping invalid file entry in template ${templateName}`);
                                 return;
                             }
-                            
+
                             try {
                                 console.log(`Downloading: ${file.name}`);
                                 await downloadFile(templateUrl + templateInfo.path + '/' + file.name, file.path);

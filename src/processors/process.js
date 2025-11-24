@@ -1,10 +1,9 @@
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as esbuild from 'esbuild';
-import { readFile, writeFile, minify, getFilesWithExtension, getFilesContent, getCssContentBlock, extractClasses, extractImportUrls } from '../util/functions.mjs'
-import { layx, breakPoints, layout } from '../core/vars.mjs'
-
-
+import { readFile, writeFile, getFilesWithExtension, getFilesContent } from '../utils/fs.js';
+import { minify, getCssContentBlock, extractClasses, extractImportUrls } from '../utils/helpers.js';
+import { layx, breakPoints, layout } from '../core/config.js';
 
 export { processFiles };
 
@@ -91,7 +90,7 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize, s
 
         await writeFile(outPath, content);
 
-        if (type !== 'js')  {
+        if (type !== 'js') {
             const finalContent = await processContent(content, file, type, optimize, true);
             await writeFile(file, minify(finalContent, type));
         }
@@ -115,7 +114,7 @@ async function runJsBundler() {
 
         // Bundle with esbuild
         await esbuild.build({
-            entryPoints: [dirConfig.js.base,`${dirConfig.js.pageFilesDir}/**/*.js`],
+            entryPoints: [dirConfig.js.base, `${dirConfig.js.pageFilesDir}/**/*.js`],
             outbase: dirConfig.js.mainDir,
             outdir: dirConfig.js.mainDir,
             allowOverwrite: true,

@@ -3,10 +3,10 @@
 # **********************
 # * Configuration Zone *
 # **********************
-VERSION="0.1.0 alpha"
+VERSION="0.2.0 beta"
 PROGRAM_DIR="/opt/layx/"
-MAIN_DIR="main/"
-MAIN_FILE="main.mjs"
+MAIN_DIR="src/"
+MAIN_FILE="cli.js"
 IMAGES_DIR="assets/image/"
 ARGS=""
 
@@ -37,7 +37,7 @@ SCRIPT_PATH="$(readlink -f "$0")"
 
 
 # Snippets path
-SNIPPETS_PATH="${SCRIPT_DIR}${MAIN_DIR}syntax/layx.code-snippets"
+SNIPPETS_PATH="${SCRIPT_DIR}src/config/syntax/layx.code-snippets"
 SNIPPETS_DIR="$HOME/.main/Code/User/snippets/"
 
 
@@ -112,7 +112,7 @@ create() {
                     cp "$item" "${CURRENT_DIR}${base_name}"
                 fi
             else
-                if [ "$base_name" != "main" ] && [ "$base_name" != "node_modules" ] && [ "$base_name" != "package.json" ] && [ "$base_name" != "package-lock.json" ]; then
+                if [ "$base_name" != "src" ] && [ "$base_name" != "node_modules" ] && [ "$base_name" != "package.json" ] && [ "$base_name" != "package-lock.json" ]; then
                     if [ -d "$item" ]; then
                         cp -r "$item" "${CURRENT_DIR}${base_name}"
                     else

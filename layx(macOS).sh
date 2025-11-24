@@ -3,7 +3,7 @@
 # **********************
 # * Configuration Zone *
 # **********************
-VERSION="0.2.0 beta"
+VERSION="0.1.0 alpha"
 PROGRAM_DIR="/Applications/LayX/"
 MAIN_DIR="src/"
 MAIN_FILE="cli.js"

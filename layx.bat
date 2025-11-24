@@ -4,7 +4,7 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 :: **********************
 :: * Configuration Zone *
 :: **********************
-SET "VERSION=0.2.0 beta"
+SET "VERSION=0.1.0 alpha"
 SET "PROGRAM_DIR=C:\Program Files\LayX\"
 SET "SRC_DIR=src\"
 SET "CLI_FILE=cli.js"

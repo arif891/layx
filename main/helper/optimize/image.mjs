@@ -13,12 +13,13 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
 
     console.log(`Optimizing images with ${optimizer}...`);
 
+    await optimizeSVG(imagesDir);
+
     for (const ext of imageExtensions) {
         const foundImages = await getFilesWithExtension(imagesDir, ext, true);
         images = [...images, ...foundImages];
     }
-    await optimizeSVG(imagesDir);
-
+    
     if (images.length === 0) {
         console.log('No images found to optimize.');
         return;

@@ -180,4 +180,3 @@ class Navbar {
 }
 
 export default new Navbar();
-export { Navbar };

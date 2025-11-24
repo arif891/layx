@@ -104,4 +104,3 @@ class Form {
 
 
 export default new Form;
-export { Form };

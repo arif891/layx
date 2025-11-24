@@ -137,5 +137,4 @@ class Alert {
 }
 
 // Export class and create a default instance
-export { Alert };
 export default new Alert();

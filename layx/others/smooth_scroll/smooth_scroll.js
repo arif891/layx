@@ -139,4 +139,3 @@ class SmoothScroll {
 }
 
 export default new SmoothScroll();
-export { SmoothScroll };

@@ -389,4 +389,3 @@ class Carousel {
 }
 
 export default new Carousel();
-export { Carousel };

@@ -151,4 +151,3 @@ class SyntaxHighlighter {
 }
 
 export default new SyntaxHighlighter();
-export {SyntaxHighlighter};

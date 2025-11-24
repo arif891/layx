@@ -96,4 +96,4 @@ class SplitText {
     }
 }
 
-new SplitText();
+export default new SplitText();

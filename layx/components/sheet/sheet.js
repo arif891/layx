@@ -328,4 +328,3 @@ class Sheet {
 
 
 export default new Sheet();
-export { Sheet };

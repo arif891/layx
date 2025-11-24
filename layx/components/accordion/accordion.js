@@ -210,5 +210,4 @@ class Accordion {
 }
 
 // Export class and create a default instance
-export { Accordion };
 export default new Accordion();

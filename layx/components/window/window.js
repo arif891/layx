@@ -85,4 +85,3 @@ class Window {
 }
 
 export default new Window();
-export {Window};

@@ -200,4 +200,3 @@ class Tab {
 }
 
 export default new Tab();
-export { Tab };

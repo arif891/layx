@@ -114,4 +114,3 @@ class Theme {
 
 // Initialize Theme
 export default new Theme();
-export { Theme };

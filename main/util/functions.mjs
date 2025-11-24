@@ -56,23 +56,57 @@ async function ensureDirectoryExists(dirPath) {
     }
 }
 
-function minify(content, Type = 'css') {
-    if (Type === 'css') {
-        return content
-            .replace(/\/\*[\s\S]*?\*\//g, '')
-            .replace(/([^{}])\s+/g, '$1 ')
-            .replace(/\s*\n\s*/g, '')
-            .replace(/\s*{\s*/g, '{')
-            .replace(/\s*}\s*/g, '}')
-            .replace(/\s*;\s*/g, ';')
-            .replace(/\/\*[\s\S]*?\*\//g, '')
+function minify(content, type = 'css') {
+    if (typeof content !== 'string' || !content) return '';
+
+    const mode = String(type).toLowerCase();
+
+    /* ---------- HTML / XML ---------- */
+    if (mode === 'html' || mode === 'xml') {
+        // 1.  Protect <pre> and <code> blocks ------------------------------------
+        const stash = [];
+        let counter = 0;
+        const key = () => `__MINIFY_STASH_${counter++}__`;
+
+        const safe = content
+            .replace(/<(pre|code)\b[^>]*>[\s\S]*?<\/\1>/gi, match => {
+                const k = key();
+                stash.push([k, match]);
+                return k;
+            });
+
+        // 2.  Minify everything else ---------------------------------------------
+        const minified = safe
+            .replace(/<!--[\s\S]*?-->/g, '')       // comments
+            .replace(/\/\*[\s\S]*?\*\//g, '')      // css comments
+            .replace(/>[\r\n]+\s*</g, '><')        // space between tags
+            .replace(/\s{2,}/g, ' ')               // collapse inner runs
             .trim();
-    } else if (Type === 'js') {
+
+        // 3.  Restore protected blocks ------------------------------------------
+        return stash.reduce((out, [k, original]) => out.replace(k, original), minified);
+    }
+
+    /* ---------- CSS ---------- */
+    if (mode === 'css') {
         return content
-            .replace(/\/\/.*|\/\*[\s\S]*?\*\//g, '')
-            .replace(/\s+/g, ' ')
+            .replace(/\/\*[\s\S]*?\*\//g, '')
+            .replace(/\s*([{}:;,])\s*/g, '$1')
+            .replace(/\s*\n\s*/g, '')
+            .replace(/;\}/g, '}')
+            .trim()
+    }
+
+    /* ---------- JS / JSON ---------- */
+    if (mode === 'js' || mode === 'json') {
+        const TOKEN = /(["'`])(?:\\[\s\S]|(?!\1).)*?\1|\/(?!\*)(?:\\.|[^\/\n])+\/[gimuy]*|\/\*[\s\S]*?\*\/|\/\/.*$/gm;
+        return content
+            .replace(TOKEN, m => (m[0] === '/' && m[1] !== '*') ? m : '') 
+            .replace(/\s+/g, ' ') 
             .trim();
     }
+
+    /* ---------- Unknown ---------- */
     return content;
 }
 

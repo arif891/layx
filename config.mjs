@@ -7,7 +7,6 @@ export const config = {
       format: 'esm',
       target: 'esnext',
       charset: 'utf8',
-      legalComments: 'none',
     }
   }
 };

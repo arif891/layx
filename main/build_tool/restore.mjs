@@ -45,7 +45,7 @@ async function restorePageFiles(type, fromDir, toDir) {
 
   for (const file of Files) {
     const content = await readFile(file);
-    await writeFile(path.join(toDir, path.basename(file)), content);
+    await writeFile(path.join(layx.directories.base, file.replace('\\', '/').replace(layx.directories.layx, '')), content);
     console.log(`Restored ${path.basename(file)} file.`);
   }
 }

@@ -86,7 +86,7 @@ async function processPageFiles(type, pageFilesDir, pageFilesOutDir, optimize, s
     const pageFiles = await getFilesWithExtension(pageFilesDir, type, true);
 
     for (const file of pageFiles) {
-        const outPath = path.join(pageFilesOutDir, path.basename(file));
+        const outPath = path.join(layx.directories.layx, file);
         const content = await readFile(file);
 
         await writeFile(outPath, content);

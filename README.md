@@ -75,6 +75,83 @@ Layx introduces intuitive syntax for common landing page elements:
 
 ### Container
 
+# Layx
+
+![Layx Social Preview](.github/layx_social_preview.png)
+
+Layx is a powerful and extensible CSS framework designed specifically for creating modern landing pages. It combines advanced layout capabilities with high customizability, making it ideal for building high-converting, responsive landing pages with minimal effort. With its modular architecture and landing-page-focused components, Layx helps you create stunning, fast-loading pages that deliver results.
+
+> **Main Point:** "Build stunning landing pages faster. No bloat, no runtime overhead—just pure performance."
+
+## ✨ Highlights
+
+- 🚫 **Zero Runtime** - No JavaScript dependencies required
+- 📦 **Landing Page Ready** - Pre-built components optimized for conversions
+- 🎨 **Highly Customizable** - Easy theming with CSS variables
+- ⚡ **Lightning Fast** - Optimized for performance and SEO
+- 📱 **Mobile-First** - Fully responsive designs that look perfect on all devices
+
+> **Note:** Layx is currently in the development stage and available for testing. We welcome your feedback and contributions!
+
+## Table of Contents
+
+- [Layx](#layx)
+  - [✨ Highlights](#-highlights)
+  - [Table of Contents](#table-of-contents)
+  - [🚀 Key Features](#-key-features)
+  - [🧠 Approach](#-approach)
+  - [💡 Why Start from Scratch?](#-why-start-from-scratch)
+  - [🎨 Syntax](#-syntax)
+    - [Container](#container)
+    - [Main Layout System](#main-layout-system)
+    - [Components (e.g., Navbar)](#components-eg-navbar)
+  - [📁 Project Structure](#-project-structure)
+  - [Installation](#installation)
+  - [🚀 Quick Start Guide](#-quick-start-guide)
+  - [📚 Documentation](#-documentation)
+  - [🤝 Contributing](#-contributing)
+  - [📄 License](#-license)
+
+## 🚀 Key Features
+
+- 📦 **Landing Page Components:** Pre-designed, conversion-focused components like hero sections, CTAs, testimonials, and pricing tables.
+- 🎨 **Rapid Development:** Build complete landing pages in minutes, not days.
+- 📱 **Fully Responsive:** Mobile-optimized layouts that adapt perfectly to any screen size.
+- ⚡ **Performance Optimized:** Lightweight CSS and zero runtime overhead for blazing-fast load times.
+- 🔧 **Built-in Sections:** Hero, features, pricing, testimonials, FAQ, footer—everything you need.
+- 🛠️ **Build Tool:** Bundle your project and remove unused code for optimal file size.
+- 🖼️ **Image Optimization:** Boost performance with the integrated image optimizer.
+- 💻 **Command-Line Interface (CLI):** Efficiently manage your landing page projects with our intuitive CLI.
+- 🚀 **SEO Ready:** Semantic HTML and optimized structure for search engines.
+- 🌐 **File-Based Routing:** File-based routing supported in Apache and similar servers like LightSpeed (common in Cpanel hosting).
+
+## 🧠 Approach
+
+Layx is purpose-built for landing pages with a focus on conversion and performance:
+
+- **Landing Page Optimized:** Purpose-built components designed for high-conversion landing pages, not general web apps.
+- **Performance First:** Leverages modern CSS without JavaScript runtime, ensuring lightning-fast load times.
+- **Conversion Focused:** Pre-designed sections and patterns that follow landing page best practices.
+- **Full-Width Designs:** Layout and container elements that extend to screen edges for modern aesthetics.
+- **Zero Bloat:** Only what you need—no unnecessary features or code.
+- **SEO Friendly:** Built with semantic HTML and structured data in mind.
+
+## 💡 Why Start from Scratch?
+
+With Layx, you don't build from zero:
+
+- **Pre-Built Starting Point:** Every project comes with a ready-to-use structure, components, and best practices already in place.
+- **Automated Optimizations:** The built-in build tool automatically minifies CSS/JS, optimizes images, and removes unused code—no manual setup needed.
+- **Repetitive Tasks Handled:** Stop writing boilerplate code. Layx handles responsive design, cross-browser compatibility, and SEO optimization out of the box.
+- **Convention Over Configuration:** Follow proven patterns and conventions, allowing you to focus on your unique content and design tweaks, not infrastructure.
+- **Ready for Production:** Deploy with confidence—your landing page is already optimized for performance, accessibility, and conversions.
+
+## 🎨 Syntax
+
+Layx introduces intuitive syntax for common landing page elements:
+
+### Container
+
 ```html
 <container>
    <div class='content'></div>
@@ -111,33 +188,15 @@ Layx is organized into a well-structured directory hierarchy:
 ```
 root
     │   index.html
-    │   layx.bat
+    │
     │
     ├───assets
     │   ├───brand
     │   ├───css
-    │   │   │   base.css
-    │   │   └───pages
-    │   │
     │   ├───font
     │   ├───images
-    │   │   ├───home
-    │   │   └───svg
-    │   │
     │   ├───js
-    │   │   │   base.js
-    │   │   └───pages
-    │   │
     │   └───media
-    │       ├───audio
-    │       └───video
-    │
-    ├───config
-    │   │   config.mjs
-    │   │   node
-    │   │   webp
-    │   └───preference
-    │           snippets.json
     │
     ├───layx
     │   │   layx.css
@@ -145,12 +204,10 @@ root
     │   │ 
     │   ├───assets
     │   │   ├───css
-    │   │   │   └───pages
     │   │   └───js
     │   │  
     │   ├───components
     │   ├───main
-    │   │   main.css
     │   ├───others
     │   └───utilities
     │
@@ -162,7 +219,6 @@ root
 Key directories:
 
 - `layx/`: The core of the framework, including components, main styles, and utilities.
-- `config/`: Holds configuration files, tools and preferences.
 - `assets/`: Here you can put your all assets like CSS, JS, images, and media files.
 - `assets/[css|js]/base.[css|js]`: Here you can write your base CSS and JS which are common, it will be added after `layx`
    CSS or JS in build time. This original CSS or JS file will be moved inside `layx/assets/[css|js]/user_base.[css|js]`.
@@ -209,6 +265,27 @@ To install Layx on your system:
 
    ```bash
    layx unbuild
+   ```
+
+5. **Add Components, Templates, or Fonts:**
+   Easily extend your project with the `add` command:
+
+   ```bash
+   # Add a component
+   layx add -c <component-name>
+
+   # Add a template
+   layx add -t <template-name>
+
+   # Add a font
+   layx add -f <font-name>
+   ```
+
+6. **Optimize Images:**
+   Compress and optimize your images for better performance:
+
+   ```bash
+   layx optimizeImages
    ```
 
 ## 📚 Documentation

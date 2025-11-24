@@ -13,13 +13,13 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
 
     console.log(`Optimizing images with ${optimizer}...`);
 
-    await optimizeSVG(imagesDir);
-
     for (const ext of imageExtensions) {
         const foundImages = await getFilesWithExtension(imagesDir, ext, true);
         images = [...images, ...foundImages];
     }
-    
+
+    optimizeSVG(imagesDir);
+
     if (images.length === 0) {
         console.log('No images found to optimize.');
         return;
@@ -61,17 +61,18 @@ async function optimizeImage(image, optimizer) {
 async function optimizeSVG(imagesDir) {
     console.log(`Optimizing SVG images.`);
     const foundSVGImages = await getFilesWithExtension(imagesDir, 'svg', true);
-    if (foundSVGImages.length > 0) {
+        if (foundSVGImages.length > 0) {
         try {
-            for (const image of foundSVGImages) {
+            foundSVGImages.forEach(async (image) => {
                 await copyFile(image, layx.directories.layxImages);
                 const content = await readFile(image);
                 const optimizedImage = await minify(content, 'svg');
-                await writeFile(image, optimizedImage);
-                console.log(`Optimized: ${image}`);
-            }
+                await writeFile(image,optimizedImage);
+        
+                console.log(`Optimized: ${image} -> ${optimizedImage}`);
+            });
         } catch (error) {
-            console.error('Error optimizing SVG images:', error);
+            
         }
     }
 }

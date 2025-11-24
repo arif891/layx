@@ -2,7 +2,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 
 import { layx } from '../../core/vars.mjs';
-import { getFilesWithExtension, readFile, writeFile, moveFile } from '../../util/functions.mjs';
+import { getFilesWithExtension, readFile, writeFile, moveFile, copyFile, minify } from '../../util/functions.mjs';
 
 export { optimizeImages };
 
@@ -29,13 +29,15 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
 
     await updateUrls(optimizer);
 
+    await optimizeSVG(imagesDir);
+
     console.log(`Optimized images with ${optimizer}`);
 }
 
 async function optimizeImage(image, optimizer) {
     try {
         const optimizedImage = image.replace(path.extname(image), `.${optimizer}`);
-        
+
         if (optimizer === 'avif') {
             await sharp(image)
                 .avif()
@@ -48,11 +50,30 @@ async function optimizeImage(image, optimizer) {
             console.warn(`Unsupported optimizer: ${optimizer}`);
             return;
         }
-        
+
         moveFile(image, `${path.dirname(image)}/original_images_dir/${path.basename(image)}`);
         console.log(`Optimized: ${image} -> ${optimizedImage}`);
     } catch (error) {
         console.error(`Error optimizing image: ${image}`, error);
+    }
+}
+
+async function optimizeSVG(imagesDir) {
+    console.log(`Optimizing SVG images.`);
+    const foundSVGImages = await getFilesWithExtension(imagesDir, 'svg', true);
+        if (foundSVGImages.length > 0) {
+        try {
+            foundSVGImages.forEach(async (image) => {
+                await copyFile(image, layx.directories.layxImages);
+                const content = await readFile(image);
+                const optimizedImage = await minify(content, 'svg');
+                await writeFile(image,optimizedImage);
+        
+                console.log(`Optimized: ${image} -> ${optimizedImage}`);
+            });
+        } catch (error) {
+            
+        }
     }
 }
 
@@ -91,7 +112,7 @@ function extractUrls(content, type = 'html') {
     switch (type) {
         case 'html':
             while ((match = srcRegex.exec(content)) !== null) {
-                srcValues.add(match[2]); 
+                srcValues.add(match[2]);
             }
             return Array.from(srcValues);
 

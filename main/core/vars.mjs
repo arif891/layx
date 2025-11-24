@@ -15,6 +15,7 @@ const layx = {
         layxAssets: 'layx/assets/',
         layxCss: 'layx/assets/css/',
         layxJs: 'layx/assets/js/',
+        layxImages: 'layx/assets/image/',
         pages: 'pages/',
         pagesCss: 'assets/css/pages/',
         pagesJs: 'assets/js/pages/',

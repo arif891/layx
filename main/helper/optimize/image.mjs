@@ -60,18 +60,17 @@ async function optimizeImage(image, optimizer) {
 async function optimizeSVG(imagesDir) {
     console.log(`Optimizing SVG images.`);
     const foundSVGImages = await getFilesWithExtension(imagesDir, 'svg', true);
-        if (foundSVGImages.length > 0) {
+    if (foundSVGImages.length > 0) {
         try {
-            foundSVGImages.forEach(async (image) => {
+            for (const image of foundSVGImages) {
                 await copyFile(image, layx.directories.layxImages);
                 const content = await readFile(image);
                 const optimizedImage = await minify(content, 'svg');
-                await writeFile(image,optimizedImage);
-        
-                console.log(`Optimized: ${image} -> ${optimizedImage}`);
-            });
+                await writeFile(image, optimizedImage);
+                console.log(`Optimized: ${image}`);
+            }
         } catch (error) {
-            
+            console.error('Error optimizing SVG images:', error);
         }
     }
 }

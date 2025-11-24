@@ -31,6 +31,8 @@ async function restoreFiles() {
       console.log(`Restored user base ${type} file.`);
 
       await restorePageFiles(type, config.fromPageFilesDir, config.toPageFilesDir);
+
+      await restoreSVGimages();
     } catch (error) {
       console.error(`Error restoring ${type} file:`, error.message);
     }
@@ -39,11 +41,18 @@ async function restoreFiles() {
 
 async function restorePageFiles(type, fromDir, toDir) {
 
-  const Files = await getFilesWithExtension(fromDir, type);
+  const Files = await getFilesWithExtension(fromDir, type, true);
 
   for (const file of Files) {
     const content = await readFile(file);
     await writeFile(path.join(toDir, path.basename(file)), content);
     console.log(`Restored ${path.basename(file)} file.`);
+  }
+}
+
+async function restoreSVGimages() {
+  const Files = await getFilesWithExtension(layx.directories.layxImages, 'svg', true);
+  for (const file of Files) {
+    await copyFile(file, path.join(layx.directories.base, file));
   }
 }

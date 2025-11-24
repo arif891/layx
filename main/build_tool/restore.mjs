@@ -54,6 +54,7 @@ async function restoreSVGimages() {
   const Files = await getFilesWithExtension(layx.directories.layxImages, 'svg', true);
   for (const file of Files) {
     const content = await readFile(file);
+    console.log(path.join(layx.directories.base, file));
     await writeFile(path.join(layx.directories.base, file), content);
     console.log(`Restored ${path.basename(file)} file.`);
   

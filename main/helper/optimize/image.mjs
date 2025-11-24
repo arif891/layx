@@ -17,6 +17,7 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
         const foundImages = await getFilesWithExtension(imagesDir, ext, true);
         images = [...images, ...foundImages];
     }
+    await optimizeSVG(imagesDir);
 
     if (images.length === 0) {
         console.log('No images found to optimize.');
@@ -28,8 +29,6 @@ async function optimizeImages(scriptDir, optimizer = 'avif') {
     }
 
     await updateUrls(optimizer);
-
-    await optimizeSVG(imagesDir);
 
     console.log(`Optimized images with ${optimizer}`);
 }

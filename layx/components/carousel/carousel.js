@@ -3,18 +3,20 @@ class Carousel {
         this.options = {
             scrollerSelector: '.scroller',
             itemSelector: '.item',
-            autoplay: false,
             autoplayInterval: 3000,
-            loop: false,
+            loop: true,
             mouseDrag: true,
             keyboardNavigation: true,
-            snap: true,
+            dragMultiplier: 2,
             ...options
         };
 
         this.carousels = document.querySelectorAll(selector);
-        this.autoplayIntervals = new WeakMap();
-        this.dragData = new WeakMap();
+
+
+        this.states = new WeakMap();
+        this.controllers = new WeakMap();
+        this.autoplayTimers = new WeakMap();
 
         this.init();
     }
@@ -26,365 +28,281 @@ class Carousel {
 
             if (!scroller || items.length === 0) return;
 
-            this.ensureControls(carousel);
-            this.ensureIndicators(carousel, items);
-
-            const state = {
+            this.states.set(carousel, {
                 currentIndex: 0,
                 itemCount: items.length,
-                isPlaying: this.options.autoplay,
-                isPaused: false
-            };
-
-            if (!carousel.hasOwnProperty('carouselState')) {
-                Object.defineProperty(carousel, 'carouselState', {
-                    value: state,
-                    writable: false,
-                    configurable: false
-                });
-            }
-
-            const prevBtn = carousel.querySelector('.prev');
-            const nextBtn = carousel.querySelector('.next');
-            const indicatorsWrapper = carousel.querySelector('.indicator-wrapper');
-
-            this.setupEventListeners(carousel, state, prevBtn, nextBtn, indicatorsWrapper, items);
-            this.setupAccessibility(carousel, items);
-            this.setupKeyboardNavigation(carousel, state);
-
-            if (this.options.autoplay) {
-                this.setupAutoplay(carousel, state);
-            }
-
-            this.updateCarousel(carousel, state);
-        });
-    }
-
-    ensureControls(carousel) {
-        if (carousel.hasAttribute('controls') && !carousel.querySelector('.control-wrapper')) {
-            const controlWrapper = document.createElement('div');
-            controlWrapper.classList.add('control-wrapper');
-
-            const createControl = (className, buttonClass) => {
-                const control = document.createElement('div');
-                control.classList.add(className);
-                const button = document.createElement('button');
-                button.classList.add(buttonClass);
-                control.appendChild(button);
-                return control;
-            };
-
-            const leftControl = createControl('left', 'prev');
-            const rightControl = createControl('right', 'next');
-
-            controlWrapper.append(leftControl, rightControl);
-            carousel.appendChild(controlWrapper);
-        }
-    }
-
-    ensureIndicators(carousel, items) {
-        if (carousel.hasAttribute('indicators')) {
-            let indicatorWrapper = carousel.querySelector('.indicator-wrapper');
-
-            if (!indicatorWrapper) {
-                indicatorWrapper = document.createElement('div');
-                indicatorWrapper.classList.add('indicator-wrapper');
-                carousel.appendChild(indicatorWrapper);
-            }
-
-            // Clear existing indicators to prevent duplicates
-            indicatorWrapper.innerHTML = '';
-
-            // Create indicators more efficiently
-            const indicators = items.map((_, index) => {
-                const indicatorButton = document.createElement('button');
-                indicatorButton.classList.add('indicator');
-                indicatorButton.setAttribute('index', index);
-                return indicatorButton;
+                isPlaying: carousel.hasAttribute('autoplay'),
+                isPaused: false,
+                isManualScrolling: false,
+                snap: /mandatory|proximity/.test(getComputedStyle(scroller).scrollSnapType),
+                autoplay: carousel.hasAttribute('autoplay'),
+                autoplayInterval: +carousel.dataset.autoplayInterval || this.options.autoplayInterval,
+                dragMultiplier: +carousel.dataset.dragMultiplier || this.options.dragMultiplier,
+                mouseDrag: carousel.dataset.mouseDrag !== 'false' && this.options.mouseDrag,
+                keyboardNavigation: carousel.dataset.keyboardNavigation !== 'false' && this.options.keyboardNavigation,
+                loop: carousel.hasAttribute('loop'),
             });
 
-            indicatorWrapper.append(...indicators);
+            // Initialize AbortController for clean destroy()
+            const controller = new AbortController();
+            this.controllers.set(carousel, controller);
+
+            // Setup UI
+            this._buildUI(carousel, items);
+
+            // Bind Events
+            this.setupEventListeners(carousel, scroller, items, controller.signal);
+            this.setupKeyboardNavigation(carousel, controller.signal);
+
+            if (this.states.get(carousel).autoplay) {
+                this.setupAutoplay(carousel, controller.signal);
+            }
+
+            // Initial Render
+            this.updateUI(carousel, 0);
+        });
+    }
+
+
+    /* ---------- DOM helpers ---------- */
+    _buildUI(carousel, items) {
+        if (!carousel.classList.contains('no-controls') && !carousel.querySelector('.control-wrapper')) {
+            carousel.insertAdjacentHTML('beforeend',
+                `<div class="control-wrapper">
+           <div class="left"><button class="prev" aria-label="Previous"></button></div>
+           <div class="right"><button class="next" aria-label="Next"></button></div>
+         </div>`);
+        }
+        if (!carousel.classList.contains('no-indicators') && !carousel.querySelector('.indicator-wrapper')) {
+            carousel.insertAdjacentHTML('beforeend',
+                `<div class="indicator-wrapper">
+           ${items.map((_, i) => `<button class="indicator" data-index="${i}" aria-label="Go to ${i + 1}"></button>`).join('')}
+         </div>`);
         }
     }
 
-    setupEventListeners(carousel, state, prevBtn, nextBtn, indicatorsWrapper, items) {
-        // Consolidated event listeners with delegation
-        carousel.addEventListener('click', (event) => {
-            if (event.target.closest('.prev')) {
-                this.navigate(carousel, state, -1);
-            } else if (event.target.closest('.next')) {
-                this.navigate(carousel, state, 1);
-            } else if (event.target.matches('.indicator')) {
-                const index = parseInt(event.target.getAttribute('index'), 10);
-                this.goToSlide(carousel, state, index);
-            }
-        });
+    setupEventListeners(carousel, scroller, items, signal) {
+        carousel.addEventListener('click', (e) => {
+            const state = this.states.get(carousel);
+            const target = e.target;
 
-        // Intersection Observer for tracking visible slides
-        const scroller = carousel.querySelector(this.options.scrollerSelector);
+            if (target.closest('.prev')) this.navigate(carousel, -1);
+            else if (target.closest('.next')) this.navigate(carousel, 1);
+            else if (target.matches('.indicator')) {
+                const index = target.dataset.index;
+                this.goToSlide(carousel, index);
+            }
+        }, { signal });
+
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const newIndex = items.indexOf(entry.target);
-                    if (newIndex !== state.currentIndex) {
-                        state.currentIndex = newIndex;
-                        this.updateIndicators(carousel, state);
-                        this.updateActiveItem(items, state.currentIndex);
-                    }
+            const state = this.states.get(carousel);
+
+            if (state.isManualScrolling) return;
+
+            const visibleEntry = entries.find(entry => entry.isIntersecting && entry.intersectionRatio > 0.5);
+
+            if (visibleEntry) {
+                const newIndex = items.indexOf(visibleEntry.target);
+                if (newIndex !== -1 && newIndex !== state.currentIndex) {
+                    state.currentIndex = newIndex;
+                    this.updateUI(carousel, newIndex);
                 }
-            });
-        }, {
-            root: scroller,
-            threshold: 0.5
-        });
+            }
+        }, { root: scroller, threshold: 0.5 });
 
         items.forEach(item => observer.observe(item));
 
-        // Optional mouse drag support
-        if (this.options.mouseDrag) {
-            this.setupMouseDrag(carousel, state, items);
+        if (this.states.get(carousel).mouseDrag) {
+            this.setupMouseDrag(carousel, scroller, items, signal);
         }
     }
 
-    isVertical(carousel) {
-        return carousel.classList.contains('vertical');
-    }
+    setupMouseDrag(carousel, scroller, items, signal) {
+        let isDown = false;
+        let startX, scrollLeft;
+        const state = this.states.get(carousel);
 
-    setupMouseDrag(carousel, state, items) {
-        let startY = 0;
-        let startX = 0;
-        let scrollLeft = 0;
-        let scrollTop = 0;
-        let isDragging = false;
-        const scroller = carousel.querySelector(this.options.scrollerSelector);
-        const isVertical = this.isVertical(carousel);
-
-        const onMouseMove = (e) => {
-            if (!isDragging) return;
-            e.preventDefault();
-
-            if (isVertical) {
-                const y = e.pageY - scroller.offsetTop;
-                const walk = (y - startY) * 1;
-                scroller.scrollTop = scrollTop - walk;
-            } else {
-                const x = e.pageX - scroller.offsetLeft;
-                const walk = (x - startX) * 1;
-                scroller.scrollLeft = scrollLeft - walk;
+        const startDrag = (e) => {
+            if (state.dragTimeout) {
+                clearTimeout(state.dragTimeout);
+                state.dragTimeout = null;
             }
-        };
-
-        const onMouseUp = () => {
-            if (!isDragging) return;
-            isDragging = false;
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-
-            if (this.options.snap) {
-                let closestIndex = 0;
-                let minDistance = Infinity;
-
-                items.forEach((item, index) => {
-                    const itemOffset = isVertical ?
-                        item.offsetTop - scroller.offsetTop :
-                        item.offsetLeft - scroller.offsetLeft;
-                    const scrollPosition = isVertical ? scroller.scrollTop : scroller.scrollLeft;
-                    const distance = Math.abs(scrollPosition - itemOffset);
-
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        closestIndex = index;
-                    }
-                });
-
-                this.goToSlide(carousel, state, closestIndex);
-            }
-
-            carousel.classList.remove('dragging');
-        };
-
-        carousel.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            if (isVertical) {
-                startY = e.pageY - scroller.offsetTop;
-                scrollTop = scroller.scrollTop;
-            } else {
-                startX = e.pageX - scroller.offsetLeft;
-                scrollLeft = scroller.scrollLeft;
-            }
+            isDown = true;
             carousel.classList.add('dragging');
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
-        });
+            startX = e.pageX - scroller.offsetLeft;
+            scrollLeft = scroller.scrollLeft;
+            state.isManualScrolling = true;
+        };
+
+        const stopDrag = () => {
+            if (!isDown) return;
+            isDown = false;
+
+            if (state.dragTimeout) {
+                clearTimeout(state.dragTimeout);
+            }
+
+            state.dragTimeout = setTimeout(() => {
+                carousel.classList.remove('dragging');
+                state.dragTimeout = null;
+            }, 500);
+
+            state.isManualScrolling = false;
+
+            if (this.states.get(carousel).snap) {
+                this.snapToNearest(carousel, scroller, items);
+            }
+        };
+
+        const moveDrag = (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - scroller.offsetLeft;
+            const walk = (x - startX) * state.dragMultiplier;
+            scroller.scrollLeft = scrollLeft - walk;
+        };
+
+        scroller.addEventListener('mousedown', startDrag, { signal });
+        document.addEventListener('mouseleave', stopDrag, { signal });
+        document.addEventListener('mouseup', stopDrag, { signal });
+        document.addEventListener('mousemove', moveDrag, { signal });
     }
 
-    navigate(carousel, state, direction) {
-        const items = carousel.querySelectorAll(this.options.itemSelector);
+    setupKeyboardNavigation(carousel, signal) {
+        const state = this.states.get(carousel);
+        if (!state.keyboardNavigation) return;
+
+        carousel.setAttribute('tabindex', '0');
+        carousel.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowLeft': this.navigate(carousel, -1); break;
+                case 'ArrowRight': this.navigate(carousel, 1); break;
+                case ' ':
+                    e.preventDefault();
+                    this.toggleAutoplay(carousel);
+                    break;
+            }
+        }, { signal });
+    }
+
+    setupAutoplay(carousel, signal) {
+        const start = () => {
+            this.clearAutoplay(carousel);
+            const state = this.states.get(carousel);
+            const timer = setInterval(() => {
+                if (!state.isPaused) this.navigate(carousel, 1);
+            }, state.autoplayInterval);
+            this.autoplayTimers.set(carousel, timer);
+        };
+
+        start();
+
+        const pause = () => { this.states.get(carousel).isPaused = true; };
+        const resume = () => { this.states.get(carousel).isPaused = false; };
+
+        carousel.addEventListener('mouseenter', pause, { signal });
+        carousel.addEventListener('focusin', pause, { signal });
+        carousel.addEventListener('mouseleave', resume, { signal });
+        carousel.addEventListener('focusout', resume, { signal });
+    }
+
+    navigate(carousel, direction) {
+        const state = this.states.get(carousel);
         let newIndex = state.currentIndex + direction;
 
-        if (this.options.loop) {
+        if (state.loop) {
             newIndex = (newIndex + state.itemCount) % state.itemCount;
         } else {
             newIndex = Math.max(0, Math.min(newIndex, state.itemCount - 1));
         }
 
-        if (newIndex !== state.currentIndex) {
-            state.currentIndex = newIndex;
-            this.updateCarousel(carousel, state);
-        }
+        this.goToSlide(carousel, newIndex);
     }
 
-    goToSlide(carousel, state, index) {
-        if (index >= 0 && index < state.itemCount) {
-            state.currentIndex = index;
-            this.updateCarousel(carousel, state);
-        }
-    }
-
-    updateCarousel(carousel, state) {
+    goToSlide(carousel, index) {
+        const state = this.states.get(carousel);
+        const scroller = carousel.querySelector(this.options.scrollerSelector);
         const items = carousel.querySelectorAll(this.options.itemSelector);
-        const targetItem = items[state.currentIndex];
-        const isVertical = this.isVertical(carousel);
+
+        if (index < 0 || index >= items.length) return;
+
+        state.currentIndex = index;
+        state.isManualScrolling = true
+
+        const targetItem = items[index];
+        const scrollSnapAlign = window.getComputedStyle(targetItem).scrollSnapAlign;
 
         targetItem.scrollIntoView({
-            behavior: 'smooth',
-            block: isVertical ? 'start' : 'nearest',
-            inline: isVertical ? 'nearest' : 'start'
+            block: 'nearest',
+            inline: scrollSnapAlign === 'none' ? 'start' : scrollSnapAlign,
+            behavior: 'smooth'
         });
 
 
-        this.updateIndicators(carousel, state);
-        this.updateActiveItem(items, state.currentIndex);
+        this.updateUI(carousel, index);
+
+        setTimeout(() => {
+            state.isManualScrolling = false;
+        }, 500);
     }
 
-    updateIndicators(carousel, state) {
-        const wrapper = carousel.querySelector('.indicator-wrapper');
-        if (!wrapper) return;
-
-        const activeIndicator = wrapper.querySelector('.indicator.active');
-        activeIndicator?.classList.remove('active');
-        wrapper.children[state.currentIndex]?.classList.add('active');
-    }
-
-    updateActiveItem(items, currentIndex) {
-        // Remove active class from current active item
-        const currentActive = items[currentIndex]?.parentElement.querySelector('.item.active');
-        if (currentActive) currentActive.classList.remove('active');
-
-        // Add active class to new active item
-        items[currentIndex]?.classList.add('active');
-    }
-
-    setupAccessibility(carousel, items) {
-        carousel.setAttribute('role', 'region');
-        carousel.setAttribute('aria-label', 'Image Carousel');
-        carousel.setAttribute('aria-roledescription', 'carousel');
-
-        const scroller = carousel.querySelector(this.options.scrollerSelector);
-        scroller.setAttribute('role', 'list');
-        scroller.setAttribute('aria-live', 'polite');
+    snapToNearest(carousel, scroller, items) {
+        let closestIndex = 0;
+        let minDistance = Infinity;
+        const currentScroll = scroller.scrollLeft;
 
         items.forEach((item, index) => {
-            item.setAttribute('role', 'listitem');
-            item.setAttribute('aria-label', `Slide ${index + 1} of ${items.length}`);
-            item.setAttribute('aria-roledescription', 'slide');
-        });
-    }
-
-    setupKeyboardNavigation(carousel, state) {
-        if (!this.options.keyboardNavigation) return;
-
-        carousel.setAttribute('tabindex', '0');
-
-        const navigationMap = carousel.classList.contains('vertical')
-            ? { prev: 'ArrowUp', next: 'ArrowDown' }
-            : { prev: 'ArrowLeft', next: 'ArrowRight' };
-
-        carousel.addEventListener('keydown', (event) => {
-            switch (event.key) {
-                case navigationMap.prev:
-                    this.navigate(carousel, state, -1);
-                    break;
-                case navigationMap.next:
-                    this.navigate(carousel, state, 1);
-                    break;
-                case 'Space':
-                    this.toggleAutoplay(carousel, state);
-                    break;
+            const itemPos = item.offsetLeft - scroller.offsetLeft;
+            const distance = Math.abs(currentScroll - itemPos);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestIndex = index;
             }
         });
+
+        this.goToSlide(carousel, closestIndex);
     }
 
-    setupAutoplay(carousel, state) {
-        if (!this.options.autoplay) return;
-
-        const startAutoplay = () => {
-            // Clear existing interval to prevent multiple timers
-            if (this.autoplayIntervals.has(carousel)) {
-                clearInterval(this.autoplayIntervals.get(carousel));
-            }
-
-            const interval = setInterval(() => {
-                if (!state.isPaused) {
-                    this.navigate(carousel, state, 1);
-                }
-            }, this.options.autoplayInterval);
-
-            this.autoplayIntervals.set(carousel, interval);
-        };
-
-        // Start autoplay
-        startAutoplay();
-
-        // Pause on hover and focus
-        ['mouseenter', 'focusin'].forEach(event => {
-            carousel.addEventListener(event, () => {
-                state.isPaused = true;
-            });
+    updateUI(carousel, index) {
+        const indicators = carousel.querySelectorAll('.indicator');
+        indicators.forEach((ind, i) => {
+            if (i === index) ind.classList.add('active');
+            else ind.classList.remove('active');
         });
 
-        ['mouseleave', 'focusout'].forEach(event => {
-            carousel.addEventListener(event, () => {
-                state.isPaused = false;
-            });
+        const items = carousel.querySelectorAll(this.options.itemSelector);
+        items.forEach((item, i) => {
+            if (i === index) item.classList.add('active');
+            else item.classList.remove('active');
         });
     }
 
-    toggleAutoplay(carousel, state) {
+    toggleAutoplay(carousel) {
+        const state = this.states.get(carousel);
         state.isPlaying = !state.isPlaying;
         state.isPaused = !state.isPlaying;
 
-        if (state.isPlaying) {
-            this.setupAutoplay(carousel, state);
-        } else {
-            clearInterval(this.autoplayIntervals.get(carousel));
-        }
+        if (state.isPlaying) this.setupAutoplay(carousel, this.controllers.get(carousel).signal);
+        else this.clearAutoplay(carousel);
+    }
 
-        // Update play/pause button if it exists
-        const playPauseBtn = carousel.querySelector('.play-pause');
-        if (playPauseBtn) {
-            playPauseBtn.setAttribute('aria-label', state.isPlaying ? 'Pause' : 'Play');
+    clearAutoplay(carousel) {
+        if (this.autoplayTimers.has(carousel)) {
+            clearInterval(this.autoplayTimers.get(carousel));
+            this.autoplayTimers.delete(carousel);
         }
     }
 
     destroy() {
         this.carousels.forEach(carousel => {
-            // Clear autoplay intervals
-            if (this.autoplayIntervals.has(carousel)) {
-                clearInterval(this.autoplayIntervals.get(carousel));
-                this.autoplayIntervals.delete(carousel);
+            if (this.controllers.has(carousel)) {
+                this.controllers.get(carousel).abort();
             }
 
-            // Remove drag data
-            if (this.dragData.has(carousel)) {
-                this.dragData.delete(carousel);
-            }
-
-            // Remove attributes
-            carousel.removeAttribute('role');
-            carousel.removeAttribute('aria-label');
-            carousel.removeAttribute('tabindex');
+            this.clearAutoplay(carousel);
         });
+        this.states = new WeakMap();
+        this.controllers = new WeakMap();
     }
 }
 

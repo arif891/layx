@@ -1,5 +1,5 @@
 carousel, .carousel {
-    --height: 500px;
+    --min-height: 300px;
     --edge-offset: .5rem;
     --indicator-bg: #fff;
 
@@ -12,57 +12,55 @@ carousel, .carousel {
     
     .scroller {
         display: flex;
-        height: var(--height);
-        overflow: auto hidden;
+        min-height: var(--min-height);
+        gap: var(--gap);
+        overflow: auto;
+        padding-inline: var(--edge-offset-x);
         scrollbar-width: none;
         scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
 
         .dragging & {
+            scroll-behavior: auto !important;
             scroll-snap-type: none !important;
         }
 
         .item {
             flex-shrink: 0;
-            height: 100%;
             width: 100%;
             user-select: none;
             -webkit-user-drag: none;
-            scroll-snap-align: start;
+            scroll-snap-align: center;
             view-timeline: --carousel-item inline;
 
             &.auto {
                width: auto;
             }
-        }
 
-        .vertical & {
-            overflow: hidden auto;
-            flex-direction: column;
-            scroll-snap-type: y mandatory;
+            &:first-child {
+                margin-inline-start: var(--edge-offset-x);
+            }
 
-            .item {
-                view-timeline: --carousel-item block;
-
-                &.auto {
-                    height: auto;
-                 }
+            &:last-child {
+                margin-inline-end: var(--edge-offset-x);
             }
         }
+
     }
 
     .indicator-wrapper {
         position: absolute;
         inset: auto 0 var(--edge-offset, 0);
         display: flex;
-        gap: .5rem;
+        gap: var(--indicator-gap, .5rem);
         padding-inline: 1rem;
         justify-content: center;
         pointer-events: none;
 
         .indicator {
             padding: 0;
-            height: .3rem;
-            width: 2rem;
+            height: var(--indicator-height, .2rem);
+            width: var(--indicator-width, 1.5rem);
             flex-shrink: 1;
             box-sizing: content-box;
             border-block: 1rem solid transparent;
@@ -74,19 +72,11 @@ carousel, .carousel {
             transition: .3s;
 
             &.active {
-               width: 3rem;
+               width: var(--indicator-active-width, 2.5rem);
                opacity: 1;
             }
         }
 
-        .vertical  & {
-            inset: 0 auto 0 var(--edge-offset, 0);
-            flex-direction: column;
-
-            .indicator {
-                border-block-width: .25rem;
-            }
-        }
     }
 
     .control-wrapper {
@@ -125,31 +115,6 @@ carousel, .carousel {
                 &:hover {
                     opacity: 1;
                 }
-            }
-        }
-
-        .vertical & {
-
-            .left,.right {
-                flex-direction: column;
-                padding-right: .75rem;
-
-                .prev {
-                  rotate: 90deg;  
-                }
-                .next {
-                   rotate: -90deg;
-                }
-             }
-
-
-            .left {
-                inset: var(--edge-offset, 0) var(--edge-offset, 0) 0 auto;
-            }
-
-            .right {
-                inset: 0 var(--edge-offset, 0) var(--edge-offset, 0) auto;
-                justify-content: end;
             }
         }
     }

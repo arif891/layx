@@ -1,6 +1,5 @@
 /*********************************************************************
  * ScrollState – tracks scroll metrics & exposes as CSS variables
- * NOW WITH SMOOTH VELOCITY to fix flickering
  *********************************************************************/
 class ScrollState {
     constructor(options = {}) {
@@ -14,8 +13,8 @@ class ScrollState {
         // State
         this.currentScroll = window.scrollY;
         this.previousScroll = window.scrollY;
-        this.instantVelocity = 0;  // NEW: raw velocity from delta
-        this.velocity = 0;         // NEW: smoothed velocity exposed to CSS
+        this.instantVelocity = 0;  
+        this.velocity = 0;         
         this.direction = 0;
         this.isScrolling = false;
         this.lastUpdateTime = performance.now();
@@ -24,7 +23,7 @@ class ScrollState {
 
         // Config
         this.topThreshold = options.topThreshold ?? window.innerHeight / 4;
-        this.velocitySmoothing = options.velocitySmoothing ?? 0.1; // NEW: 0–1, lower = smoother
+        this.velocitySmoothing = options.velocitySmoothing ?? 0.1;
         this.velocityDamping = options.velocityDamping ?? 0.9;
         this.scrollEndDelay = options.scrollEndDelay ?? 50;
 
@@ -109,16 +108,12 @@ class ScrollState {
     }
 
     _updateLoop() {
-        // FIX: Smooth velocity with low-pass filter instead of instant jump
         if (this.isScrolling) {
-            // Lerp towards the raw instant velocity
             this.velocity += (this.instantVelocity - this.velocity) * this.velocitySmoothing;
         } else {
-            // Damp towards zero after scroll ends
             this.velocity *= this.velocityDamping;
         }
 
-        // Stop loop when velocity is effectively zero and not scrolling
         if (Math.abs(this.velocity) < 0.001 && !this.isScrolling) {
             this.velocity = 0;
             this.direction = 0;

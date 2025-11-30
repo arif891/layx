@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+
+        <style>
+            body {
+                margin: 0;
+            }
+
+            .block {
+                height: 100vh;
+                display: grid;
+                place-items: center;
+                font-size: 2.5rem;
+            }
+
+            .demo {
+                width: 80%;
+                background-color: aliceblue;
+                font-size: 2.5rem;
+                margin: 5rem auto;
+                text-align: center;
+                padding-block: 15vh;
+                transition: 1s;
+                opacity: 0;
+                translate: 0 25%;
+
+                &.ivp {
+                    opacity: 1;
+                    translate: 0 0;
+                }
+            }
+
+            video {
+                display: block;
+                width: 100%;
+                opacity: .6;
+                transition: .3s;
+
+                 &.ivp { 
+                    opacity: 1;
+                 }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="block">Scroll Down</div>
+        <div class="demo" data-vpt>IN VIEWPORT</div>
+        <video data-vpt src="../../components/media/assets/video.mp4" muted loop></video>
+        <div class="block">Scroll Up</div>
+
+        <script type="module">
+            import ViewportTrigger from './viewport_trigger.js';
+        </script>
+    </body>
+
+</html>

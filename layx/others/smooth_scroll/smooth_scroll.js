@@ -10,9 +10,9 @@ class SmoothScroll {
 
   /* ---------- ctor -------------------------------------------------- */
   constructor(opts = {}) {
-    this.ease = opts.ease ?? 0.025;
-    this.threshold = opts.threshold ?? .1;   // px under which we snap
-    this.easing = this._validateEasing(opts.easing ?? 'easeOutCubic');
+    this.ease = opts.ease ?? document.documentElement.dataset.ease ?? 0.025;
+    this.threshold = opts.threshold ?? document.documentElement.dataset.threshold ?? .1;   // px under which we snap
+    this.easing = this._validateEasing(opts.easing ?? document.documentElement.dataset.easing ?? 'easeOutCubic');
 
     this.target = window.scrollY;           // where we want to be
     this.current = window.scrollY;          // where we are

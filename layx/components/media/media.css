@@ -52,7 +52,7 @@ video {
         }
 
         &::-webkit-media-controls-timeline {
-            padding-block: 1.5rem min(1% , 1.5rem);
+            padding-block: 1.5rem clamp(.25rem, 1%, 1.25rem);
         }
 
         &::-webkit-media-controls-play-button {

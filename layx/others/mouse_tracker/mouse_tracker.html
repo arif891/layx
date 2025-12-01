@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mouse Tracker Demo</title>
+        <style>
+            :root {
+                --bg: #000000;
+                --card-bg: #1e293b;
+                --text: #f8fafc;
+                --accent: #38bdf8;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background-color: var(--bg);
+                color: var(--text);
+                font-family: system-ui, -apple-system, sans-serif;
+                gap: 2rem;
+            }
+
+            h1 {
+                font-weight: 300;
+                letter-spacing: 0.05em;
+            }
+
+            .container {
+                display: flex;
+                gap: 2rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .card {
+                width: 300px;
+                height: 200px;
+                background-color: var(--card-bg);
+                border-radius: 1rem;
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* Demo 1: Spotlight Effect (Pixel values) */
+            .spotlight {
+                /* Default position if JS fails or before init */
+                --mouse-x: 50%;
+                --mouse-y: 50%;
+            }
+
+            .spotlight::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y),
+                        rgba(56, 189, 248, 0.15),
+                        transparent 40%);
+                pointer-events: none;
+            }
+
+            .spotlight::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y),
+                        rgba(56, 189, 248, 0.4),
+                        transparent 40%);
+                opacity: 0;
+                transition: opacity 0.3s;
+                pointer-events: none;
+            }
+
+            .spotlight:hover::after {
+                opacity: 1;
+            }
+
+            /* Demo 2: 3D Tilt (Normalized values -1 to 1) */
+            .tilt-wrapper {
+                perspective: 1000px;
+            }
+
+            .tilt {
+                --mouse-x: 0;
+                --mouse-y: 0;
+                transform:
+                    rotateY(calc(var(--mouse-x) * 10deg)) rotateX(calc(var(--mouse-y) * -10deg));
+                transition: transform 0.1s;
+            }
+
+            .content {
+                z-index: 1;
+                text-align: center;
+                pointer-events: none;
+            }
+
+            .label {
+                display: block;
+                font-size: 0.875rem;
+                opacity: 0.7;
+                margin-bottom: 0.5rem;
+            }
+
+            .value {
+                font-family: monospace;
+                color: var(--accent);
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <h1>Mouse Tracker</h1>
+
+        <div class="container">
+            <!-- Pixel Tracking -->
+            <div class="card spotlight" data-mouse-track>
+                <div class="content">
+                    <span class="label">Spotlight Effect</span>
+                    <div class="value">Pixel Tracking</div>
+                </div>
+            </div>
+
+            <!-- Normalized Tracking -->
+            <div class="tilt-wrapper">
+                <div class="card tilt" data-mouse-track="normalized">
+                    <div class="content">
+                        <span class="label">3D Tilt</span>
+                        <div class="value">Normalized (-1 to 1)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="module" src="./mouse_tracker.js"></script>
+    </body>
+
+</html>

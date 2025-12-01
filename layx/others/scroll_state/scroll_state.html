@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Scroll State</title>
+
+        <style>
+            html {
+                font-family: sans-serif;
+
+                &::after {
+                    content: attr(style);
+                    position: fixed;
+                    inset: 50% 0 auto;
+                    text-align: center;
+                    padding-inline: 2.5rem;
+                    font-size: 1.5rem;
+                }
+            }
+
+            body {
+                height: 300vh;
+                margin: 0;
+            }
+
+            .scroll__status__wrapper {
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+                h1 {
+                    font-weight: 500;
+                    text-align: center;
+                }
+
+                .status__indicators {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: .5rem;
+
+                    h2 {
+                        font-weight: 500;
+                    }
+
+                    span {
+                        opacity: 0;
+
+                        &.down, &.up {
+                            opacity: 1;
+                            display: none;
+                        }
+
+                        .scrolling & {
+                            &.scrolling {
+                                opacity: 1;
+                            }
+                        }
+
+                        .down & {
+                            &.down {
+                                display: inline;
+                            }
+                        }
+
+                        .up & {
+                            &.up {
+                                 display: inline;
+                            }
+                        }
+
+                        .scrolled & {
+                            &.scrolled {
+                                opacity: 1;
+                            }
+                        }
+
+                        .bottom & {
+                            &.bottom {
+                                opacity: 1;
+                            }
+                        }
+                    }
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="scroll__status__wrapper">
+            <h1>Scroll Down to See Status Updates</h1>
+            <div class="status__indicators">
+                <h2>Scroll Activity: <span class="scrolling">Scrolling Active</span></h2>
+
+                <h2>Last Direction:
+                    <span class="down">Scrolled Down</span>
+                    <span class="up">Scrolled Up</span>
+                </h2>
+
+                <h2><span class="scrolled">**Past Top Threshold**</span></h2>
+                <h2><span class="bottom">**Reached Bottom**</span></h2>
+            </div>
+        </div>
+
+        <script type="module">
+            import ScrollState from './scroll_state.js';
+        </script>
+    </body>
+
+</html>

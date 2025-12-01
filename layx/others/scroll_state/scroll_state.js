@@ -13,8 +13,8 @@ class ScrollState {
         // State
         this.currentScroll = window.scrollY;
         this.previousScroll = window.scrollY;
-        this.instantVelocity = 0;  
-        this.velocity = 0;         
+        this.instantVelocity = 0;
+        this.velocity = 0;
         this.direction = 0;
         this.isScrolling = false;
         this.lastUpdateTime = performance.now();
@@ -22,6 +22,7 @@ class ScrollState {
         this.rafId = null;
 
         // Config
+        this.updateVelocity = options.updateVelocity ?? document.documentElement.dataset.scrollVelocity === 'false' ? false : true;
         this.topThreshold = options.topThreshold ?? window.innerHeight / 4;
         this.velocitySmoothing = options.velocitySmoothing ?? 0.1;
         this.velocityDamping = options.velocityDamping ?? 0.9;
@@ -31,7 +32,8 @@ class ScrollState {
         this.smoothScroll = options.smoothScroll || window.__smoothScrollInstance;
 
         if (window.__scrollStateInstance) {
-            console.warn('Scroll State already initialized.'); return
+            console.warn('ScrollState already initialized.');
+            return;
         }
 
         if (this.smoothScroll) {
@@ -43,6 +45,7 @@ class ScrollState {
         } else {
             window.addEventListener('scroll', this._onNativeScroll, { passive: true });
         }
+
         window.__scrollStateInstance = this;
     }
 
@@ -53,7 +56,7 @@ class ScrollState {
     }
 
     _onSmoothUpdate(data) {
-        this._measureScroll(data.currentScroll || window.scrollY);
+        this._measureScroll(data.currentScroll ?? window.scrollY);
     }
 
     _onSmoothEnd() {
@@ -70,27 +73,30 @@ class ScrollState {
     }
 
     _measureScroll(scrollY) {
-        const now = performance.now();
-        const deltaTime = now - this.lastUpdateTime || 16;
-
+ 
         this.previousScroll = this.currentScroll;
         this.currentScroll = scrollY;
-
         const deltaY = this.currentScroll - this.previousScroll;
-
-        this.instantVelocity = (deltaY / window.innerHeight) / (deltaTime / 1000);
-        this.instantVelocity = Math.max(-1, Math.min(1, this.instantVelocity));
 
         if (deltaY > 0) this.direction = 1;
         else if (deltaY < 0) this.direction = -1;
 
-        this.lastUpdateTime = now;
+        
+        if (this.updateVelocity) {
+            const now = performance.now();
+            const deltaTime = now - this.lastUpdateTime || 16;
+            this.lastUpdateTime = now;
+
+            this.instantVelocity = Math.max(-1, Math.min(1,
+                (deltaY / window.innerHeight) / (deltaTime / 1000)));
+        }
     }
 
     _scheduleScrollEnd() {
         clearTimeout(this.scrollEndTimeout);
         this.scrollEndTimeout = setTimeout(() => {
             this.isScrolling = false;
+            this.direction = 0;
         }, this.scrollEndDelay);
     }
 
@@ -108,38 +114,42 @@ class ScrollState {
     }
 
     _updateLoop() {
-        if (this.isScrolling) {
-            this.velocity += (this.instantVelocity - this.velocity) * this.velocitySmoothing;
-        } else {
-            this.velocity *= this.velocityDamping;
-        }
+        if (this.updateVelocity) {
+            if (this.isScrolling) {
+                this.velocity += (this.instantVelocity - this.velocity) * this.velocitySmoothing;
+            } else {
+                this.velocity *= this.velocityDamping;
+            }
 
-        if (Math.abs(this.velocity) < 0.001 && !this.isScrolling) {
-            this.velocity = 0;
-            this.direction = 0;
-            this._stopLoop();
-            this._updateCSS();
-            this._updateClasses();
-            return;
+            // stop loop when velocity becomes negligible
+            if (Math.abs(this.velocity) < 0.001 && !this.isScrolling) {
+                this.velocity = 0;
+                this._stopLoop();
+                this._updateCSS();
+                this._updateClasses();
+                return;
+            }
         }
 
         this._updateCSS();
         this._updateClasses();
-
         this.rafId = requestAnimationFrame(this._updateLoop);
     }
 
     _updateCSS() {
         const root = document.documentElement;
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        const scrollPercent = maxScroll > 0 ? (this.currentScroll / maxScroll) * 100 : 0;
+        const maxScroll = root.scrollHeight - window.innerHeight;
+        const scrollPct = maxScroll > 0 ? (this.currentScroll / maxScroll) * 100 : 0;
 
-        root.style.setProperty('--scroll-position', scrollPercent.toFixed(2));
-        root.style.setProperty('--scroll-velocity', this.velocity.toFixed(3));
+        root.style.setProperty('--scroll-position', scrollPct.toFixed(2));
         root.style.setProperty('--scroll-direction', this.direction);
 
+        if (this.updateVelocity) {
+            root.style.setProperty('--scroll-velocity', this.velocity.toFixed(3));
+        }
+
         root.classList.toggle('scrolled', this.currentScroll >= this.topThreshold);
-        root.classList.toggle('bottom', this.currentScroll >= maxScroll - 1); 
+        root.classList.toggle('bottom', this.currentScroll >= maxScroll - 1);
     }
 
     _updateClasses() {
@@ -166,7 +176,6 @@ class ScrollState {
             window.removeEventListener('scroll', this._onNativeScroll);
         }
 
-        // Reset CSS
         const root = document.documentElement;
         root.style.removeProperty('--scroll-position');
         root.style.removeProperty('--scroll-velocity');

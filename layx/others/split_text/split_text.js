@@ -1,3 +1,16 @@
+/**
+ * SplitText
+ * 
+ * A utility class to split text content into words and/or letters for animation purposes.
+ * It wraps text in spans and assigns CSS variables for staggered animations.
+ * 
+ * Features:
+ * - Splits text into words, letters, or both.
+ * - Supports custom selectors (default: [data-split-text]).
+ * - Auto-refreshes on DOM changes (optional).
+ * - Assigns CSS variables: --word-index, --letter-index, --global-index.
+ * - Supports split direction: start, center, end (via data-split-from).
+ */
 class SplitText {
     constructor(selector = '[data-split-text]', options = {}) {
         this.selector = selector;

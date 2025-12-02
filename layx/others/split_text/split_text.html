@@ -8,16 +8,48 @@
         body {
             margin: 0;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            display: grid;
+            place-items: center;
+            font-family: sans-serif;
         }
+
+        h1 {
+            font-weight: 500;
+            font-size: calc(2.5vh + 2.5vw);
+            text-align: center;
+            margin: 5vh 0;
+            letter-spacing: -.5;
+        }
+
+        .word-wrap {
+            display: inline-block;
+            overflow: clip;
+
+            .word {
+
+            }
+
+            .letter {
+                display: inline-block;
+                translate: 0 100%;
+                animation: in .6s forwards calc(1s / var(--letters) * var(--letter-index)) ;
+            }
+        }
+
+        @keyframes in {
+            to {
+                translate: 0;
+            }
+        }
+
     </style>
 </head>
 <body>
-    <h1 data-split-text data-split-from="center">Split Text Demo</h1>
+    <div class="wrapper">
+        <h1 data-split-text>Split Text Start</h1>
+        <h1 data-split-text data-split-from="center">Split Text Center</h1>
+        <h1 data-split-text data-split-from="end">Split Text End</h1>
+    </div>
     <script src="split_text.js" type="module"></script>
 </body>
 </html>

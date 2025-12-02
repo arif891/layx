@@ -1,9 +1,3 @@
-/**
- * SplitText 
- *  – Minimal API
- *  – survives XSS (textContent instead of innerHTML)
- *  – survives mutation (MutationObserver)
- */
 class SplitText {
     constructor(selector = '[data-split-text]', options = {}) {
         this.selector = selector;
@@ -34,12 +28,17 @@ class SplitText {
         document.querySelectorAll(sel).forEach(el => this._splitIfNeeded(el));
     }
 
+    destroy() {
+        this._observer?.disconnect();
+        this._observer = null;
+        this.elMap = new WeakMap();
+    }
 
     /* ---------- private ---------- */
     _splitIfNeeded(el) {
-        if (this.elMap.has(el)) return;               // already done
+        if (this.elMap.has(el)) return;
         const raw = el.firstChild?.nodeType === 3 ? el.firstChild.textContent : '';
-        if (!raw.trim()) return;                      // empty text node
+        if (!raw.trim()) return;
 
         const type = (el.dataset.splitText || 'both').toLowerCase();
         const safeType = this.validTypes.has(type) ? type : 'both';
@@ -48,47 +47,73 @@ class SplitText {
         this.elMap.set(el, meta);
     }
 
+    _getSplitFrom(el) {
+        const v = (el.dataset.splitFrom || 'start').toLowerCase();
+        return ['start', 'center', 'end'].includes(v) ? v : 'start';
+    }
+
+    _assignIndices(list, mode, cssPrefix) {
+        const n = list.length;
+        const isCenter = mode === 'center';
+        const mid = n / 2 - 0.5;
+
+        list.forEach((item, i) => {
+            const idx = isCenter
+                ? Math.floor(Math.abs(i - mid) + (n % 2 === 0 ? 1 : 0))
+                : mode === 'end' ? n - 1 - i : i;
+
+            item.style.setProperty(`--${cssPrefix}-index`, idx);
+            item.style.setProperty('--global-index', item.dataset.globalIdx);
+        });
+    }
+
     _buildFragments(host, text, type) {
         const words = text.trim().split(/\s+/);
-        const letters = [];                 // flat list of <span class=letter>
-        const wordWraps = [];               // <span class=word-wrap>
+        const letters = [];           // flat <span class=letter>
+        const wordWraps = [];         // <span class=word-wrap>
 
-        let letterIdx = 0;
         const docFrag = document.createDocumentFragment();
+        const mode = this._getSplitFrom(host);
 
-        words.forEach((word, wordIdx) => {
+        /* 1.  build spans ----------------------------------------------------- */
+        let globalIdx = 0;
+        words.forEach((word, wIdx) => {
             const wordWrap = document.createElement('span');
             wordWrap.className = 'word-wrap';
 
             const wordSpan = document.createElement('span');
             wordSpan.className = 'word';
-            wordSpan.style.setProperty('--word-index', wordIdx);
+            wordSpan.dataset.globalIdx = wIdx;
 
-            if (type === 'word') {                       // words only
-                wordSpan.textContent = word;
-            } else {                                     // letter or both
-                for (const ch of word) {
-                    const l = document.createElement('span');
-                    l.className = 'letter';
-                    l.style.setProperty('--letter-index', letterIdx++);
-                    l.textContent = ch;
-                    wordSpan.appendChild(l);
-                    letters.push(l);
-                }
+            for (const ch of word) {
+                const l = document.createElement('span');
+                l.className = 'letter';
+                l.textContent = ch;
+                l.dataset.globalIdx = globalIdx++;
+                letters.push(l);
+                wordSpan.appendChild(l);
             }
-
             wordWrap.appendChild(wordSpan);
-            docFrag.appendChild(wordWrap);
-            if (wordIdx !== words.length - 1) {          // preserve single space
-                docFrag.appendChild(document.createTextNode(' '));
-            }
             wordWraps.push(wordWrap);
         });
 
-        host.innerHTML = '';            // wipe old text node
+        /* 2.  index assignment ----------------------------------------------- */
+        this._assignIndices(letters, mode, 'letter');
+        this._assignIndices(
+            wordWraps.map(w => w.querySelector('.word')),
+            mode,
+            'word'
+        );
+
+        /* 3.  inject --------------------------------------------------------- */
+        wordWraps.forEach((wrap, i) => {
+            docFrag.appendChild(wrap);
+            if (i !== wordWraps.length - 1) docFrag.appendChild(document.createTextNode(' '));
+        });
+
+        host.innerHTML = '';
         host.appendChild(docFrag);
 
-        /* expose CSS counters */
         if (type !== 'letter') host.style.setProperty('--words', words.length);
         if (type !== 'word') host.style.setProperty('--letters', letters.length);
 

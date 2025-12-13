@@ -10,7 +10,7 @@ class SmoothScroll {
 
   /* ---------- ctor -------------------------------------------------- */
   constructor(opts = {}) {
-    this.ease = opts.ease ?? document.documentElement.dataset.ease ?? 0.025;
+    this.ease = opts.ease ?? document.documentElement.dataset.ease ?? 0.015;
     this.threshold = opts.threshold ?? document.documentElement.dataset.threshold ?? .1;   // px under which we snap
     this.easing = this._validateEasing(opts.easing ?? document.documentElement.dataset.easing ?? 'easeOutCubic');
     this.preventWithKeys = opts.preventWithKeys ?? true;
@@ -87,6 +87,7 @@ class SmoothScroll {
     if (this.preventWithKeys) {
       if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
     }
+    if (e.target.dataset.smoothScroll === 'prevent') { this._stop(); return }
     e.preventDefault();
     this.target = this._clamp(this.target + e.deltaY);
     this._start();

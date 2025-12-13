@@ -99,11 +99,15 @@ class SmoothScroll {
   }
   _keys(e) {
     const map = {
-      PageUp: -innerHeight,
-      PageDown: innerHeight,
-      Home: 0,
-      End: document.documentElement.scrollHeight,
+      PageUp: -window.innerHeight,
+      PageDown: window.innerHeight,
+      Home: 0,                                    
+      End: document.documentElement.scrollHeight, 
+      ArrowUp: -50,
+      ArrowDown: 50,
+      ' ': window.innerHeight                   
     };
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (map[e.key] == null) return;
     e.preventDefault();
     if (this.isRunning) this.emit('interrupt');

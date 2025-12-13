@@ -52,19 +52,19 @@ class SmoothScroll {
     });
   }
 
-  /* ---------- public scroll-to ------------------------------------- */
+  /* ---------- public ------------------------------------- */
   scrollTo(y) {
     this.target = this._clamp(y);
     this._start();
   }
 
-  /* ---------- public destroy --------------------------------------- */
   destroy() {
     this._stop();
     removeEventListener('wheel', this._wheel, { passive: false });
     removeEventListener('scroll', this._native);
     removeEventListener('keydown', this._keys);
     document.documentElement.style.scrollBehavior = '';
+    delete window.__smoothScrollInstance;
   }
 
   /* ---------- private ---------------------------------------------- */
@@ -107,7 +107,7 @@ class SmoothScroll {
       ArrowDown: 50,
       ' ': window.innerHeight                   
     };
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
     if (map[e.key] == null) return;
     e.preventDefault();
     if (this.isRunning) this.emit('interrupt');
@@ -141,7 +141,7 @@ class SmoothScroll {
     const fn = this.easing;
     const norm = Math.min(1, Math.abs(dy) / innerHeight);
     this.current += dy * this.ease * (1 + fn(1 - norm));
-    scrollTo(0, Math.round(this.current));
+    scrollTo(0, this.current);
     this.emit('update', { currentScroll: this.current, diff: dy });
     this.raf = requestAnimationFrame(this._tick);
   }

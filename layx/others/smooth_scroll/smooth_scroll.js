@@ -13,6 +13,7 @@ class SmoothScroll {
     this.ease = opts.ease ?? document.documentElement.dataset.ease ?? 0.025;
     this.threshold = opts.threshold ?? document.documentElement.dataset.threshold ?? .1;   // px under which we snap
     this.easing = this._validateEasing(opts.easing ?? document.documentElement.dataset.easing ?? 'easeOutCubic');
+    this.preventWithKeys = opts.preventWithKeys ?? true;
 
     this.target = window.scrollY;           // where we want to be
     this.current = window.scrollY;          // where we are
@@ -83,6 +84,9 @@ class SmoothScroll {
     addEventListener('keydown', this._keys);
   }
   _wheel(e) {
+    if (this.preventWithKeys) {
+      if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
+    }
     e.preventDefault();
     this.target = this._clamp(this.target + e.deltaY);
     this._start();

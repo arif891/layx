@@ -59,28 +59,23 @@
             </tr>
         </thead>
         <tbody>
-            <!-- 
-                Using <template> is required here because placing ${...} text directly 
-                inside <tbody> is invalid HTML and browsers would hoist it out. 
-                The <template> tag preserves the position of the content.
-            -->
             <template>
-                ${ list.map(u => `
-                <tr style="border-bottom: 1px solid #dddddd;">
-                    <td style="padding: 12px 15px;">${u.id}</td>
-                    <td style="padding: 12px 15px; font-weight: bold;">${u.name}</td>
-                    <td style="padding: 12px 15px;">${u.role}</td>
-                    <td style="padding: 12px 15px;">
-                        <span style="
-                                padding: 4px 8px; border-radius: 4px; font-size: 0.85em; 
-                                background: ${ u.status === 'Active' ? '#c8e6c9' : '#ffcdd2' };
-                                color: ${ u.status === 'Active' ? '#2e7d32' : '#c62828' };
-                            ">
-                            ${u.status}
-                        </span>
-                    </td>
-                </tr>
-                `).join('') }
+            ${ list.map(u => `
+            <tr style="border-bottom: 1px solid #dddddd;">
+                <td style="padding: 12px 15px;">${u.id}</td>
+                <td style="padding: 12px 15px; font-weight: bold;">${u.name}</td>
+                <td style="padding: 12px 15px;">${u.role}</td>
+                <td style="padding: 12px 15px;">
+                    <span style="
+                            padding: 4px 8px; border-radius: 4px; font-size: 0.85em; 
+                            background: ${ u.status === 'Active' ? '#c8e6c9' : '#ffcdd2' };
+                            color: ${ u.status === 'Active' ? '#2e7d32' : '#c62828' };
+                        ">
+                        ${u.status}
+                    </span>
+                </td>
+            </tr>
+            `).join('') }
             </template>
         </tbody>
     </table>

@@ -87,7 +87,7 @@ class SmoothScroll {
     if (this.preventWithKeys) {
       if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
     }
-    if (e.target.dataset.smoothScroll === 'prevent') { if (this.isRunning) this.emit('interrupt'); this._stop(); return }
+    if (e.target.closest('[data-smooth-scroll="prevent"]')) { if (this.isRunning) this.emit('interrupt'); this._stop(); return }
     e.preventDefault();
     this.target = this._clamp(this.target + e.deltaY);
     this._start();

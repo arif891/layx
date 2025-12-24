@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-ease="0.015" data-threshold="0.5">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Smooth Scroll Example</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', sans-serif;
+                margin: 0;
+                padding: 0;
+                background: #111;
+                color: #fff;
+            }
+
+            header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                backdrop-filter: blur(10px);
+                padding: 20px;
+                z-index: 100;
+                border-bottom: 1px solid #333;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            nav button {
+                background: transparent;
+                border: 1px solid #555;
+                color: #fff;
+                padding: 8px 16px;
+                margin-left: 10px;
+                cursor: pointer;
+                border-radius: 4px;
+                transition: all 0.2s;
+            }
+
+            nav button:hover {
+                background: #fff;
+                color: #000;
+            }
+
+            section {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                border-bottom: 1px solid #222;
+            }
+
+            section:nth-child(even) {
+                background: #161616;
+            }
+
+            h2 {
+                font-size: 3rem;
+                margin: 0 0 20px 0;
+                background: linear-gradient(45deg, #ff00cc, #3333ff);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            p {
+                max-width: 600px;
+                line-height: 1.6;
+                color: #aaa;
+                text-align: center;
+            }
+
+            .status-bar {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: #222;
+                padding: 10px 20px;
+                border-radius: 20px;
+                font-family: monospace;
+                border: 1px solid #444;
+            }
+
+            /* Example of an element that prevents smooth scroll capture */
+            .native-scroll-area {
+                width: 300px;
+                height: 200px;
+                overflow-y: auto;
+                background: #222;
+                border: 1px solid #555;
+                padding: 10px;
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <header>
+            <div style="font-weight: bold;">SmoothScroll.js</div>
+            <nav>
+                <button onclick="scrollToTop()">Top</button>
+                <button onclick="scrollToSection(2)">Section 2</button>
+                <button onclick="scrollToSection(4)">Section 4</button>
+                <button onclick="scrollToBottom()">Bottom</button>
+            </nav>
+        </header>
+
+        <section id="s1">
+            <h2>Section One</h2>
+            <p>Scroll down to experience the inertia. This library intercepts wheel and key events to provide smooth
+                scrolling.</p>
+        </section>
+
+        <section id="s2">
+            <h2>Section Two</h2>
+            <p>This is the second section. The scrolling feel can be customized via <code>data-ease</code> attribute on
+                the html tag.</p>
+        </section>
+
+        <section id="s3">
+            <h2>Section Three</h2>
+            <p>Example of an inner scrollable area that should behave natively:</p>
+            <div class="native-scroll-area" data-smooth-scroll="prevent">
+                <p>Hover here and scroll.</p>
+                <p>Line 1</p>
+                <p>Line 2</p>
+                <p>Line 3</p>
+                <p>Line 4</p>
+                <p>Line 5</p>
+                <p>Line 6</p>
+                <p>Line 7</p>
+                <p>Line 8</p>
+                <p>Line 9</p>
+                <p>Line 10</p>
+                <p>Line 11</p>
+                <p>Line 12</p>
+                <p>Line 13</p>
+                <p>Line 14</p>
+                <p>Line 15</p>
+            </div>
+            <p style="margin-top: 10px; font-size: 0.8em;">(Attribute <code>data-smooth-scroll="prevent"</code> allows
+                native scrolling inside this box)</p>
+        </section>
+
+        <section id="s4">
+            <h2>Section Four</h2>
+            <p>You can also control the scroll programmatically using the API.</p>
+        </section>
+
+        <section id="s5">
+            <h2>Section Five</h2>
+            <p>End of the page.</p>
+        </section>
+
+        <div class="status-bar" id="status">Scrolled: 0px</div>
+
+        <script type="module" src="./app.js"></script>
+    </body>
+
+</html>

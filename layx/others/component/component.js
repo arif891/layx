@@ -43,8 +43,8 @@ class Component {
     /* ---------- private ---------- */
 
 
-    /* depth-first walk with cycle detection */
-    async _walk(el, seen = new Set()) {
+    /* depth-first walk with cycle detection + context inheritance */
+    async _walk(el, seen = new Set(), parentCtx = this._ctx) {
         const name = el.getAttribute('name');
         const src = el.getAttribute('src');
 
@@ -60,14 +60,15 @@ class Component {
             const tpl = this._registry[name];
             if (!tpl) return this._die(el, `component '${name}' not found`);
 
-            /* process nested components first */
-            const next = new Set(seen).add(name);
-            await Promise.all([...tpl.querySelectorAll('component')]
-                .map(c => this._walk(c, next)));
-
             /* build instance and swap into DOM */
-            const instance = await this._instantiate(tpl, el);
+            const { node: instance, ctx: instanceCtx } = await this._instantiate(tpl, el, parentCtx);
             el.replaceWith(instance);
+
+            /* process nested components in the new instance */
+            const next = new Set(seen).add(name);
+            await Promise.all([...instance.querySelectorAll('component')]
+                .map(c => this._walk(c, next, instanceCtx)));
+
             document.dispatchEvent(new CustomEvent('component-loaded', { detail: { name } }));
         } catch (err) {
             this._die(el, err.message);
@@ -88,7 +89,7 @@ class Component {
         return job;
     }
 
-    /* parse <template data-component="…"> or any tag with data-component */
+    /* parse <div data-component="…"> or any tag with data-component */
     _registerHTML(html) {
         const doc = new DOMParser().parseFromString(html, 'text/html');
         doc.querySelectorAll('[data-component]').forEach(node => {
@@ -104,13 +105,14 @@ class Component {
     }
 
     /* produce real DOM from template */
-    async _instantiate(tpl, placeholder) {
+    async _instantiate(tpl, placeholder, parentCtx) {
         const node = tpl.cloneNode(true);
         this._copyAttrs(placeholder, node);
+        let ctx = parentCtx;
 
         if (tpl._raw) {                 // dynamic template
             try {
-                const ctx = this._buildCtx(tpl, placeholder);
+                ctx = this._buildCtx(tpl, placeholder, parentCtx);
                 node.innerHTML = this._render(tpl._raw, ctx);
             } catch (e) {
                 this._die(node, `Render error: ${e.message}`);
@@ -118,12 +120,14 @@ class Component {
             node.removeAttribute('dynamic');
             node.removeAttribute('prop');
         }
-        return node;
+        return { node, ctx };
     }
 
-    /* merge global context + prop expression */
-    _buildCtx(tpl, ph) {
-        const ctx = { ...this._ctx };
+    /* merge parent context + prop expression */
+    _buildCtx(tpl, ph, parentCtx) {
+        const ctx = { ...parentCtx };
+
+        // 2. Data prop (rich types via evaluation)
         const expr = ph.getAttribute('prop');
         if (!expr) return ctx;
 

@@ -10,6 +10,10 @@ class SmoothScroll {
 
   /* ---------- ctor -------------------------------------------------- */
   constructor(opts = {}) {
+    if (window.__smoothScrollInstance) {
+      console.warn('Smooth Scroll already initialized.'); return window.__smoothScrollInstance;
+    }
+
     this.ease = opts.ease ?? document.documentElement.dataset.ease ?? 0.015;
     this.threshold = opts.threshold ?? document.documentElement.dataset.threshold ?? .1;   // px under which we snap
     this.easing = this._validateEasing(opts.easing ?? document.documentElement.dataset.easing ?? 'easeOutCubic');
@@ -26,10 +30,6 @@ class SmoothScroll {
     this._native = this._native.bind(this);
     this._keys = this._keys.bind(this);
     this._tick = this._tick.bind(this);
-
-    if (window.__smoothScrollInstance) {
-      console.warn('Smooth Scroll already initialized.'); return window.__smoothScrollInstance;
-    }
 
     this._addListeners();
     window.__smoothScrollInstance = this;   // keep singleton reachable
@@ -101,11 +101,11 @@ class SmoothScroll {
     const map = {
       PageUp: -window.innerHeight,
       PageDown: window.innerHeight,
-      Home: 0,                                    
-      End: document.documentElement.scrollHeight, 
+      Home: 0,
+      End: document.documentElement.scrollHeight,
       ArrowUp: -50,
       ArrowDown: 50,
-      ' ': window.innerHeight                   
+      ' ': window.innerHeight
     };
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
     if (map[e.key] == null) return;

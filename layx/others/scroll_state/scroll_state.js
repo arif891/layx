@@ -3,6 +3,10 @@
  *********************************************************************/
 class ScrollState {
     constructor(options = {}) {
+        if (window.__scrollStateInstance) {
+            console.warn('ScrollState already initialized.');
+            return window.__scrollStateInstance;
+        }
         // Bind methods
         this._onSmoothStart = this._onSmoothStart.bind(this);
         this._onSmoothUpdate = this._onSmoothUpdate.bind(this);
@@ -30,11 +34,6 @@ class ScrollState {
 
         // SmoothScroll integration (auto-detect)
         this.smoothScroll = options.smoothScroll || window.__smoothScrollInstance;
-
-        if (window.__scrollStateInstance) {
-            console.warn('ScrollState already initialized.');
-            return window.__scrollStateInstance;
-        }
 
         if (this.smoothScroll) {
             this.smoothScroll
@@ -73,7 +72,7 @@ class ScrollState {
     }
 
     _measureScroll(scrollY) {
- 
+
         this.previousScroll = this.currentScroll;
         this.currentScroll = scrollY;
         const deltaY = this.currentScroll - this.previousScroll;
@@ -81,7 +80,7 @@ class ScrollState {
         if (deltaY > 0) this.direction = 1;
         else if (deltaY < 0) this.direction = -1;
 
-        
+
         if (this.updateVelocity) {
             const now = performance.now();
             const deltaTime = now - this.lastUpdateTime || 16;

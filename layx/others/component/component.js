@@ -5,17 +5,20 @@ Component Manager - A simple web component system for quick prototyping
 /* WARNING: Don't use in production, can be used in development stage for quick prototyping */
 
 class Component {
-    constructor(dataContext = {}, debug = true) {
-        this._ctx = dataContext;
-        this._debug = debug;
-        this._registry = Object.create(null);
-        this._fetching = new Map();
-        this._tplCache = new Map();
-
+    constructor(dataContext = {}, options = {}) {
         if (window.__componentInstance) {
             console.warn('ComponentManager already initialized');
             return window.__componentInstance;
         }
+        this.options = {
+            debug: true,
+            ...options
+        }
+        this._ctx = dataContext;
+        this._debug = this.options.debug;
+        this._registry = Object.create(null);
+        this._fetching = new Map();
+        this._tplCache = new Map();
 
         window.__componentInstance = this;
         this.ready = this.init();
@@ -27,6 +30,14 @@ class Component {
         const roots = document.querySelectorAll('component');
         await Promise.all([...roots].map(el => this._walk(el)));
         document.dispatchEvent(new CustomEvent('components-ready'));
+    }
+
+    destroy() {
+        window.__componentInstance = null;
+        this._ctx = null;
+        this._registry = null;
+        this._fetching = null;
+        this._tplCache = null;
     }
 
     /* ---------- private ---------- */

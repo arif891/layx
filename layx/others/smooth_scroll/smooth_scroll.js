@@ -28,7 +28,7 @@ class SmoothScroll {
     this._tick = this._tick.bind(this);
 
     if (window.__smoothScrollInstance) {
-      console.warn('Smooth Scroll already initialized.'); return
+      console.warn('Smooth Scroll already initialized.'); return window.__smoothScrollInstance;
     }
 
     this._addListeners();

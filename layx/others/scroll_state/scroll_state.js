@@ -33,7 +33,7 @@ class ScrollState {
 
         if (window.__scrollStateInstance) {
             console.warn('ScrollState already initialized.');
-            return;
+            return window.__scrollStateInstance;
         }
 
         if (this.smoothScroll) {

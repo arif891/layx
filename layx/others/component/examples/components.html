@@ -1,0 +1,90 @@
+<!-- 
+    Library of usage examples for component.js 
+-->
+
+<!-- 1. Simple Static Component -->
+<template data-component="simple-alert">
+    <div style="background: #e3f2fd; color: #0d47a1; padding: 15px; border-radius: 4px; border: 1px solid #90caf9;">
+        <strong>Info:</strong> This is a static alert component.
+    </div>
+</template>
+
+<!-- 2. Dynamic Component with Props -->
+<!-- Takes 'name' and 'role' as props via destructuring or positional arguments -->
+<div data-component="profile-card" dynamic prop="name, role"
+    style="background: white; border: 1px solid #ddd; padding: 20px; border-radius: 8px; max-width: 300px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">${name}</div>
+    <div style="color: #666; font-size: 0.9em;">${role}</div>
+    <div style="margin-top: 10px; font-size: 0.8em; color: #aaa;">Data Context: ${appName}</div>
+</div>
+
+<!-- 3. Nested Component -->
+<div data-component="dashboard-layout"
+    style="display: grid; grid-template-columns: 200px 1fr; gap: 20px; background: white; padding: 20px;">
+    <aside style="background: #f0f0f0; padding: 10px;">
+        <h3>Sidebar</h3>
+        <ul>
+            <li>Home</li>
+            <li>Profile</li>
+            <li>Settings</li>
+        </ul>
+    </aside>
+    <main>
+        <h3>Main Content Area</h3>
+        <p>This component loads other components inside it:</p>
+        <component src="./components.html" name="simple-alert"></component>
+        <br>
+        <component src="./components.html" name="profile-card" prop="'Nested User', 'Guest'"></component>
+    </main>
+</div>
+
+<!-- 4. Object Prop Component -->
+<!-- When a single object is passed, properties are merged into context -->
+<div data-component="notification-box" dynamic
+    style="border-left: 4px solid #4caf50; background: #e8f5e9; padding: 15px;">
+    <h4 style="margin: 0 0 5px 0; color: #2e7d32;">${title}</h4>
+    <p style="margin: 0; color: #388e3c;">${message}</p>
+</div>
+
+<!-- 5. Data Table Component -->
+<!-- Iterates over 'list' prop using standard JS map().join('') -->
+<div data-component="user-table" dynamic prop="list" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.9em; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+        <thead>
+            <tr style="background-color: #009879; color: #ffffff; text-align: left;">
+                <th style="padding: 12px 15px;">ID</th>
+                <th style="padding: 12px 15px;">Name</th>
+                <th style="padding: 12px 15px;">Role</th>
+                <th style="padding: 12px 15px;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 
+                Using <template> is required here because placing ${...} text directly 
+                inside <tbody> is invalid HTML and browsers would hoist it out. 
+                The <template> tag preserves the position of the content.
+            -->
+            <template>
+                ${ list.map(u => `
+                <tr style="border-bottom: 1px solid #dddddd;">
+                    <td style="padding: 12px 15px;">${u.id}</td>
+                    <td style="padding: 12px 15px; font-weight: bold;">${u.name}</td>
+                    <td style="padding: 12px 15px;">${u.role}</td>
+                    <td style="padding: 12px 15px;">
+                        <span style="
+                                padding: 4px 8px; border-radius: 4px; font-size: 0.85em; 
+                                background: ${ u.status === 'Active' ? '#c8e6c9' : '#ffcdd2' };
+                                color: ${ u.status === 'Active' ? '#2e7d32' : '#c62828' };
+                            ">
+                            ${u.status}
+                        </span>
+                    </td>
+                </tr>
+                `).join('') }
+            </template>
+        </tbody>
+    </table>
+    <div style="margin-top: 10px; color: #666; font-style: italic;">
+        Total Users: ${list.length}
+    </div>
+</div>

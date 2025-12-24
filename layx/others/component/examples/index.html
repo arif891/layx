@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Layx Component Examples</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                padding: 20px;
+                background: #f4f4f4;
+            }
+
+            .example-section {
+                margin-bottom: 40px;
+                border-bottom: 2px solid #ddd;
+                padding-bottom: 20px;
+            }
+
+            h2 {
+                color: #555;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <h1>Layx Component System</h1>
+        <p>Below are examples demonstrating different features of the component system.</p>
+
+        <div class="example-section">
+            <h2>1. Static Component</h2>
+            <p>A simple component with static HTML content.</p>
+            <component src="./components.html" name="simple-alert"></component>
+        </div>
+
+        <div class="example-section">
+            <h2>2. Dynamic Component & Props</h2>
+            <p>Passing properties to a component. <code>prop="'John Doe', 'Engineer'"</code></p>
+            <component src="./components.html" name="profile-card" prop="'John Doe', 'Engineer'"></component>
+
+            <p>Using global context variable. <code>prop="globalAdmin, 'System Administrator'"</code></p>
+            <component src="./components.html" name="profile-card" prop="globalAdmin, 'System Administrator'">
+            </component>
+        </div>
+
+        <div class="example-section">
+            <h2>3. Nested Components</h2>
+            <p>A component that contains other components.</p>
+            <component src="./components.html" name="dashboard-layout"></component>
+        </div>
+
+        <div class="example-section">
+            <h2>4. Object Props</h2>
+            <p>Passing a single object as props. <code>prop="{ title: 'Notification', message: 'This is an object prop
+                    example.' }"</code></p>
+            <component src="./components.html" name="notification-box"
+                prop="{ title: 'Notification', message: 'This is an object prop example.' }"></component>
+        </div>
+
+        <div class="example-section">
+            <h2>5. Render Table from List</h2>
+            <p>Rendering a table by mapping over a list of objects (<code>userList</code>) defined in the global
+                context.</p>
+            <component src="./components.html" name="user-table" prop="userList"></component>
+        </div>
+
+        <script type="module" src="./app.js"></script>
+    </body>
+
+</html>

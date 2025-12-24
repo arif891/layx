@@ -18,6 +18,7 @@ class SmoothScroll {
     this.threshold = opts.threshold ?? document.documentElement.dataset.threshold ?? .1;   // px under which we snap
     this.easing = this._validateEasing(opts.easing ?? document.documentElement.dataset.easing ?? 'easeOutCubic');
     this.preventWithKeys = opts.preventWithKeys ?? true;
+    this.preventWithAttribute = opts.preventWithAttribute ?? true;
 
     this.target = window.scrollY;           // where we want to be
     this.current = window.scrollY;          // where we are
@@ -87,7 +88,9 @@ class SmoothScroll {
     if (this.preventWithKeys) {
       if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
     }
-    if (e.target.closest('[data-smooth-scroll="prevent"]')) { if (this.isRunning) this.emit('interrupt'); this._stop(); return }
+    if (this.preventWithAttribute && e.target.closest('[data-smooth-scroll="prevent"]')) {
+      if (this.isRunning) this.emit('interrupt'); this._stop(); return
+    }
     e.preventDefault();
     this.target = this._clamp(this.target + e.deltaY);
     this._start();

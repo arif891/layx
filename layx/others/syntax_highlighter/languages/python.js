@@ -17,7 +17,7 @@ export default [
 				sub: [
 					{
 						match: /(?!^{)[^]*(?=}$)/g,
-						sub: 'py'
+						sub: 'python'
 					}
 				]
 			}

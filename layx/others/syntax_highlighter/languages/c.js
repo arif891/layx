@@ -29,7 +29,7 @@ export default [
 			{
 				//type: 'str',
 				match: /[^{}]*(?=}$)/g,
-				sub: 'asm'
+				sub: 'assembly'
 			}
 		]
 	},

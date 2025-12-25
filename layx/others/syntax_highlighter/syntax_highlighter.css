@@ -36,6 +36,7 @@
 			padding: var(--padding);
 			max-width: 100%;
 			overflow-x: auto;
+			scrollbar-width: thin;
 		}
 	}
 

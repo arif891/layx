@@ -26,7 +26,7 @@ export default [
 			},
 			{
 				match: /(?!^\$|{)[^]+(?=}$)/g,
-				sub: 'js'
+				sub: 'javascript'
 			},
 		],
 	},

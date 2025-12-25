@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Layx Syntax Highlighter</title>
+        <link rel="stylesheet" href="../syntax_highlighter.css">
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+            rel="stylesheet">
+        <style>
+            :root {
+                /* Default (Light) Theme Variables */
+                --bg-color: #f8f9fa;
+                --surface-color: #ffffff;
+                --text-color: #1f2937;
+                --border-color: #e5e7eb;
+                --primary-color: #3b82f6;
+                --secondary-color: #6b7280;
+                --radius: 8px;
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+
+            [theme="dark"] {
+                /* Dark Theme Variables */
+                --bg-color: #111827;
+                --surface-color: #1f2937;
+                --text-color: #f9fafb;
+                --border-color: #374151;
+                --primary-color: #60a5fa;
+                --secondary-color: #9ca3af;
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            }
+
+            * {
+                box-sizing: border-box;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                margin: 0;
+                padding: 40px 20px;
+                line-height: 1.6;
+            }
+
+            .container {
+                max-width: 900px;
+                margin: 0 auto;
+            }
+
+            header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 60px;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+                font-weight: 800;
+                margin: 0;
+                background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .subtitle {
+                color: var(--secondary-color);
+                font-size: 1.1rem;
+                margin-top: 5px;
+            }
+
+            .theme-toggle {
+                background: var(--surface-color);
+                border: 1px solid var(--border-color);
+                color: var(--text-color);
+                padding: 8px 16px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-weight: 500;
+                box-shadow: var(--shadow);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .theme-toggle:hover {
+                border-color: var(--primary-color);
+            }
+
+            section {
+                margin-bottom: 50px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .badge {
+                font-size: 0.8rem;
+                background: var(--primary-color);
+                color: white;
+                padding: 2px 8px;
+                border-radius: 4px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            p {
+                color: var(--secondary-color);
+                margin-bottom: 20px;
+            }
+
+            /* Override highlighter font */
+            [data-code-lang] {
+                font-family: 'JetBrains Mono', monospace !important;
+                box-shadow: var(--shadow);
+                border: 1px solid var(--border-color);
+            }
+
+            button.copy {
+                background: transparent;
+                border: 1px solid var(--border-color);
+                color: var(--secondary-color);
+                cursor: pointer;
+                border-radius: 4px;
+                padding: 4px 8px;
+                transition: all 0.2s;
+            }
+
+            button.copy:hover {
+                background: var(--bg-color);
+                color: var(--primary-color);
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="container">
+            <header>
+                <div>
+                    <h1>Layx Highlighter</h1>
+                    <div class="subtitle">Lightweight, client-side syntax highlighting.</div>
+                </div>
+                <button class="theme-toggle" id="themeBtn">
+                    <span>🌙</span> Toggle Theme
+                </button>
+            </header>
+
+            <section>
+                <h2>JavaScript <span class="badge">ES6+</span></h2>
+                <p>Highlights classes, template literals, functions, and more.</p>
+<pre data-code-lang="javascript">
+/*
+* Async function example
+*/
+async function fetchData(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.map(item => ({
+      id: item.id,
+      name: item.name.toUpperCase()
+    }));
+  } catch (e) {
+    console.error("Fetching failed:", e);
+    return null; // Return null on failure
+  }
+}
+</pre>
+            </section>
+
+            <section>
+                <h2>CSS <span class="badge">Modern</span></h2>
+                <p>Support for nested rules, variables, and media queries.</p>
+<pre data-code-lang="css">
+:root {
+  --primary: #5f27cd;
+}
+
+body {
+  background-color: #f1f2f6;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+.card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+
+  & > h3 {
+    color: var(--primary);
+    margin-bottom: 0.5em;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+</pre>
+            </section>
+
+            <section>
+                <h2>HTML <span class="badge">Semantic</span></h2>
+                <p>Clean highlighting for tags, strings, and attributes.</p>
+                <pre data-code-lang="html">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Dashboard&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="app"&gt;
+        &lt;!-- Main Header --&gt;
+        &lt;header class="top-bar"&gt;
+            &lt;h1&gt;User Dashboard&lt;/h1&gt;
+            &lt;nav&gt;
+                &lt;a href="/profile" class="active"&gt;Profile&lt;/a&gt;
+                &lt;a href="/settings"&gt;Settings&lt;/a&gt;
+            &lt;/nav&gt;
+        &lt;/header&gt;
+        
+        &lt;main&gt;
+            &lt;p&gt;Welcome back, User!&lt;/p&gt;
+        &lt;/main&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+            </section>
+
+            <section>
+                <h2>Python <span class="badge">Clean</span></h2>
+                <p>Excellent readability for Python scripts.</p>
+<pre data-code-lang="python">
+import random
+
+class NumberGuesser:
+def __init__(self, limit=100):
+self.target = random.randint(1, limit)
+
+self.attempts = 0
+def guess(self, number):
+self.attempts += 1
+if number == self.target:
+return f"Correct! Found in {self.attempts} tries."
+elif number < self.target: return "Too low!" else: return "Too high!" game=NumberGuesser()
+print(game.guess(50))
+</pre>
+            </section>
+
+            <section>
+                <h2>JSON <span class="badge">Data</span></h2>
+                <p>Clear distinction between keys and values.</p>
+<pre data-code-lang="json">
+ {
+    "server": {
+    "host": "localhost",
+    "port": 8080,
+    "active": true
+    },
+
+    "endpoints": [
+    "/api/v1/users",
+    "/api/v1/posts"
+    ],
+    
+    "timeout": 5000,
+    "metadata": null
+}
+</pre>
+            </section>
+
+        </div>
+
+        <script type="module">
+            import SyntaxHighlighter from '../syntax_highlighter.js';
+
+            // Theme Toggling Logic
+            const btn = document.getElementById('themeBtn');
+            const root = document.documentElement;
+
+            // Check system preference
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                root.setAttribute('theme', 'dark');
+            }
+
+            btn.addEventListener('click', () => {
+                const current = root.getAttribute('theme');
+                const newTheme = current === 'dark' ? 'light' : 'dark';
+                root.setAttribute('theme', newTheme);
+                btn.querySelector('span').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            });
+
+            console.log('SyntaxHighlighter initialized.');
+        </script>
+    </body>
+
+</html>

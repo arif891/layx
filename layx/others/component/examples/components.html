@@ -83,3 +83,23 @@
         Total Users: ${list.length}
     </div>
 </div>
+
+<!-- 6. Prop Inheritance Example -->
+<!-- Parent component receives 'sectionTitle', 'themeColor' -->
+<div data-component="parent-info" dynamic prop="sectionTitle, themeColor"
+    style="border: 2px dashed #999; padding: 20px; margin: 10px 0;">
+    <h3 style="color: ${themeColor}">${sectionTitle} (Parent)</h3>
+    <p>The parent has received the theme color: <strong>${themeColor}</strong></p>
+    
+    <!-- Child component uses 'themeColor' from parent context WITHOUT explicit prop passing -->
+    <component name="child-info"></component>
+</div>
+
+<!-- Child component that expects 'themeColor' to be in the context -->
+<div data-component="child-info" dynamic
+    style="background: #fdfdfd; border: 1px solid #eee; padding: 10px; margin-top: 10px;">
+    <strong>Child Component:</strong>
+    <span style="color: ${themeColor}; font-weight: bold;">
+        I inherited the color ${themeColor} from my parent!
+    </span>
+</div>

@@ -42,7 +42,7 @@ export default [
 			},
 			{
 				match: RegExp(`${xmlElement.match}|[^]*(?=</script\\s*>$)`, 'g'),
-				sub: 'javascript'
+				sub: 'js'
 			},
 			xmlElement
 		]

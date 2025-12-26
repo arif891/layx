@@ -17,7 +17,7 @@ export default [
 				sub: [
 					{
 						match: /(?!^{)[^]*(?=}$)/g,
-						sub: 'python'
+						sub: 'py'
 					}
 				]
 			}
@@ -39,7 +39,7 @@ export default [
 	},
 	{
 		type: 'func',
-		match: /[a-z_]+(?=\s*\()/g
+		match: /[a-z_]\w*(?=\s*\()/gi
 	},
 	{
 		type: 'oper',

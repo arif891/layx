@@ -1,4 +1,4 @@
-import { detectLanguage } from '../helper/language_detector.js';
+import { detectLanguage } from '../detect.js'
 
 export default [
 	{
@@ -31,18 +31,20 @@ export default [
 	},
 	{
 		type: 'kwd',
-		match: /_[^_]*_|\*[^*]*\*/g
+		match: /\b_\S([^\n]*?\S)?_\b|\*\S([^\n]*?\S)?\*/g
 	},
 	{
 		type: 'kwd',
 		match: /^\s*(\*|\d+\.)\s/gm
 	},
 	{
-		type: 'oper',
-		match: /\[[^\]]*]/g
-	},
-	{
 		type: 'func',
-		match: /\([^)]*\)/g
+		match: /\[[^\]]*]\([^)]*\)|<[^>]*>/g,
+		sub: [
+			{
+				type: 'oper',
+				match: /^\[[^\]]*]/g
+			}
+		]
 	}
 ]

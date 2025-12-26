@@ -1,5 +1,5 @@
-import markdown from './markdown.js'
-import { detectLanguage } from '../helper/language_detector.js';
+import md from './md.js'
+import { detectLanguage } from '../detect.js'
 
 export default [
 	{
@@ -30,5 +30,5 @@ export default [
 			}
 		]
 	},
-	...markdown
+	...md
 ]

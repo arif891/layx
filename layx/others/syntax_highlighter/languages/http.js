@@ -1,4 +1,4 @@
-import { detectLanguage } from '../helper/language_detector.js';
+import { detectLanguage } from '../detect.js'
 
 export default [
 	{

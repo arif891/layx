@@ -192,17 +192,17 @@ async function fetchData(url) {
 @import "my-styles.css";
 
 :root {
-  --primary: #5f27cd;
+  --primary: #AAAAAA;
 }
 
-body {
+[attr=value] {
   background-color: #f1f2f6;
   display: grid;
   place-items: center;
   min-height: 100vh;
 }
 
-.card {
+:is(.card) {
   background: white;
   padding: 2rem;
   border-radius: 12px;
@@ -210,8 +210,8 @@ body {
   background: url(test.jpg);
 
   & > h3 {
-    color: var(--primary);
-    margin-bottom: 0.5em;
+    color: var(--primary-1);
+    margin-bottom: 0.5em 0deg;
   }
 
   &:hover {
@@ -219,8 +219,14 @@ body {
   }
 }
 
-@media print {
-	body { font-size: 10pt }
+@media screen and (width < 480px) and (max-width: 768px) {
+  body {
+    background-color: lightgreen;
+  }
+}
+
+@font-face {
+
 }
 </pre>
             </section>

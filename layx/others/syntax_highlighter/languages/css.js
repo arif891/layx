@@ -23,16 +23,16 @@ export default [
 		match: /&/g
 	},
 	{
-		type: 'kwd',
-		match: /(?<=^|[{};,\s&])(?:[a-z][\w-]*|#[\w-]+|\.[\w-]+|::?[\w-]+)(?=\s*(?:[{,>+~[\s]|$))/gm
-	},
-	{
 		type: 'num',
 		match: /#[\da-f]{3,8}\b/g
 	},
 	{
 		type: 'num',
 		match: /-?(?:\d+\.?\d*|\.\d+)(cm|mm|in|px|pt|pc|em|ex|ch|rem|vw|vh|vmin|vmax|%)?/g
+	},
+	{
+		type: 'kwd',
+		match: /(?<=^|[{};,\s&])(?:[a-z][\w-]*|#[\w-]+|\.[\w-]+|::?[\w-]+)(?=\s*(?:[{,>+~[\s]|$))/gm
 	},
 	{
 		match: /url\([^)]*\)/g,

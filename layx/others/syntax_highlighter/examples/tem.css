@@ -1,0 +1,33 @@
+@import "my-styles.css";
+
+:root {
+  --primary: #5f27cd;
+}
+
+body {
+  background-color: #f1f2f6;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+.card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: .0 10px 20px rgba(0,0,0,0.1);
+  background: url(test.jpg);
+
+  & > h3 {
+    color: var(--primary);
+    margin-bottom: 0.5em;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+@media print {
+	body { font-size: 10pt }
+}

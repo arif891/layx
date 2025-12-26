@@ -189,6 +189,8 @@ async function fetchData(url) {
                 <h2>CSS <span class="badge">Modern</span></h2>
                 <p>Support for nested rules, variables, and media queries.</p>
 <pre data-code-lang="css">
+@import "my-styles.css";
+
 :root {
   --primary: #5f27cd;
 }
@@ -205,6 +207,7 @@ body {
   padding: 2rem;
   border-radius: 12px;
   box-shadow: .0 10px 20px rgba(0,0,0,0.1);
+  background: url(test.jpg);
 
   & > h3 {
     color: var(--primary);
@@ -214,6 +217,10 @@ body {
   &:hover {
     transform: translateY(-5px);
   }
+}
+
+@media print {
+	body { font-size: 10pt }
 }
 </pre>
             </section>

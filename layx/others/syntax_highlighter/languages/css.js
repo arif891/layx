@@ -8,29 +8,31 @@ export default [
 	},
 	{
 		type: 'kwd',
-		match: /@\w+\b|\b(and|not|only|or)\b|\b[a-z-]+(?=[^{}]*{)/g
+		match: /@\w+\b|\b(and|not|only|or)\b/g
 	},
 	{
 		type: 'var',
-		match: /\b[\w-]+(?=\s*:)|(::?|\.)[\w-]+(?=[^{}]*{)/g
+		match: /--[\w-]+/g
 	},
 	{
-		type: 'func',
-		match: /#[\w-]+(?=[^{}]*{)/g
+		type: 'var',
+		match: /[\w-]+(?=\s*:(?!:))/g
+	},
+	{
+		type: 'var',
+		match: /&/g
+	},
+	{
+		type: 'kwd',
+		match: /(?<=^|[{};,\s&])(?:[a-z][\w-]*|#[\w-]+|\.[\w-]+|::?[\w-]+)(?=\s*(?:[{,>+~[\s]|$))/gm
 	},
 	{
 		type: 'num',
-		match:  /#[\da-f]{3,8}/g
+		match: /#[\da-f]{3,8}\b/g
 	},
 	{
 		type: 'num',
-		match: /\d+(\.\d+)?(cm|mm|in|px|pt|pc|em|ex|ch|rem|vm|vh|vmin|vmax|%)?/g,
-		sub: [
-			{
-				type: 'var',
-				match: /[a-z]+|%/g
-			}
-		]
+		match: /-?(?:\d+\.?\d*|\.\d+)(cm|mm|in|px|pt|pc|em|ex|ch|rem|vw|vh|vmin|vmax|%)?/g
 	},
 	{
 		match: /url\([^)]*\)/g,
@@ -47,10 +49,10 @@ export default [
 	},
 	{
 		type: 'func',
-		match: /\b[a-zA-Z]\w*(?=\s*\()/g
+		match: /\b[a-zA-Z][\w-]*(?=\s*\()/g
 	},
 	{
-		type: 'num',
-		match: /\b[a-z-]+\b/g
+		type: 'bool',
+		match: /\b(auto|inherit|initial|unset|revert|none|normal|true|false|all|both|left|right|top|bottom|center|middle|start|end|flex-start|flex-end|space-between|space-around|space-evenly|baseline|stretch|block|inline|inline-block|flex|inline-flex|grid|inline-grid|table|inline-table|absolute|relative|fixed|sticky|static|visible|hidden|collapse|scroll|clip|ellipsis|wrap|nowrap|break-word|pre|pre-wrap|pre-line|bold|bolder|lighter|italic|oblique|underline|overline|line-through|uppercase|lowercase|capitalize|solid|dashed|dotted|double|groove|ridge|inset|outset|transparent|currentColor|white|black|red|green|blue|yellow|orange|purple|pink|gray|grey|brown|cyan|magenta|silver|gold)\b/g
 	}
 ]

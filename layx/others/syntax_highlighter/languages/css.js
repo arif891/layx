@@ -47,7 +47,7 @@ export default [
 	},
 	{
 		type: 'bool',
-		match: /\b(auto|inherit|initial|unset|revert|revert-layer|none|normal|all|both|transparent|currentColor|true|false|block|inline|flex|grid|subgrid|contents|table|list-item|run-in|ruby|flexbox|absolute|relative|fixed|sticky|static|left|right|top|bottom|center|middle|start|end|space-between|space-around|space-evenly|baseline|stretch|bold|bolder|lighter|italic|oblique|underline|overline|line-through|uppercase|lowercase|capitalize|pre|nowrap|wrap|break-word|clip|ellipsis|solid|dashed|dotted|double|groove|ridge|inset|outset|hidden|and|not|only|or|from|to)(?:-[\w-]+)?\b/g
+		match: /\b(in|from|to|at|vs|nearest|up|down|always|stable|both|none|auto|inherit|initial|unset|revert|normal|all|transparent|currentColor|true|false|block|inline|flex|grid|subgrid|contents|table|flexbox|absolute|relative|fixed|sticky|static|left|right|top|bottom|center|middle|start|end|baseline|stretch|bold|bolder|lighter|italic|oblique|underline|overline|pre|nowrap|wrap|clip|ellipsis|solid|dashed|dotted|double|groove|ridge|inset|outset|hidden|and|not|only|or)(?:-[\w-]+)?\b/g
 	},
 	{
 		type: 'type',

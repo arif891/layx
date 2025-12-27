@@ -243,12 +243,12 @@ async function fetchData(url) {
 }
 
 /* Nesting & Scoping */
-.container * {
+.container div {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
   gap: var(--grid-gap);
   
-  & > .item {
+  & > p.test h3 {
     background: light-dark(white, #1a1a1a);
     padding: var(--spacing-sm);
     border: 1px solid color-mix(in srgb, currentColor 20%, transparent);

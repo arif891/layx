@@ -49,6 +49,10 @@ export default [
 		type: 'bool',
 		match: /\b(in|from|to|at|vs|nearest|up|down|always|stable|both|none|auto|inherit|initial|unset|revert|normal|all|transparent|currentColor|true|false|block|inline|flex|grid|subgrid|contents|table|flexbox|absolute|relative|fixed|sticky|static|left|right|top|bottom|center|middle|start|end|baseline|stretch|bold|bolder|lighter|italic|oblique|underline|overline|pre|nowrap|wrap|clip|ellipsis|solid|dashed|dotted|double|groove|ridge|inset|outset|hidden|and|not|only|or)(?:-[\w-]+)?\b/g
 	},
+    {
+        type: 'section', 
+        match: /::?[\w-]+\b/g
+    },
 	{
 		type: 'type',
 		match: /(?:\.|#|::?)[\w-]+|(?<!@[\w-]+\s+)(?<![-\w:])\b[a-z][\w\d-]*(?=[^{};]*\{)|(?<=\b:[a-z-]+\()[a-z][\w\d-]*(?=[^)]*\))/gmi

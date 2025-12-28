@@ -163,25 +163,77 @@
                 <h2>JavaScript <span class="badge">ES6+</span></h2>
                 <p>Highlights classes, template literals, functions, and more.</p>
 <pre data-code-lang="js">
-/*
-* Async function example
-*/
-async function fetchData(url) {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+/**
+ * Syntax Highlighter Stress Test
+ * Testing: Regex, Template Literals, Classes, and Async logic.
+ */
+
+import DefaultExport, { NamedExport as Alias } from 'node:events';
+
+const SYMBOL_KEY = Symbol('__highlighter_test__');
+
+class TestBench extends Alias {
+  #privateField = 42;
+  static staticField = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/g;
+
+  constructor(options = {}) {
+    super();
+    this.config = { 
+      timeout: options?.timeout ?? 1000,
+      enabled: true 
+    };
+  }
+
+  async *generateData(items) {
+    for (const item of items) {
+      // Testing template literal nesting and escapes
+      yield `Processing: ${item} (Index: ${items.indexOf(item)}) \`Inner Backtick\``;
+      
+      try {
+        await new Promise(r => setTimeout(r, this.#privateField));
+      } catch (err) {
+        console.error(err?.message || 'Unknown error');
+      }
     }
-    const data = await response.json();
-    return data.map(item => ({
-      id: item.id,
-      name: item.name.toUpperCase()
-    }));
-  } catch (e) {
-    console.error("Fetching failed:", e);
-    return null; // Return null on failure
+  }
+
+  calculate(val) {
+    // Testing operators and multi-line logic
+    return val << 2 >>> 1 !== 10 ? (val ** 2) : Math.sqrt(val);
   }
 }
+
+// Testing Regex vs Division ambiguity
+const regexTest = / \/ /g.test(" / "); 
+const divisionTest = 10 / 2 / 5;
+
+const complexObject = {
+  get [SYMBOL_KEY]() {
+    return "Dynamic Key Content";
+  },
+  "quoted-property": true,
+  nullValue: null,
+  undefinedValue: undefined,
+  bigInt: 9007199254740991n
+};
+
+/*
+  Block comment with 
+  // Nested single line comment
+  var shouldNotBeHighlightedAsKeyword = true;
+*/
+
+(async function main() {
+  const bench = new TestBench({ timeout: 500 });
+  const data = ["Alpha", "Beta", "Gamma"];
+
+  for await (const status of bench.generateData(data)) {
+    console.log(`%c ${status}`, "color: #00ff00; font-weight: bold;");
+  }
+  
+  const result = bench.calculate(divisionTest?.toString().length ?? 0);
+  console.log(`Final result: ${result}`);
+})();
 </pre>
             </section>
 

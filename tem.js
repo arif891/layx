@@ -1,72 +1,52 @@
-
 /**
- * Syntax Highlighter Stress Test
- * Testing: Regex, Template Literals, Classes, and Async logic.
+ * THE ULTIMATE REGEX CRUSHER
+ * Tests: Nested backticks, Regex-in-ternary, 
+ * Labelled loops, and ASI (Automatic Semicolon Insertion) traps.
  */
 
-import DefaultExport, { NamedExport as Alias } from 'node:events';
+const ϟ = Symbol('complex');
 
-const SYMBOL_KEY = Symbol('__highlighter_test__');
+export class ShadowRealm extends (class { constructor(x) { this.x = x } }) {
+    static #privateField = /[^/]*/.test('/') ? "div" : 5 / 2 / 1;
+    
+    // Test 1: The Regex/Division ambiguity in a property initializer
+    isRegex = [ /[/]/, 5 / 2, /\// ].map(v => v instanceof RegExp);
 
-class TestBench extends Alias {
-  #privateField = 42;
-  static staticField = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/g;
+    async *[ϟ](...{ 0: head, length, [length - 1]: tail }) {
+        // Test 2: Destructuring with template literals as keys
+        const { [`prop-${head}`]: value = `Result: ${
+            // Test 3: Deeply nested template logic with internal comments
+            (function*(n) {
+                while(n--) yield `Value: ${n / /regex/.test(n)}`; // Division or Regex?
+            })(5).next().value
+        }`} = { 'prop-undefined': 'Found' };
 
-  constructor(options = {}) {
-    super();
-    this.config = { 
-      timeout: options?.timeout ?? 1000,
-      enabled: true 
-    };
-  }
+        // Test 4: Labelled block with ASI traps
+        highlighter_test: {
+            if (!value) break highlighter_test;
+            console.log(tail?.(head) ?? "Default");
+        }
 
-  async *generateData(items) {
-    for (const item of items) {
-      // Testing template literal nesting and escapes
-      yield `Processing: ${item} (Index: ${items.indexOf(item)}) \`Inner Backtick\``;
-      
-      try {
-        await new Promise(r => setTimeout(r, this.#privateField));
-      } catch (err) {
-        console.error(err?.message || 'Unknown error');
-      }
+        // Test 5: The "BigInt vs. Name" and "Private Method" check
+        yield 123n;
+        return await this.#process.call(null, {
+            data: [0xABCDEF, 0b1010, .5e-10],
+            pattern: / (?:(?<=\s)|(?<=^))\/context\//gi
+        });
     }
-  }
 
-  calculate(val) {
-    // Testing operators and multi-line logic
-    return val << 2 >>> 1 !== 10 ? (val ** 2) : Math.sqrt(val);
-  }
+    async #process({ data, pattern }) {
+        // Test 6: Arrow function with complex lookahead requirements
+        const handler = async (item, { fallback = () => {} } = {}) => 
+            item?.match?.(pattern) 
+                ? item.replace(pattern, (match) => `${match}`) 
+                : fallback(item);
+
+        return data.reduce(async (acc, cur) => (await acc) + (await handler(cur)), "");
+    }
 }
 
-// Testing Regex vs Division ambiguity
-const regexTest = / \/ /g.test(" / "); 
-const divisionTest = 10 / 2 / 5;
+// Test 7: The "Everything at Once" expression
+const result = (([a, b] = [1, 2]) => a / b / ( /123/.test("123") ? 4 : 5 ))();
 
-const complexObject = {
-  get [SYMBOL_KEY]() {
-    return "Dynamic Key Content";
-  },
-  "quoted-property": true,
-  nullValue: NaN,
-  undefinedValue: undefined,
-  bigInt: 9007199254740991n
-};
-
-/*
-  Block comment with 
-  // Nested single line comment
-  var shouldNotBeHighlightedAsKeyword = true;
-*/
-
-(async function main() {
-  const bench = new TestBench({ timeout: 500 });
-  const data = ["Alpha", "Beta", "Gamma"];
-
-  for await (const status of bench.generateData(data)) {
-    console.log(`%c ${status}`, "color: #00ff00; font-weight: bold;");
-  }
-  
-  const result = bench.calculate(divisionTest?.toString().length ?? 0);
-  console.log(`Final result: ${result}`);
-})();
+console.log(`Final Test: ${`Inner ${`Deepest ${/`/.source}`}`}`);

@@ -10,7 +10,7 @@ export default [
 		expand: 'num'
 	},
 	{
-		type: 'num',
+		type: 'func',
 		match: /\bnull\b/g
 	},
 	{

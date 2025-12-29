@@ -164,56 +164,70 @@
                 <p>Highlights classes, template literals, functions, and more.</p>
 <pre data-code-lang="js">
 /**
- * SYNTACTIC CHAOS GAUNTLET V6: THE TYPE SYSTEM STRIKES BACK
- * Focus: Keyword Priority, Complex JSDoc, and Edge-Case Functions
+ * SYNTACTIC CHAOS GAUNTLET V7: THE FINAL FRONTIER
+ * Focus: Operator overload, Regex vs Division, and Deep Recursion
  */
 
-// 1. Keyword vs Function Call Priority
-// "await" and "if" are keywords. They must NOT be .func even if followed by "("
-async function controlFlow(stream) {
-  // 'await' here should be .kwd (Purple/Pink), NOT .func (Purple/Blue)
-  for await (const chunk of stream) { 
-    if (chunk) process(chunk); // 'if' should be .kwd
+// 1. Divider vs Regex: The classic JS ambiguous grammar
+const g = 10;
+const r = g / 2 / g;       // Division (10 / 2 / 10 = 0.5)
+const s = g / 2 / g /i;    // Division followed by ... wait, is it regex? No.
+const t = g / 2 / /regex/; // Division by regex literal
+
+// 2. The "Keyword As Value" & "Computed Property" Nightmare
+const api = {
+  [Symbol.toStringTag]: "API",
+  delete: delete void 0,       // .var: .kwd .kwd .num
+  if: true ? "yes" : "no",     // .var: .bool .oper .str
+  static: class Static {},     // .var: .kwd .class
+  async *[Symbol.asyncIterator]() { yield this.if; }
+};
+
+// 3. Mathematical Separators & BigInt
+const weirdNums = [
+  1_000_000,       // Standard separator
+  1_2_3,           // Valid? No, but highlighter shouldn't crash
+  0.000_001,       // Decimal separator
+  1e1_00,          // Exponent separator
+  0xDE_AD_BE_EFn   // BigInt Hex separator
+];
+
+// 4. Class Field & Static Block Complexity
+class Matrix {
+  static #cache = new Map();
+  operator = "+";
+  
+  // Highlighting check: 'operator' is property, 'if' is keyword
+  calc(x) {
+    if (this.operator === "+") return x + x;
+    return this.#cache.get(x) ?? null;
+  }
+
+  static {
+    // Label collision with keyword?
+    init: for (let i = 0; i < 5; i++) {
+      if (i > 2) break init;
+    }
   }
 }
 
-// 2. The collision: Keywords that ARE functions
-const utils = {
-  if: (c) => c,
-  catch: (e) => e
-};
-// These should be .func because they adhere to the "dot rule"
-utils.if(true);    
-utils.catch(err); 
+// 5. Deeply Nested Callbacks with Arrow Functions
+const pipeline = (val) => 
+  val
+    ?.split("")
+    .map((c, i) => ({ id: i, char: c }))
+    .filter(({ id }) => id % 2 === 0)
+    .reduce((acc, { char }) => acc + char, "");
 
-// 3. JSDoc Type Torture
-/**
- * @typedef {{ id: number, tags: string[] }} RecordType
- * @param {Map<string, (string|number)[]>} complexMap - inner types colored
- * @param {function(string, ?number): void} callback - arrow syntax in types
- * @returns {Promise<import("module").Type>}       - dynamic imports
- */
-function typeCheck(complexMap, callback) {}
+// 6. Template Literal with "Impossible" Nesting and Escapes
+const html = `
+  <div class="${ `nested-${ (i => `level-${i}`)(2) }` }">
+    <!-- Comment inside string -->
+    ${ /* JS Comment */ "Content" }
+  </div>
+`;
 
-// 4. Object Literal Key vs Value
-const config = {
-  timeout: 5000,       // timeout -> .var (Red), : -> .oper (Blue)
-  "quoted-key": true,  // quoted -> .str (Green)
-  [Symbol.asyncIterator]: null, 
-  method() { return this.timeout; }
-};
-
-// 5. Arrow Function Variations
-const f1 = async a => a;      // async -> .kwd
-const f2 = async (a) => a;    // (a) -> plain/var
-const f3 = (a = 1) => a + 1;  // = -> .oper, 1 -> .num
-
-// 6. Regex Edge Case: Unbalanced or Complex Escapes
-const r1 = /\/\//g;     // Matches //
-const r2 = /\\/g;       // Matches \
-const r3 = /[\n\r\t]/;  // Control chars
-
-console.log("Gauntlet V6: Ready.");
+console.log("Gauntlet V7: Status Report.", api.delete);
 </pre>
             </section>
 

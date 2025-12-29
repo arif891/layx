@@ -54,6 +54,14 @@ export default [
 		match: /(?<![(,]\s*)\s*[#a-zA-Z$_][\w$_]*(?=\s*=\s*(\(?[\w,{}\[\]()=. ]+\)? =>|function\b))/g
 	},
 	{
+		type: 'kwd',
+		match: /\bstatic\b(?=\s*\{)/g
+	},
+	{
+		type: 'var',
+		match: /\b[a-zA-Z$_][\w$_]*(?=\s*=\s*)/g
+	},
+	{
 		type: 'var',
 		match: /(?<!(?<!\.)\.)(?<!\?\.)(?<=\.|(?:\?\.\s*))[#a-zA-Z$_][\w$_]*/g
 	},
@@ -67,6 +75,10 @@ export default [
 	},
 	{
 		type: 'var',
+		match: /\b(?:delete|if|static|true|false)\b(?=\s*:(?!\s*[:=]))/g
+	},
+	{
+		type: 'var',
 		match: /\b[a-zA-Z$_][\w$_]*(?=\s*:(?!\s*[:=]))/g
 	},
 	{
@@ -74,7 +86,7 @@ export default [
 		match: /:/g
 	},
 	{
-		match: /\/(?!\s)(?:\\.|\[(?:\\.|\[(?:\\.|[^\]])*\]|[^\]])*\]|(?!\/)[^\r\n\\])+\/[dgimsuyv]*/g,
+		match: /(?<=(?:^|[=(,:[!&|?{};<>\+*\-\/%^~]|\b(?:case|else|do|return|throw|typeof|void|yield|await|new|in|instanceof))\s*)\/(?!\s)(?:\\.|\[(?:\\.|\[(?:\\.|[^\]])*\]|[^\]])*\]|(?!\/)[^\r\n\\])+\/[dgimsuyv]*/g,
 		sub: 'regex'
 	},
 	{

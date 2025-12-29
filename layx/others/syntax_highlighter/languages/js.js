@@ -27,11 +27,11 @@ export default [
 	},
 	{
 		type: 'num',
-		match: /\b(NaN|null|undefined|[A-Z][A-Z_]*)\b/g
+		match: /\b([A-Z][A-Z_]*)\b/g
 	},
 	{
 		type: 'bool',
-		match: /\b(true|false)\b/g
+		match: /\b(true|false|NaN|null|undefined|Infinity)\b/g
 	},
 	{
 		type: 'oper',

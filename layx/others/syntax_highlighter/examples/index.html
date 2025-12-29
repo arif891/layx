@@ -164,79 +164,70 @@
                 <p>Highlights classes, template literals, functions, and more.</p>
 <pre data-code-lang="js">
 /**
- * SYNTACTIC CHAOS GAUNTLET V3: THE TRANSPILER'S NIGHTMARE
- * Focus: Decorators, Dense Destructuring, and Ambiguous Blocks
+ * SYNTACTIC CHAOS GAUNTLET V4: THE COLOR SPECTRUM
+ * Focus: Token Mapping, Diff Logic, and Meta-Programming
  */
 
-@sealed
-@version("3.0.0")
-class AdvancedProcessor extends null {
-  static #version = 0x1_000_000n;
+@observed
+@inject("Store")
+export default class MetaAnalyzer extends AbstractService {
+  static #ID = 0xDEAD_BEEF; // .num
   
-  // 1. Destructuring with Symbols, Computed Keys, and Nested Defaults
-  async process({ 
-    [Symbol.iterator]: iter, 
-    data: { 
-      'raw-stream': stream = [], 
-      metadata: [firstMeta = { type: 'json' }, ...others] = [] 
-    } = {} 
-  } = {}) {
-    
-    // 2. Chained Nullish Coalescing & Assignment
-    const timeout = this.config?.timeout ?? 5000;
-    this.cache ??= new Map();
-    
-    // 3. The "Block vs Object" Ambiguity
-    // Is this a labeled block or an object literal? (It's a labeled block)
-    audit: {
-      const entry = { audit: true, time: Date.now() };
-      if (entry.time % 2 === 0) break audit;
-      console.log("Odd timestamp.");
+  // 1. Diff-like Tokens (Using .insert and .deleted for logic markers)
+  // These aren't native JS but useful for testing custom token mapping
+  [Symbol.metadata] = {
+    fixed: true, // .bool
+    deprecated: false
+  };
+
+  /**
+   * @type {string} // .type inside .jsdoc
+   * @param {number} offset // .type
+   * @returns {Promise<Section>} // .class and .type
+   */
+  async analyze(data, { mode = "fast", flag } = {}) {
+    // 2. The "Section" Label & Error 구조
+    process_section: { // .section or .oper
+      if (!data) throw new Error("FAULT_DETECTED"); // .err
+      
+      const results = await data.map(item => {
+        // 3. Property (var) vs Function (func) vs Keyword (kwd)
+        const val = item.value ?? item.calc?.(); // .var vs .func
+        return val / 2 / /regex/.test(val); // .num, .oper, .regex
+      });
+
+      if (results.length === 0) break process_section;
     }
 
-    // 4. Dense Ternary and Optional Chaining Method Calls
-    return stream?.length > 0 
-      ? await this.#execute?.(stream[0b0]?.id ?? "anon")
-      : void (iter?.next());
-  }
+    // 4. Dot-Notation for Keywords (The strict adjacency test)
+    const obj = { delete: true };
+    obj.delete();    // Should be .func
+    obj . delete;    // Should be .kwd (because of space)
+    obj?.delete;     // Should be .var (optional chaining)
 
-  // 5. Private Method with Keyword Name & Default params
-  #delete(id = "default", ...[a, b, c]) {
-    return delete this.entries[id] && (a || b || c);
-  }
-
-  // 6. Async Generator with Yield* and Complex Logic
-  async *[Symbol.asyncIterator]() {
-    let current = 0;
-    while (current < 10) {
-      // Numerical separator inside binary inside shift
-      yield { step: current++, val: 0b1010_1010n << 2n };
-      if (current === 5) yield* [1, 2, 3].map(n => n / /regex/.exec("regex")?.length);
-    }
+    // 5. Types & Logical Assignments
+    let status: ServiceStatus = "active"; // .type (TS-like)
+    status &&= "pending"; // .oper
+    
+    return {
+      id: MetaAnalyzer.#ID,
+      version: 1_000n, // .num
+      raw: `Stream: ${"DATA" + (0b101 >> 1)}` // .str, .oper
+    };
   }
 }
 
-// 7. Exotic Regex: Nesting Brackets and Backreferences
-const urlParser = /^(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?/;
-const backrefTest = /(['"])(?:(?!\1)[^\\]|\\.)*\1/; // Match balanced quotes
+// 6. Dense Regex with Class Balancing
+const scanner = /[\p{ASCII}&&\Q[+-*]\E[[a-z]--[aeiou]]]/v;
 
-// 8. Comma Operator & Void in One-Liners
-const shortcut = (a, b) => (a++, b++, void(a + b), a * b);
-
-// 9. Keyword as property name vs Keyword
-const metadata = {
-  get: true,
-  set: (v) => console.log(v),
-  class: "legacy",
-  static: true
+// 7. Symbols & Computed Logic
+const KEY = Symbol("secret");
+const vault = {
+  [KEY]: (a, b) => (a++, b++, a + b), // .func and .oper
+  get info() { return void 0; } // .kwd and .bool
 };
 
-// Test Dot Adjacency
-metadata.get = false;
-metadata . set("new value");
-console.log(metadata?.class, metadata?.["static"]);
-
-console.log("Gauntlet V3: Locked and Loaded.");
+console.log("Gauntlet V4: Fully Tokenized.");
 </pre>
             </section>
 

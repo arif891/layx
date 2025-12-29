@@ -164,92 +164,79 @@
                 <p>Highlights classes, template literals, functions, and more.</p>
 <pre data-code-lang="js">
 /**
- * SYNTACTIC CHAOS GAUNTLET V2: THE ES-NEXT FRONTIER
- * Focus: Private Internals, Logical Assignments, and Regex V-Flag
+ * SYNTACTIC CHAOS GAUNTLET V3: THE TRANSPILER'S NIGHTMARE
+ * Focus: Decorators, Dense Destructuring, and Ambiguous Blocks
  */
 
-// 1. Top-Level Await & Logical Assignments
-// Should highlight: ??=, &&=, ||= as operators
-let config = await Promise.resolve({ timeout: null });
-config.timeout ??= 3000;
-config.active &&= true;
-config.cache ||= "default";
-
-// 2. The "Private Method" Trap
-// Testing: #private identifiers and keyword-named methods
-class SecurityShield {
-  #internalKey = 0xDE_AD_BE_EFn;
-  static #instancecount = 0;
-
-  // Private getter and setter
-  get #key() { return this.#internalKey; }
+@sealed
+@version("3.0.0")
+class AdvancedProcessor extends null {
+  static #version = 0x1_000_000n;
   
-  // Keyword as a private method name
-  #delete() { 
-    return void (this.#internalId = null); 
+  // 1. Destructuring with Symbols, Computed Keys, and Nested Defaults
+  async process({ 
+    [Symbol.iterator]: iter, 
+    data: { 
+      'raw-stream': stream = [], 
+      metadata: [firstMeta = { type: 'json' }, ...others] = [] 
+    } = {} 
+  } = {}) {
+    
+    // 2. Chained Nullish Coalescing & Assignment
+    const timeout = this.config?.timeout ?? 5000;
+    this.cache ??= new Map();
+    
+    // 3. The "Block vs Object" Ambiguity
+    // Is this a labeled block or an object literal? (It's a labeled block)
+    audit: {
+      const entry = { audit: true, time: Date.now() };
+      if (entry.time % 2 === 0) break audit;
+      console.log("Odd timestamp.");
+    }
+
+    // 4. Dense Ternary and Optional Chaining Method Calls
+    return stream?.length > 0 
+      ? await this.#execute?.(stream[0b0]?.id ?? "anon")
+      : void (iter?.next());
   }
 
-  // Static private block with logic
-  static {
-    try {
-      this.#instancecount++;
-    } catch {
-      this.#instancecount = -1;
+  // 5. Private Method with Keyword Name & Default params
+  #delete(id = "default", ...[a, b, c]) {
+    return delete this.entries[id] && (a || b || c);
+  }
+
+  // 6. Async Generator with Yield* and Complex Logic
+  async *[Symbol.asyncIterator]() {
+    let current = 0;
+    while (current < 10) {
+      // Numerical separator inside binary inside shift
+      yield { step: current++, val: 0b1010_1010n << 2n };
+      if (current === 5) yield* [1, 2, 3].map(n => n / /regex/.exec("regex")?.length);
     }
   }
 }
 
-// 3. The "Inception" Regex (v-flag & Nested Classes)
-// The 'v' flag allows nested character classes [[...]]
-const advancedRegex = /[\p{White_Space}&&\Q[+-*]\E[[a-z]--[aeiou]]]/v;
+// 7. Exotic Regex: Nesting Brackets and Backreferences
+const urlParser = /^(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?/;
+const backrefTest = /(['"])(?:(?!\1)[^\\]|\\.)*\1/; // Match balanced quotes
 
-// 4. Async Generators with Yield and Spread
-// Testing: * adjacency and spread inside yield
-async function* dataStream(source) {
-  for await (const chunk of source) {
-    yield* [...chunk].map(x => x ** 2n);
-  }
-}
+// 8. Comma Operator & Void in One-Liners
+const shortcut = (a, b) => (a++, b++, void(a + b), a * b);
 
-// 5. Destructuring "The Wall"
-// Nested symbols, defaults, and aliases in one line
-const { 
-  [Symbol.for("app.id")]: id = "guest", 
-  details: { tags: [first = "none", ...others] = [] } = {} 
-} = await fetchUser();
-
-// 6. Template Literal "Comment War"
-// Putting comments and strings inside a template literal should recursive highlight
-const sql = tag`
-  SELECT * FROM ${ "users" /* table name */ }
-  WHERE id = ${ 
-    ((uid) => `RAW_${uid}`)("123") // lambda inside
-  } 
-  -- This is a SQL comment, but inside a JS string
-  AND status = 'active'
-`;
-
-// 7. Keyword-Identifier Duality
-// In JS, 'if' is a keyword, but 'obj.if' is a property.
-const controlFlow = {
-  if: (cond, fn) => cond && fn(),
-  while: (cond, fn) => { while(cond()) fn(); },
-  delete: true
+// 9. Keyword as property name vs Keyword
+const metadata = {
+  get: true,
+  set: (v) => console.log(v),
+  class: "legacy",
+  static: true
 };
 
-// Check: Are these highlighted as properties (words after dot) or keywords?
-controlFlow.if(true, () => controlFlow.delete);
-controlFlow?.while(() => false, () => {});
+// Test Dot Adjacency
+metadata.get = false;
+metadata . set("new value");
+console.log(metadata?.class, metadata?.["static"]);
 
-// 8. The "Broken" Division (Comment or Division?)
-const x = 1 / 
-  /* 
-     This is a multi-line comment 
-     separating values 
-  */ 
-  2; 
-
-console.log("Gauntlet V2: Success.", typeof 1n === 'bigint');
+console.log("Gauntlet V3: Locked and Loaded.");
 </pre>
             </section>
 

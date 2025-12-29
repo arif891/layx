@@ -34,6 +34,10 @@ export default [
 		sub: 'js_template_literals'
 	},
 	{
+		type: 'func',
+		match: /@[\w$_.]+/g
+	},
+	{
 		type: 'kwd',
 		match: /=>|(?<!(?<!\.)\.)(?<!\?\.)\b(this|set|get|as|async|await|break|case|catch|class|const|constructor|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|if|implements|import|in|instanceof|interface|let|var|of|new|package|private|protected|public|return|static|super|switch|throw|throws|try|typeof|void|while|with|yield)\b/g
 	},
@@ -50,16 +54,20 @@ export default [
 		match: /\b(true|false|NaN|null|undefined|Infinity)\b/g
 	},
 	{
-		type: 'oper',
-		match: /[/*+:?&|%^~=!,<>.^-]+/g
-	},
-	{
 		type: 'func',
 		match: /[#a-zA-Z$_][\w$_]*(?=\s*((\?\.)?\s*\(|=\s*(\(?[\w,{}\[\])]+\)? =>|function\b)))/g
 	},
 	{
 		type: 'var',
-		match: /(?<!\.\.)(?<=\.|(?:\?\.\s*))[#a-zA-Z$_][\w$_]*/g
+		match: /(?<!(?<!\.)\.)(?<!\?\.)(?<=\.|(?:\?\.\s*))[#a-zA-Z$_][\w$_]*/g
+	},
+	{
+		type: 'oper',
+		match: /\b\w+\s*:(?!\s*[:=])/g
+	},
+	{
+		type: 'oper',
+		match: /[/*+:?&|%^~=!,<>.^-]+/g
 	},
 	{
 		type: 'class',

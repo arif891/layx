@@ -1,9 +1,5 @@
 export default [
 	{
-		match: /^(?!\/).*/gm,
-		sub: 'todo'
-	},
-	{
 		type: 'num',
 		match: new class {
 			exec(str) {
@@ -19,6 +15,7 @@ export default [
 				return { index: start, 0: str.slice(start, i) };
 			}
 		}(),
+		sub: 'regex'
 	},
 	{
 		type: 'kwd',

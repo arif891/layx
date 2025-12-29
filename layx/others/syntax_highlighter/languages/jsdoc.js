@@ -7,7 +7,7 @@ export default [
 	},
 	{
 		type: 'type',
-		match: /{[\w\s|<>,.@\[\]]+}/g
+		match: /{(?:[^}{]|\{(?:[^}{]|\{[^}{]*\})*\})*}/g
 	},
 	{
 		type: 'var',

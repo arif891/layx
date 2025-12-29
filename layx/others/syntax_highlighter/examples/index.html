@@ -164,70 +164,56 @@
                 <p>Highlights classes, template literals, functions, and more.</p>
 <pre data-code-lang="js">
 /**
- * SYNTACTIC CHAOS GAUNTLET V4: THE COLOR SPECTRUM
- * Focus: Token Mapping, Diff Logic, and Meta-Programming
+ * SYNTACTIC CHAOS GAUNTLET V6: THE TYPE SYSTEM STRIKES BACK
+ * Focus: Keyword Priority, Complex JSDoc, and Edge-Case Functions
  */
 
-@observed
-@inject("Store")
-export default class MetaAnalyzer extends AbstractService {
-  static #ID = 0xDEAD_BEEF; // .num
-  
-  // 1. Diff-like Tokens (Using .insert and .deleted for logic markers)
-  // These aren't native JS but useful for testing custom token mapping
-  [Symbol.metadata] = {
-    fixed: true, // .bool
-    deprecated: false
-  };
-
-  /**
-   * @type {string} // .type inside .jsdoc
-   * @param {number} offset // .type
-   * @returns {Promise<Section>} // .class and .type
-   */
-  async analyze(data, { mode = "fast", flag } = {}) {
-    // 2. The "Section" Label & Error 구조
-    process_section: { // .section or .oper
-      if (!data) throw new Error("FAULT_DETECTED"); // .err
-      
-      const results = await data.map(item => {
-        // 3. Property (var) vs Function (func) vs Keyword (kwd)
-        const val = item.value ?? item.calc?.(); // .var vs .func
-        return val / 2 / /regex/.test(val); // .num, .oper, .regex
-      });
-
-      if (results.length === 0) break process_section;
-    }
-
-    // 4. Dot-Notation for Keywords (The strict adjacency test)
-    const obj = { delete: true };
-    obj.delete();    // Should be .func
-    obj . delete;    // Should be .kwd (because of space)
-    obj?.delete;     // Should be .var (optional chaining)
-
-    // 5. Types & Logical Assignments
-    let status: ServiceStatus = "active"; // .type (TS-like)
-    status &&= "pending"; // .oper
-    
-    return {
-      id: MetaAnalyzer.#ID,
-      version: 1_000n, // .num
-      raw: `Stream: ${"DATA" + (0b101 >> 1)}` // .str, .oper
-    };
+// 1. Keyword vs Function Call Priority
+// "await" and "if" are keywords. They must NOT be .func even if followed by "("
+async function controlFlow(stream) {
+  // 'await' here should be .kwd (Purple/Pink), NOT .func (Purple/Blue)
+  for await (const chunk of stream) { 
+    if (chunk) process(chunk); // 'if' should be .kwd
   }
 }
 
-// 6. Dense Regex with Class Balancing
-const scanner = /[\p{ASCII}&&\Q[+-*]\E[[a-z]--[aeiou]]]/v;
+// 2. The collision: Keywords that ARE functions
+const utils = {
+  if: (c) => c,
+  catch: (e) => e
+};
+// These should be .func because they adhere to the "dot rule"
+utils.if(true);    
+utils.catch(err); 
 
-// 7. Symbols & Computed Logic
-const KEY = Symbol("secret");
-const vault = {
-  [KEY]: (a, b) => (a++, b++, a + b), // .func and .oper
-  get info() { return void 0; } // .kwd and .bool
+// 3. JSDoc Type Torture
+/**
+ * @typedef {{ id: number, tags: string[] }} RecordType
+ * @param {Map<string, (string|number)[]>} complexMap - inner types colored
+ * @param {function(string, ?number): void} callback - arrow syntax in types
+ * @returns {Promise<import("module").Type>}       - dynamic imports
+ */
+function typeCheck(complexMap, callback) {}
+
+// 4. Object Literal Key vs Value
+const config = {
+  timeout: 5000,       // timeout -> .var (Red), : -> .oper (Blue)
+  "quoted-key": true,  // quoted -> .str (Green)
+  [Symbol.asyncIterator]: null, 
+  method() { return this.timeout; }
 };
 
-console.log("Gauntlet V4: Fully Tokenized.");
+// 5. Arrow Function Variations
+const f1 = async a => a;      // async -> .kwd
+const f2 = async (a) => a;    // (a) -> plain/var
+const f3 = (a = 1) => a + 1;  // = -> .oper, 1 -> .num
+
+// 6. Regex Edge Case: Unbalanced or Complex Escapes
+const r1 = /\/\//g;     // Matches //
+const r2 = /\\/g;       // Matches \
+const r3 = /[\n\r\t]/;  // Control chars
+
+console.log("Gauntlet V6: Ready.");
 </pre>
             </section>
 

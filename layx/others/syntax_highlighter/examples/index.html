@@ -164,77 +164,92 @@
                 <p>Highlights classes, template literals, functions, and more.</p>
 <pre data-code-lang="js">
 /**
- * Syntax Highlighter Stress Test
- * @author Gemini
+ * SYNTACTIC CHAOS GAUNTLET V2: THE ES-NEXT FRONTIER
+ * Focus: Private Internals, Logical Assignments, and Regex V-Flag
  */
 
-import { EventEmitter } from 'events';
+// 1. Top-Level Await & Logical Assignments
+// Should highlight: ??=, &&=, ||= as operators
+let config = await Promise.resolve({ timeout: null });
+config.timeout ??= 3000;
+config.active &&= true;
+config.cache ||= "default";
 
-const GLOBAL_SYMBOL = Symbol('test_highlighter');
-const REGEX_COMPLEX = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/gi;
+// 2. The "Private Method" Trap
+// Testing: #private identifiers and keyword-named methods
+class SecurityShield {
+  #internalKey = 0xDE_AD_BE_EFn;
+  static #instancecount = 0;
 
-// Testing Template Literals & Interpolation
-const greeting = (name) => `Hello, ${name}! 
-  This is a multiline string test.
-  Math: ${10 + 20 / 5}`;
-
-/**
- * Main Class to test OOP syntax
- */
-export default class HighlighterTester extends EventEmitter {
-  #privateField = 42;
-  static VERSION = '1.0.0';
-
-  constructor(options = {}) {
-    super();
-    this.options = { ...options, enabled: true };
-    this.data = [null, undefined, true, false, Infinity, NaN];
+  // Private getter and setter
+  get #key() { return this.#internalKey; }
+  
+  // Keyword as a private method name
+  #delete() { 
+    return void (this.#internalId = null); 
   }
 
-  // Testing Async/Await and Try-Catch
-  async processData(input) {
+  // Static private block with logic
+  static {
     try {
-      const response = await fetch(`https://api.example.com/v1/${input}`);
-      const result = await response.json();
-      
-      this.emit('success', {
-        id: result?.id ?? 'default_id', // Optional chaining & Nullish coalescing
-        timestamp: Date.now()
-      });
-    } catch (error) {
-      console.error(`Error: ${error.message}`);
-      throw new Error("Processing failed.");
+      this.#instancecount++;
+    } catch {
+      this.#instancecount = -1;
     }
   }
+}
 
-  // Testing Bitwise and Logic operators
-  runCheck(val) {
-    const bitwise = (val << 2) | (0xFF & 0b1010);
-    const ternary = val > 0 ? "positive" : "negative";
-    
-    // Testing object shorthand and dynamic keys
-    return {
-      bitwise,
-      ternary,
-      [GLOBAL_SYMBOL]: typeof val,
-      ["key_" + 1]: "dynamic"
-    };
+// 3. The "Inception" Regex (v-flag & Nested Classes)
+// The 'v' flag allows nested character classes [[...]]
+const advancedRegex = /[\p{White_Space}&&\Q[+-*]\E[[a-z]--[aeiou]]]/v;
+
+// 4. Async Generators with Yield and Spread
+// Testing: * adjacency and spread inside yield
+async function* dataStream(source) {
+  for await (const chunk of source) {
+    yield* [...chunk].map(x => x ** 2n);
   }
 }
 
-// Testing Generator functions
-function* sequenceGenerator() {
-  yield 1;
-  yield* [2, 3];
-  return 4;
-}
+// 5. Destructuring "The Wall"
+// Nested symbols, defaults, and aliases in one line
+const { 
+  [Symbol.for("app.id")]: id = "guest", 
+  details: { tags: [first = "none", ...others] = [] } = {} 
+} = await fetchUser();
 
-// Testing closures and higher-order functions
-const factory = (multiplier) => (num) => num * multiplier;
-const doubler = factory(2);
+// 6. Template Literal "Comment War"
+// Putting comments and strings inside a template literal should recursive highlight
+const sql = tag`
+  SELECT * FROM ${ "users" /* table name */ }
+  WHERE id = ${ 
+    ((uid) => `RAW_${uid}`)("123") // lambda inside
+  } 
+  -- This is a SQL comment, but inside a JS string
+  AND status = 'active'
+`;
 
-// Final edge case: Regex inside a function call
-console.log("Test matches: ", "test@example.com".match(/[^@]+@[^@]+/));
+// 7. Keyword-Identifier Duality
+// In JS, 'if' is a keyword, but 'obj.if' is a property.
+const controlFlow = {
+  if: (cond, fn) => cond && fn(),
+  while: (cond, fn) => { while(cond()) fn(); },
+  delete: true
+};
+
+// Check: Are these highlighted as properties (words after dot) or keywords?
+controlFlow.if(true, () => controlFlow.delete);
+controlFlow?.while(() => false, () => {});
+
+// 8. The "Broken" Division (Comment or Division?)
+const x = 1 / 
+  /* 
+     This is a multi-line comment 
+     separating values 
+  */ 
+  2; 
+
+console.log("Gauntlet V2: Success.", typeof 1n === 'bigint');
 </pre>
             </section>
 

@@ -8,68 +8,6 @@ export let
 		match: RegExp(`<[\/!?]?${name}${properties}[\/!?]?>`, 'g'),
 		sub: [
 			{
-				match: /style\s*=\s*('[^']*'|"[^"]*")/gi,
-				sub: [
-					{
-						match: /^style\s*=\s*/gi,
-						sub: [
-							{
-								type: 'class',
-								match: /^style/gi
-							},
-							{
-								type: 'oper',
-								match: /=/g
-							}
-						]
-					},
-					{
-						match: /('[^']*'|"[^"]*")/g,
-						sub: [
-							{
-								type: 'str', // quotes
-								match: /^['"]|['"]$/g
-							},
-							{
-								match: /[^"']+/g,
-								sub: 'css'
-							}
-						]
-					}
-				]
-			},
-			{
-				match: /on\w+\s*=\s*('[^']*'|"[^"]*")/gi,
-				sub: [
-					{
-						match: /^on\w+\s*=\s*/gi,
-						sub: [
-							{
-								type: 'class',
-								match: /^on\w+/gi
-							},
-							{
-								type: 'oper',
-								match: /=/g
-							}
-						]
-					},
-					{
-						match: /('[^']*'|"[^"]*")/g,
-						sub: [
-							{
-								type: 'str', // quotes
-								match: /^['"]|['"]$/g
-							},
-							{
-								match: /[^"']+/g,
-								sub: 'js'
-							}
-						]
-					}
-				]
-			},
-			{
 				type: 'var',
 				match: RegExp(`^<[\/!?]?${name}`, 'g'),
 				sub: [

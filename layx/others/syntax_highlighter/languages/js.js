@@ -34,6 +34,10 @@ export default [
 		sub: 'js_template_literals'
 	},
 	{
+		type: 'var',
+		match: /\b(?!(?:true|false|null|undefined|NaN|Infinity|this|default)\b)[a-zA-Z_$][\w$]*\b(?=\s*:(?!\s*[:=]))/g
+	},
+	{
 		type: 'kwd',
 		match: /=>|(?<!(?<!\.)\.)(?<!\?\.)\b(this|set|get|as|async|await|break|case|catch|class|const|constructor|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|if|implements|import|in|instanceof|interface|let|var|of|new|package|private|protected|public|return|static|super|switch|throw|throws|try|typeof|void|while|with|yield)\b/g
 	},
@@ -72,10 +76,6 @@ export default [
 	{
 		type: 'func',
 		match: /(?<=\.)(?:if|catch|while|for|switch|async)\b(?=\s*\()/g
-	},
-	{
-		type: 'var',
-		match: /\b(?:delete|if|static|true|false)\b(?=\s*:(?!\s*[:=]))/g
 	},
 	{
 		type: 'var',

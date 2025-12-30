@@ -164,70 +164,76 @@
                 <p>Highlights classes, template literals, functions, and more.</p>
 <pre data-code-lang="js">
 /**
- * SYNTACTIC CHAOS GAUNTLET V7: THE FINAL FRONTIER
- * Focus: Operator overload, Regex vs Division, and Deep Recursion
+ * SYNTACTIC SANITY CHECK
+ * Focus: Real-world usage patterns
  */
 
-// 1. Divider vs Regex: The classic JS ambiguous grammar
-const g = 10;
-const r = g / 2 / g;       // Division (10 / 2 / 10 = 0.5)
-const s = g / 2 / g /i;    // Division followed by ... wait, is it regex? No.
-const t = g / 2 / /regex/; // Division by regex literal
+import React, { useState, useEffect } from 'react';
+import { api } from './services/api';
 
-// 2. The "Keyword As Value" & "Computed Property" Nightmare
-const api = {
-  [Symbol.toStringTag]: "API",
-  delete: delete void 0,       // .var: .kwd .kwd .num
-  if: true ? "yes" : "no",     // .var: .bool .oper .str
-  static: class Static {},     // .var: .kwd .class
-  async *[Symbol.asyncIterator]() { yield this.if; }
-};
+// 1. Standard Constants & Types
+const MAX_RETRIES = 3;
+const BASE_URL = "https://api.example.com/v1";
 
-// 3. Mathematical Separators & BigInt
-const weirdNums = [
-  1_000_000,       // Standard separator
-  1_2_3,           // Valid? No, but highlighter shouldn't crash
-  0.000_001,       // Decimal separator
-  1e1_00,          // Exponent separator
-  0xDE_AD_BE_EFn   // BigInt Hex separator
-];
-
-// 4. Class Field & Static Block Complexity
-class Matrix {
-  static #cache = new Map();
-  operator = "+";
+/**
+ * Renders a user profile card
+ * @param {object} props - Component props
+ * @param {string} props.userId - The user ID to fetch
+ */
+export default function UserProfile({ userId, theme = "light" }) {
+  // 2. Hooks & State
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
   
-  // Highlighting check: 'operator' is property, 'if' is keyword
-  calc(x) {
-    if (this.operator === "+") return x + x;
-    return this.#cache.get(x) ?? null;
+  // 3. Effects with async/await
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const data = await api.get(`/users/${userId}`);
+        setUser(data);
+      } catch (err) {
+        console.error("Failed to load user:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [userId]);
+
+  // 4. Conditional Rendering Logic
+  if (loading) {
+    return (
+      &lt;div className="spinner"&gt;
+        &lt;span&gt;Test Loading...&lt;/span&gt;
+      &lt;/div&gt;
+    );
   }
 
-  static {
-    // Label collision with keyword?
-    init: for (let i = 0; i < 5; i++) {
-      if (i > 2) break init;
-    }
-  }
+  // 5. Standard Object/Array Manipulation
+  const tags = user?.tags?.map(t => t.toLowerCase()) ?? [];
+  const statusColor = user.isActive ? "green" : "red";
+
+  // 6. Template Literal with Simple interpolation
+  const summary = `User ${user.name} has ${tags.length} tags.`;
+
+  return (
+    &lt;div className={`profile-card ${theme}`}&gt;
+      &lt;h1&gt;{user.name}&lt;/h1&gt;
+      &lt;p style={{ const: statusColor }}&gt;{summary}&lt;/p&gt; 
+      &lt;button onClick={() => alert("Clicked!")}&gt;
+        Contact Form
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
 }
 
-// 5. Deeply Nested Callbacks with Arrow Functions
-const pipeline = (val) => 
-  val
-    ?.split("")
-    .map((c, i) => ({ id: i, char: c }))
-    .filter(({ id }) => id % 2 === 0)
-    .reduce((acc, { char }) => acc + char, "");
-
-// 6. Template Literal with "Impossible" Nesting and Escapes
-const html = `
-  <div class="${ `nested-${ (i => `level-${i}`)(2) }` }">
-    <!-- Comment inside string -->
-    ${ /* JS Comment */ "Content" }
-  </div>
-`;
-
-console.log("Gauntlet V7: Status Report.", api.delete);
+// 7. Regex check (just to be sure)
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+console.log("Valid email?", emailRegex.test("user@example.com"));
 </pre>
             </section>
 

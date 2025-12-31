@@ -111,7 +111,8 @@ export class SyntaxHighlighter {
   }
 
   /* ---------- DOM injector ---------- */
-  async highlightElement(el, lang = el.dataset.codeLang, mode, opt) {
+  async highlightElement(el, lang = el.dataset.codeLang, mode, options) {
+    const opt = { complete: true, ...options };
     const txt = el.textContent.trim();
     mode ??= txt.includes('\n') ? 'multiline' : 'oneline';
     el.dataset.mode = mode;
@@ -122,10 +123,18 @@ export class SyntaxHighlighter {
       el.dataset.rendered = true;
     } else {
       const codeEle = el.querySelector('.code');
-      codeEle.innerHTML = await this._getCode(txt, lang);
+      const code = await this._getCode(txt, lang);
+      codeEle.innerHTML = code;
       if (mode === 'multiline' && opt.lineNumbers) {
         el.querySelector('.numbers').innerHTML = this._getLineNumbers((txt.match(/\n/g) || []).length + 1);
       }
+    }
+
+    if (!opt.complete) {
+      if (this._lastEle && this._lastEle !== el) {
+        this._lastEle.classList.add('highlighted');
+      }
+      this._lastEle = el;
     }
 
     if (opt.complete && !el.classList.contains('highlighted')) {
@@ -141,7 +150,7 @@ export class SyntaxHighlighter {
   async highlightAll(opt) {
     return Promise.all(
       [...document.querySelectorAll('[data-code-lang]:not(.highlighted)')]
-        .map(el => this.highlightElement(el, undefined, undefined, { complete: true, ...opt }))
+        .map(el => this.highlightElement(el, undefined, undefined, opt))
     );
   }
 

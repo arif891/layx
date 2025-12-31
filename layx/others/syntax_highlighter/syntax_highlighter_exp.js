@@ -128,7 +128,7 @@ export class SyntaxHighlighter {
       }
     }
 
-    if (opt.complete) {
+    if (opt.complete && !el.classList.contains('highlighted')) {
       el.classList.add('code-block', lang, mode, 'highlighted');
       const btn = el.querySelector('.copy');
       if (btn) {

@@ -93,7 +93,7 @@ export class SyntaxHighlighter {
     );
 
     const lineNums = multiline && opt.lineNumbers
-      ? `<div class="numbers">${this._getLineNumbers(src.split('\n').length)}</div>`
+      ? `<div class="numbers">${this._getLineNumbers((src.match(/\n/g) || []).length + 1)}</div>`
       : '';
 
     const header = multiline

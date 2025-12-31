@@ -142,6 +142,12 @@ export class SyntaxHighlighter {
   loadLanguage(languageName, language) {
     this._langs[languageName] = language;
   }
+
+  /* ---------- pre-loader ---------- */
+  async preLoadLanguages(...langs) {
+    await Promise.all(langs.map(lang => import(`./languages/${lang}.js`)));
+    return this;
+  }
 }
 
 export default new SyntaxHighlighter();

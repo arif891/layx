@@ -138,36 +138,36 @@
 	
 	[theme=dark] & {
 
-		.deleted, .err, .var {
-			color: #ff5261
-		}
+	.err, .kwd {
+		color: #ff5898
+	}
 
-		.section, .kwd {
-			color: #ff7cc6
-		}
+	.num, .class {
+		color: #ff9d5b
+	}
 
-		.class {
-			color: #eab07c
-		}
+	.numbers, .cmnt {
+		color: #acacac
+	}
 
-		.numbers, .cmnt {
-			color: #7d828b
-		}
+	.insert, .str {
+		color: #97ffa8
+	}
 
-		.insert, .type, .func, .bool {
-			color: #71d58a
-		}
+	.bool {
+		color: #4ea7ff
+	}
 
-		.num {
-			color: #b581fd
-		}
+	.type, .oper {
+		color: #8ac5ff
+	}
 
-		.oper {
-			color: #80c6ff
-		}
+	.section, .func {
+		color: #a672ff
+	}
 
-		.str {
-			color: #4dacfa
-		}
+	.deleted, .var {
+		color: #ff6a6a
+	}
 	}
 }

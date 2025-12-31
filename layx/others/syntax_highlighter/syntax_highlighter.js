@@ -143,9 +143,19 @@ export class SyntaxHighlighter {
     this._langs[languageName] = language;
   }
 
-  /* ---------- pre-loader ---------- */
-  async preLoadLanguages(...langs) {
-    await Promise.all(langs.map(lang => import(`./languages/${lang}.js`)));
+  /* ---------- language pre-loader ---------- */
+  async preLoadLanguages(...langNames) {
+    await Promise.all(
+      langNames.map(async (name) => {
+        if (this._langs[name]) return;
+
+        try {
+          this._langs[name] = await import(`./languages/${name}.js`);
+        } catch (err) {
+          console.error(`Failed to load language: ${name}`, err);
+        }
+      })
+    );
     return this;
   }
 }

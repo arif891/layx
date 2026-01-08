@@ -22,7 +22,7 @@ class SmoothScroll {
 
     this.target = window.scrollY;           // where we want to be
     this.current = window.scrollY;          // where we are
-    this.scrollLock = false;
+    this.scrollLocked = false;
     this.isRunning = false;
     this.raf = 0;
 
@@ -92,7 +92,7 @@ class SmoothScroll {
     if (this.preventWithAttribute && e.target.closest('[data-smooth-scroll="prevent"]')) {
       if (this.isRunning) this.emit('interrupt'); this._stop(); return
     }
-    if (this.scrollLock) return;
+    if (this.scrollLocked) return;
     e.preventDefault();
     this.target = this._clamp(this.target + e.deltaY);
     this._start();
@@ -112,7 +112,7 @@ class SmoothScroll {
       ArrowDown: 50,
       ' ': window.innerHeight
     };
-    if (this.scrollLock) return;
+    if (this.scrollLocked) return;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
     if (map[e.key] == null) return;
     e.preventDefault();

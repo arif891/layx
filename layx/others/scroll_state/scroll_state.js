@@ -3,10 +3,6 @@
  *********************************************************************/
 class ScrollState {
     constructor(options = {}) {
-        if (window.__scrollStateInstance) {
-            console.warn('ScrollState already initialized.');
-            return window.__scrollStateInstance;
-        }
         // Bind methods
         this._onSmoothStart = this._onSmoothStart.bind(this);
         this._onSmoothUpdate = this._onSmoothUpdate.bind(this);
@@ -26,7 +22,8 @@ class ScrollState {
         this.rafId = null;
 
         // Config
-        this.updateVelocity = options.updateVelocity ?? document.documentElement.dataset.scrollVelocity === 'false' ? false : true;
+        this.updateVelocity = options.updateVelocity ?? false;
+        this.updateCSS = options.updateCSS ?? false;
         this.topThreshold = options.topThreshold ?? window.innerHeight / 4;
         this.velocitySmoothing = options.velocitySmoothing ?? 0.1;
         this.velocityDamping = options.velocityDamping ?? 0.9;
@@ -34,6 +31,11 @@ class ScrollState {
 
         // SmoothScroll integration (auto-detect)
         this.smoothScroll = options.smoothScroll || window.__smoothScrollInstance;
+
+        if (window.__scrollStateInstance) {
+            console.warn('ScrollState already initialized.');
+            return;
+        }
 
         if (this.smoothScroll) {
             this.smoothScroll
@@ -138,10 +140,13 @@ class ScrollState {
     _updateCSS() {
         const root = document.documentElement;
         const maxScroll = root.scrollHeight - window.innerHeight;
-        const scrollPct = maxScroll > 0 ? (this.currentScroll / maxScroll) * 100 : 0;
 
-        root.style.setProperty('--scroll-position', scrollPct.toFixed(2));
-        root.style.setProperty('--scroll-direction', this.direction);
+        if (this.updateCSS) {
+            const scrollPct = maxScroll > 0 ? this.currentScroll / maxScroll : 0;
+             
+            root.style.setProperty('--scroll-position', scrollPct.toFixed(2));
+            root.style.setProperty('--scroll-direction', this.direction);
+        }
 
         if (this.updateVelocity) {
             root.style.setProperty('--scroll-velocity', this.velocity.toFixed(3));

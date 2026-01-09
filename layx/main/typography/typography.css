@@ -21,6 +21,14 @@ p, .p, h6, h5, h4, h3, h2, h1,  .h6,.h5,.h4,.h3,.h2,.h1 {
      margin: 0;
      line-height: 1;
     }
+
+    &.bl {
+        text-wrap: balance;
+    }
+
+    &.pr {
+        text-wrap: pretty;
+    }
 }
 
 

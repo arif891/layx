@@ -1,0 +1,81 @@
+:root {
+  /* ========================================= */
+  /* CORE PRIMITIVES (The Math)                */
+  /* ========================================= */
+
+  /* Standard Ease-Out (Decelerate) - Use for UI Enters */
+  --ease-out-quad:  cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);  /* The "Luxury" Standard */
+  --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);      /* Super Smooth Long Tail */
+  --ease-out-expo:  cubic-bezier(0.19, 1, 0.22, 1);      /* Dramatic Stop */
+
+  /* Standard Ease-In (Accelerate) - Use for UI Exits */
+  --ease-in-quad:   cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  --ease-in-cubic:  cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-in-quart:  cubic-bezier(0.895, 0.03, 0.685, 0.22);
+
+  /* Standard Ease-In-Out (States) - Use for Hovers/Loops */
+  --ease-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+
+  /* ========================================= */
+  /* LINEAR SPRINGS (Calculated Physics)       */
+  /* Best for: Micro-interactions, Modals      */
+  /* ========================================= */
+
+  /* Gentle Spring (Good for UI cards) */
+  --spring-gentle: linear(
+    0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017,
+    1.077, 1.116, 1.135, 1.133, 1.117, 1.085, 1.046, 1.004 59.6%, 0.966, 0.945,
+    0.936, 0.939, 0.948, 0.976 86.8%, 0.992, 1
+  );
+
+  /* Bouncy Spring (Good for notifications/alerts) */
+  --spring-bouncy: linear(
+    0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017,
+    1.077, 1.116, 1.135, 1.133, 1.117, 1.085, 1.046, 1.004 59.6%, 0.966, 0.945,
+    0.936, 0.939, 0.948, 0.976 86.8%, 0.992, 1
+  );
+
+  /* Snappy Spring (Good for buttons) */
+  --spring-snappy: linear(
+    0, 0.93, 1 3%, 0.92, 1 6%, 0.96, 1 9%, 0.98, 1 12%, 0.99, 1 15%, 1
+  );
+
+  /* ========================================= */
+  /* SEMANTIC TOKENS (Use these in CSS)        */
+  /* ========================================= */
+
+  /* 1. The "Awwwards" Feel (Long, luxurious deceleration) */
+  --ease-lux: var(--ease-out-quint);
+  
+  /* 2. The "Product" Feel (Snappy, responsive) */
+  --ease-swift: var(--ease-out-quart);
+
+  /* 3. The "Power" Feel (High velocity start, slow stop) */
+  --ease-power: var(--ease-out-expo);
+
+  /* 4. Utilities */
+  --ease-enter: var(--ease-out-quart);  /* Elements entering screen */
+  --ease-exit:  var(--ease-in-quad);    /* Elements leaving screen (faster) */
+  --ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6); /* Overshoot */
+}
+
+@keyframes _opacity {
+    to {
+        opacity: var(--_kt, 1);
+    }
+}
+
+@keyframes _translate {
+    to {
+        translate: var(--_kt, 0);
+    }
+}
+
+@keyframes _rotate {
+    to {
+        rotate: var(--_kt, 0deg);
+    }
+}

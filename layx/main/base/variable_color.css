@@ -1,48 +1,16 @@
 /* Other color variables (light theme) */
-:root, [theme=light] {
+:root {
     /* Colors */
-    --brand-color: #2DD4BF;
-    --primary-color: #3B82F6;
-    --secondary-color: #94A3B8;
+    --brand-color:light-dark(#2DD4BF, #5EEAD4);
+    --primary-color: light-dark(#3B82F6, #60A5FA);
+    --secondary-color: light-dark(#94A3B8, #64748B);
 
     /* Surface Colors */
-    --surface-2-color: #F8FAFC;
-    --surface-3-color: #F1F5F9;
-    --surface-4-color: #E2E8F0;
-
-    /* Text Colors */
-    --text-2-color: #181818;
-    --text-3-color: #323339;
-    --text-4-color: #434954;
+    --surface-color: light-dark(#F8FAFC,);
 
     /* States */
-    --success-color: #10B981;
-    --warning-color: #F59E0B;
-    --danger-color: #EF4444;
-    --info-color: #0EA5E9;
-}
-
-
-/* Other color variables (dark theme) */
-[theme=dark] {
-    /* Colors */
-    --brand-color: #5EEAD4;
-    --primary-color: #60A5FA;
-    --secondary-color: #64748B;
-
-    /* Surface Colors */
-    --surface-2-color: #262626;
-    --surface-3-color: #171717;
-    --surface-4-color: #0a0a0a;
-
-    /* Text Colors */
-    --text-2-color: #F9FAFB;
-    --text-3-color: #D1D5DB;
-    --text-4-color: #9CA3AF;
-
-    /* States */
-    --success-color: #34D399;
-    --warning-color: #FBBF24;
-    --danger-color: #F87171;
-    --info-color: #38BDF8;
+    --success-color: light-dark(#10B981, #34D399);
+    --warning-color: light-dark(#F59E0B, #FBBF24);
+    --danger-color: light-dark(#EF4444, #F87171);
+    --info-color: light-dark(#0EA5E9, #38BDF8);
 }

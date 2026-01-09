@@ -1,7 +1,9 @@
 /* Important variables */
 :root {
     /* Typography */
-    --font-family: 'Red Hat Display', sans-serif;
+    --ff-sans: 'Red Hat Display', sans-serif;
+
+    --font-family: var(--ff-sans);
     --font-size: initial;
     --font-weight: 500;
     --line-height: initial;
@@ -19,35 +21,23 @@
     --radius: var(--base-radius);
     --vpu: var(--base-vpu);
     --duration: var(--base-duration);
+
+    /* Colors */
+    --color: light-dark(#000, #fff);
+    --bg-color: light-dark(#fff, #000);
+
+    --heading-color: light-dark(#000, #fff);
+    --paragraph-color: light-dark(#353c4a, #f1f1f1);
+    --link-color: light-dark(#2da5e6, #70cdff);
+    --accent-color: light-dark(#bae7ff, #2da5e6);
+
+    color-scheme: light dark;
 }
 
-
-/* Important color variables (light theme) */
-:root, [theme=light] {
-    --color-rgb: 0, 0, 0;
-    --bg-color-rgb: 255, 255, 255;
-    --heading-color: #000;
-    --paragraph-color: #353c4a;
-    --link-color: #2da5e6;
-    --surface-color: rgb(250, 250, 250);
-    --accent-color: #bae7ff;
-
-    --scrollbar-color: rgba(var(--color-rgb), .3);
-    --color: rgb(var(--color-rgb));
-    --bg-color: rgb(var(--bg-color-rgb));
-
+[theme=light] {
     color-scheme: light;
 }
 
-/* Important color variables (dark theme) */
 [theme=dark] {
-    --color-rgb: 255, 255, 255;
-    --bg-color-rgb: 0, 0, 0;
-    --heading-color: #fff;
-    --paragraph-color: #f1f1f1;
-    --link-color: #70cdff;
-    --surface-color: rgb(30, 30, 30);
-    --accent-color: #2da5e6;
-
     color-scheme: dark;
 }

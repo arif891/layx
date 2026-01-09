@@ -102,17 +102,9 @@ small {
 a {
     text-decoration: none;
     color: var(--link-color);
-    transition: .3s;
-
-    &:not(:has(*)) {
-        &:hover {
-            opacity: .8;
-            text-decoration: underline;
-        }
-    }
 }
 
-backdrop, dialog::backdrop, [popover].modal::backdrop {
+backdrop, ::backdrop {
     --backdrop-bg: rgba(var(--color-rgb),.3);
     position: fixed;
     inset: 0;
@@ -127,13 +119,8 @@ backdrop, dialog::backdrop, [popover].modal::backdrop {
         opacity: 0 !important;
     }
 
-    &[open], &.open {
+    &[open], &.open, [open] & {
         display: block;
         opacity: 1;
     }
-}
-
-dialog:open::backdrop, [popover].modal:popover-open::backdrop {
-    display: block;
-    opacity: 1;
 }

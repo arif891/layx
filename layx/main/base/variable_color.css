@@ -1,7 +1,7 @@
 /* Other color variables (light theme) */
 :root {
     /* Colors */
-    --brand-color:light-dark(#2DD4BF, #5EEAD4);
+    --brand-color: light-dark(#2DD4BF, #5EEAD4);
     --primary-color: light-dark(#3B82F6, #60A5FA);
     --secondary-color: light-dark(#94A3B8, #64748B);
 

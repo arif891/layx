@@ -31,6 +31,8 @@
     --link-color: light-dark(#2da5e6, #70cdff);
     --accent-color: light-dark(#bae7ff, #2da5e6);
 
+    --surface-color: oklch(from var(--bg-color) calc(l - var(--srs, .1) * var(--si, 1) * sign(l - .5)) c h);
+
     color-scheme: light dark;
 }
 

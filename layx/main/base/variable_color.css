@@ -6,7 +6,11 @@
     --secondary-color: light-dark(#94A3B8, #64748B);
 
     /* Surface Colors */
-    --surface-color: light-dark(#F8FAFC,);
+    --surface-color-2: oklch(from var(--bg-color) calc(l - .2 * sign(l - .5)) c h);
+    --surface-color-3: oklch(from var(--bg-color) calc(l - .3 * sign(l - .5)) c h);
+    --surface-color-4: oklch(from var(--bg-color) calc(l - .4 * sign(l - .5)) c h);
+    --surface-color-5: oklch(from var(--bg-color) calc(l - .5 * sign(l - .5)) c h);
+    --surface-color-6: oklch(from var(--bg-color) calc(l - .6 * sign(l - .5)) c h);
 
     /* States */
     --success-color: light-dark(#10B981, #34D399);

@@ -1,6 +1,6 @@
 /* default Scrollbar Fix */
 :root {
-    --_color: var(--scrollbar-color, var(--color, #000))
+    --_color: var(--scrollbar-color, var(--color, #000));
     scrollbar-width: thin;
     scrollbar-color: rgb(from var(--_color) r g b / .3) var(--bg-color, #fff);
 }

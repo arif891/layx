@@ -3,7 +3,7 @@ layout,.layout {
     display: grid;
     grid-template-columns: repeat(var(--num-x, 12), 1fr);
     grid-template-rows: repeat(var(--num-y, none), 1fr);
-    gap: var(--gap-y,0) var(--gap-x,0);
+    gap: var(--gap-y, normal) var(--gap-x, normal);
 
     &:not([class*="num-x-"]):not(:has([class*="x-"])) {
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -32,6 +32,7 @@ layout,.layout {
 
     .sub,.sub-x,.sub-y {
         display: grid;
+        gap: var(--gap-y, normal) var(--gap-x, normal);
     }
 
     .sub {
@@ -230,7 +231,7 @@ layout,.layout {
 
 
 /*<gap>*/
-layout, .layout {
+layout, .layout, .sub, .sub-x, .sub-y {
     &.gap-x, &.gap  {
         --gap-x: clamp(.2rem, 1vw, 1rem);
     }

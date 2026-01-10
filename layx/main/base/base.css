@@ -105,13 +105,12 @@ a {
 }
 
 backdrop, ::backdrop {
-    --backdrop-bg: rgb(from var(--color, #000) r g b / .3);
     position: fixed;
     inset: 0;
     display: none;
     opacity: 0;
     z-index: 2;
-    background: var(--backdrop-bg);
+    background: var(--backdrop-bg, rgb(from var(--color, #000) r g b / .3));
     transition: var(--backdrop-transition, .6s) allow-discrete;
     backdrop-filter: blur(var(--blur));
 

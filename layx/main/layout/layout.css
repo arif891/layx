@@ -32,7 +32,18 @@ layout,.layout {
 
     .sub,.sub-x,.sub-y {
         display: grid;
-        gap: var(--gap-y, normal) var(--gap-x, normal);
+
+        &:is(.gap,[class*="gap-"]):not([class*="gap-x"],[class*="gap-y"]) {
+         gap: var(--gap-y, normal) var(--gap-x, normal);
+        }
+
+        &[class*="gap-x"] {
+            column-gap: var(--gap-x, normal);
+        }
+
+        &[class*="gap-y"] {
+            row-gap: var(--gap-y, normal);
+        }
     }
 
     .sub {

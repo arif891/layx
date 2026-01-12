@@ -107,19 +107,19 @@ a {
 backdrop, ::backdrop {
     position: fixed;
     inset: 0;
-    display: none;
+    visibility: hidden;
     opacity: 0;
     z-index: 2;
     background: var(--backdrop-bg, rgb(from var(--color, #000) r g b / .3));
     transition: var(--backdrop-transition, .6s) allow-discrete;
-    backdrop-filter: blur(var(--blur));
+    backdrop-filter: blur(var(--backdrop-blur));
 
     @starting-style {
         opacity: 0 !important;
     }
 
     &[open], &.open, [open] & {
-        display: block;
+        visibility: visible;
         opacity: 1;
     }
 }

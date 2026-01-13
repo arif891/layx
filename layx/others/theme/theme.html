@@ -12,20 +12,18 @@
         <link rel="stylesheet" href="/layx/main/base/base.css">
         <link rel="stylesheet" href="/layx/main/typography/typography.css">
         <link rel="stylesheet" href="/layx/main/container/container.css">
-        <link rel="stylesheet" href="/layx/components/button/button.css">
-
-
+        <link rel="stylesheet" href="/layx/components/button/button.css"> 
 
         <style>
             body {
-                transition: .3s;
+                transition: background-color .3s;
             }
 
             button {
                 margin: 5px;
             }
 
-            button[data-theme-value] {
+            button[data-theme-set] {
                 display: inline-flex;
                 gap: .5rem;
             }
@@ -36,17 +34,17 @@
     <body>
 
         <container class="__container">
-            <button data-theme-toggle class="theme-toggler">Toggle Theme</button> 
+            <button data-theme-toggle class="theme-toggler">Toggle Theme</button>
 
-            <div data-theme-group class="wrapper">
-                <button data-theme-value="light">Light</button>
-                <button data-theme-value="dark">Dark</button>
-                <button data-theme-value="auto">Auto</button>
+            <div class="wrapper">
+                <button data-theme-set="light">Light</button>
+                <button data-theme-set="dark">Dark</button>
+                <button data-theme-set="auto">Auto</button>
             </div>
-    
+
             <p>Theme Update: <span data-theme-update class="theme-update"></span></p>
         </container>
-        
+
         <script type="module">
             import Theme from './theme.js';
         </script>

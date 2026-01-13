@@ -1,117 +1,130 @@
 /**************************************************************************************************
  * Theme manager – drop-in, zero-dependency, framework-agnostic
- * 1.  CSS-only dark / light / auto  (no FOUC)
- * 2.  System change listener        (respects “auto”)
- * 3.  <meta name="theme-color">     (PWA tint bar)
- * 4.  aria-pressed on toggler       (a11y)
- * 5.  dispatch “theme:changed”      (decouple UI)
- * 6.  tiny public API               (Theme.get() / .set() / .toggle())
- * 7.  guarded against double-init   (safe to import many times)
+ * 1.  System change listener        (respects “auto”)
+ * 2.  <meta name="theme-color">     (PWA tint bar)
+ * 3.  dispatch “theme-changed”      (decouple UI)
+ * 4.  tiny public API               (Theme.get() / .set() / .toggle())
+ * 5.  guarded against double-init   (safe to import many times)
  **************************************************************************************************/
 class Theme {
   /* ---------- static façade --------------------------------------------------------------- */
-  static _instance = null;
+  static _i = null;                                    // private singleton
 
-  static get() { return Theme._instance?.getStoredTheme() ?? 'auto'; }
-  static set(t) { Theme._instance?.setTheme(t); }
-  static toggle() { Theme._instance?.toggleTheme(); }
+  static get() { return Theme._i?._stored ?? 'auto'; }
+  static set(t) { Theme._i?._set(t); }
+  static toggle() { Theme._i?._toggle(); }
+
+  /* ---------- constants ------------------------------------------------------------------- */
+  static STORAGE_KEY = 'theme';
+  static THEMES = Object.freeze(['light', 'dark', 'auto']);
 
   /* ---------- ctor ------------------------------------------------------------------------ */
   constructor() {
-    if (Theme._instance) return Theme._instance;          // singleton
-    Theme._instance = this;
+    if (Theme._i) return Theme._i;
+    Theme._i = this;
 
-    this.root = document.documentElement;
-    this.store = localStorage;
-    this.key = 'theme';                                // localStorage key
-    this.themes = ['light', 'dark'];                      // allowed values
+    this._root = document.documentElement;
+    this._media = matchMedia('(prefers-color-scheme: dark)');
 
-    this.toggler = document.querySelector('[data-theme-toggle]');
-    this.radioGroup = document.querySelector('[data-theme-group]');
-    this.updatables = document.querySelectorAll('[data-theme-update]');
-    this.metaColor = this._ensureMetaThemeColor();
+    this._raf = 0;
 
-    this.init();
+    this._stored = this._load();
+    this._apply(this._stored);
+    this._wire();
   }
 
   /* ---------- public ---------------------------------------------------------------------- */
-  init() {
-    /* 1. paint ASAP – prevents FOUC */
-    this.setTheme(this.getStoredTheme());
-
-    /* 2. listeners */
-    this.toggler?.addEventListener('click', () => this.toggleTheme());
-    this.radioGroup?.addEventListener('click', e => {
-      const btn = e.target.closest('[data-theme-value]');
-      if (btn) this.setTheme(btn.dataset.themeValue);
-    });
-
-    window.matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', () => {
-        if (this.getStoredTheme() === 'auto') this.setTheme('auto');
-      });
+  _set(next) {
+    if (!Theme.THEMES.includes(next)) return void console.warn(`[Theme] invalid value "${next}"`);
+    if (next === this._stored) return;
+    this._stored = next;
+    try { localStorage.setItem(Theme.STORAGE_KEY, next); } catch {}
+    this._apply(next);
   }
 
-  getStoredTheme() { return this.store.getItem(this.key) || 'auto'; }
-
-  setTheme(theme) {
-    if (!['light', 'dark', 'auto'].includes(theme)) return;
-
-    const applied = theme === 'auto' ? this._systemTheme() : theme;
-    this.root.setAttribute('theme', applied);
-    this.store.setItem(this.key, theme);
-
-    this._syncUI(theme);
-    this._updateMeta();
-    this._announce(theme);
+  _toggle() {
+    const active = this._stored === 'auto' ? this._sys() : this._stored;
+    this._set(active === 'light' ? 'dark' : 'light');
   }
 
-  toggleTheme() {
-    const stored = this.getStoredTheme();
-    const active = stored === 'auto' ? this._systemTheme() : stored;
-    this.setTheme(active === 'light' ? 'dark' : 'light');
+  destroy() {
+    document.removeEventListener('click', this._onClick, true);
+    this._media.removeEventListener('change', this._onMedia);
+    window.removeEventListener('storage', this._onStorage);
+    Theme._i = null;
   }
 
   /* ---------- private --------------------------------------------------------------------- */
-  _systemTheme() {
-    return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  _load() {
+    try {
+      const v = localStorage.getItem(Theme.STORAGE_KEY);
+      return Theme.THEMES.includes(v) ? v : 'auto';
+    } catch { return 'auto'; }
+  }
+
+  _sys() { return this._media.matches ? 'dark' : 'light'; }
+
+  _apply(theme) {
+    const effective = theme === 'auto' ? this._sys() : theme;
+    this._root.setAttribute('theme', effective);
+    this._syncUI(theme);
+    this._paintMeta();
+    this._announce(theme, effective);
+  }
+
+  _wire() {
+    this._ensureMeta();
+    this._paintMeta(true);
+
+    this._onClick = (e) => {
+      const t = e.target.closest('[data-theme-set], [data-theme-toggle]');
+      if (!t) return;
+      t.dataset.themeSet ? this._set(t.dataset.themeSet) : this._toggle();
+    };
+
+    this._onMedia = () => this._stored === 'auto' && this._apply('auto');
+    this._onStorage = (e) => e.key === Theme.STORAGE_KEY && this._set(e.newValue ?? 'auto');
+
+    document.addEventListener('click', this._onClick, { passive: true, capture: true });
+    this._media.addEventListener('change', this._onMedia, { passive: true });
+    window.addEventListener('storage', this._onStorage);
   }
 
   _syncUI(theme) {
-    /* toggler pressed state */
-    this.toggler?.setAttribute('aria-pressed', theme === 'dark');
-
-    /* radio buttons */
-    this.radioGroup
-      ?.querySelectorAll('[data-theme-value]')
-      .forEach(btn => btn.classList.toggle('active', btn.dataset.themeValue === theme));
-
-    /* generic updatable elements */
-    this.updatables.forEach(el => el.setAttribute('data-theme-update', theme));
+    document.querySelectorAll('[data-theme-update]').forEach(el => el.setAttribute('data-theme-update', theme));
   }
 
-  _updateMeta() {
-    const color = window.getComputedStyle(document.body).backgroundColor;
-    if (this.metaColor && this.metaColor.dataset.update == 'true') {
-      this.metaColor.setAttribute('content', color);
-    } 
+  _ensureMeta() {
+    this._meta = document.querySelector('meta[name="theme-color"]')
+    || Object.assign(document.head.appendChild(document.createElement('meta')), { name: 'theme-color' });
+    if (!this._meta.content) this._meta.dataset.update = 'true';
   }
 
-  _ensureMetaThemeColor() {
-    let meta = document.querySelector('meta[name="theme-color"]');
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.setAttribute('name', 'theme-color');
-      meta.dataset.update = 'true';
-      document.head.appendChild(meta);
-    }
-    return meta;
+  _paintMeta(initial = false) {
+    if (this._meta?.dataset.update !== 'true') return;
+    cancelAnimationFrame(this._raf);
+    const color = getComputedStyle(document.body).backgroundColor;
+
+    this._meta.content = color;
+    if (initial) return;
+
+    const { transitionProperty, transitionDuration } = getComputedStyle(document.body);
+    const dur = parseFloat(transitionDuration) * (transitionDuration.includes('ms') ? 1 : 1000);
+    const isBgTransition = /\b(background|background-color|all)\b/.test(transitionProperty);
+
+    if (!isBgTransition || dur <= 0) return this._meta.content = color;
+
+    const start = performance.now();
+    const loop = (t) => {
+      this._meta.content = getComputedStyle(document.body).backgroundColor;
+      if (t - start < dur) this._raf = requestAnimationFrame(loop);
+    };
+    this._raf = requestAnimationFrame(loop);
   }
 
-  _announce(theme) {
-    this.root.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme } }));
+  _announce(theme, applied) {
+    this._root.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme, applied } }));
   }
 }
 
-// Initialize Theme
 export default new Theme();

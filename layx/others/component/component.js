@@ -219,4 +219,4 @@ class Component {
     }
 }
 
-export default Component;
+new Component();

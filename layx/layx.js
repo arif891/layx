@@ -1,5 +1,5 @@
 /* Theme */
-import Theme from './others/theme/theme.js';
+import './others/theme/theme.js';
 
 /* Components */
 

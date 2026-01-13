@@ -84,4 +84,4 @@ class Window {
 
 }
 
-export default new Window();
+new Window();

@@ -127,4 +127,4 @@ class Theme {
   }
 }
 
-export default new Theme();
+new Theme();

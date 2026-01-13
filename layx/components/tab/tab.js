@@ -199,4 +199,4 @@ class Tab {
     }
 }
 
-export default new Tab();
+new Tab();

@@ -130,4 +130,4 @@ class MouseTracker {
 }
 
 
-export default new MouseTracker();
+new MouseTracker();

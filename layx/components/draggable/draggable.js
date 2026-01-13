@@ -176,4 +176,4 @@ class Draggable {
     }
 }
 
-export default new Draggable();
+new Draggable();

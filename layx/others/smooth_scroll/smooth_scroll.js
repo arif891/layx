@@ -153,4 +153,4 @@ class SmoothScroll {
   }
 }
 
-export default new SmoothScroll();
+new SmoothScroll();

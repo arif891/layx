@@ -96,4 +96,4 @@ class ViewportTrigger {
   }
 }
 
-export default new ViewportTrigger()
+new ViewportTrigger()

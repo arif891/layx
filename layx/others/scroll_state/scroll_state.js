@@ -188,4 +188,4 @@ class ScrollState {
     }
 }
 
-export default new ScrollState();
+new ScrollState();

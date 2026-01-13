@@ -134,4 +134,4 @@ class SplitText {
     }
 }
 
-export default new SplitText();
+new SplitText();

@@ -248,4 +248,4 @@ class Dialog {
   }
 }
 
-export default new Dialog();
+new Dialog();

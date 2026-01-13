@@ -103,4 +103,4 @@ class Form {
 }
 
 
-export default new Form;
+new Form;

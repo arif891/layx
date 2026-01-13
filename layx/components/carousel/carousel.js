@@ -306,4 +306,4 @@ class Carousel {
     }
 }
 
-export default new Carousel();
+new Carousel();

@@ -160,4 +160,4 @@ export class SyntaxHighlighter {
   }
 }
 
-export default new SyntaxHighlighter();
+new SyntaxHighlighter();

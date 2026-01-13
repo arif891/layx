@@ -327,4 +327,4 @@ class Sheet {
 }
 
 
-export default new Sheet();
+new Sheet();

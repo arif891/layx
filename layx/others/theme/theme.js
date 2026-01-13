@@ -91,10 +91,10 @@ class Theme {
   }
 
   _updateMeta() {
-    const color = getComputedStyle(this.root)
-      .getPropertyValue('--bg-color')
-      .trim() || (this.root.getAttribute('theme') === 'dark' ? '#000' : '#fff');
-    this.metaColor.setAttribute('content', color);
+    const color = window.getComputedStyle(document.body).backgroundColor;
+    if (this.metaColor && this.metaColor.dataset.update == 'true') {
+      this.metaColor.setAttribute('content', color);
+    } 
   }
 
   _ensureMetaThemeColor() {
@@ -102,13 +102,14 @@ class Theme {
     if (!meta) {
       meta = document.createElement('meta');
       meta.setAttribute('name', 'theme-color');
+      meta.dataset.update = 'true';
       document.head.appendChild(meta);
     }
     return meta;
   }
 
   _announce(theme) {
-    this.root.dispatchEvent(new CustomEvent('theme:changed', { detail: { theme } }));
+    this.root.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme } }));
   }
 }
 

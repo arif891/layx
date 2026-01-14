@@ -104,6 +104,12 @@ a {
     color: var(--link-color);
 }
 
+[popover] {
+    border: initial;
+    color: inherit;
+    background-color: inherit;
+}
+
 backdrop, ::backdrop {
     position: fixed;
     inset: 0;
@@ -111,8 +117,8 @@ backdrop, ::backdrop {
     opacity: 0;
     z-index: 2;
     background: var(--backdrop-bg, rgb(from var(--color, #000) r g b / .3));
-    transition: var(--backdrop-transition, .6s) allow-discrete;
-    backdrop-filter: blur(var(--backdrop-blur));
+    transition: var(--backdrop-transition, opacity .6s) allow-discrete;
+    backdrop-filter: blur(var(--blur));
 
     @starting-style {
         opacity: 0 !important;

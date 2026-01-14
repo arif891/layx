@@ -97,35 +97,35 @@
 	}
 
 	.err, .kwd {
-		color: #e16
+		color: light-dark(#e16, #ff5898)
 	}
 
 	.num, .class {
-		color: #f60
+		color: light-dark(#f60, #ff9d5b)
 	}
 
 	.numbers, .cmnt {
-		color: #999
+		color: light-dark(#999, #acacac)
 	}
 
 	.insert, .str {
-		color: #7d8
+		color: light-dark(#7d8, #97ffa8)
 	}
 
 	.bool {
-		color: #3bf
+		color: light-dark(#3bf, #4ea7ff)
 	}
 
 	.type, .oper {
-		color: #5af
+		color: light-dark(#5af, #8ac5ff)
 	}
 
 	.section, .func {
-		color: #84f
+		color: light-dark(#84f, #a672ff)
 	}
 
 	.deleted, .var {
-		color: #f44
+		color: light-dark(#f44, #a672ff)
 	}
 
 	.http.oneline .kwd {
@@ -133,41 +133,5 @@
 		color: #fff;
 		padding: 5px 7px;
 		border-radius: 5px
-	}
-
-	
-	[theme=dark] & {
-
-	.err, .kwd {
-		color: #ff5898
-	}
-
-	.num, .class {
-		color: #ff9d5b
-	}
-
-	.numbers, .cmnt {
-		color: #acacac
-	}
-
-	.insert, .str {
-		color: #97ffa8
-	}
-
-	.bool {
-		color: #4ea7ff
-	}
-
-	.type, .oper {
-		color: #8ac5ff
-	}
-
-	.section, .func {
-		color: #a672ff
-	}
-
-	.deleted, .var {
-		color: #ff6a6a
-	}
 	}
 }

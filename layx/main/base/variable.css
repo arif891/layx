@@ -31,7 +31,7 @@
     --link-color: light-dark(#2da5e6, #70cdff);
     --accent-color: light-dark(#bae7ff, #2da5e6);
 
-    --surface-color: hsl(from var(--bg-color) h s calc(l - (var(--srs, 10) + (var(--si, 1) - 1) * (var(--srs, 10) * 0.5)) * sign(l - .5)));
+    --surface-color: hsl(from var(--bg-color) h s calc(l - ((var(--srs, 5) + (var(--si, 1) - 1) * (var(--srs, 5) * 0.5)) * (1.5 - 0.5 * sign(l - .5))) * sign(l - .5)));
 
     color-scheme: light dark;
 }

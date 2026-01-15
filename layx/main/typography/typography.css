@@ -29,6 +29,14 @@ p, .p, h6, h5, h4, h3, h2, h1,  .h6,.h5,.h4,.h3,.h2,.h1 {
     &.pr {
         text-wrap: pretty;
     }
+
+    &.ca {
+        text-box: trim-both cap alphabetic;
+    }
+
+    &.ct {
+        text-box: trim-both cap text;
+    }
 }
 
 

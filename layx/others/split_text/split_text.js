@@ -16,11 +16,10 @@ class SplitText {
         this.selector = selector;
         this.opts = { autoRefresh: false, ...options };
         this.elMap = new WeakMap();
-        this.validTypes = new Set(['word', 'letter', 'both']);
         
-        this._globalLetterIdx = 0;
+        this._globalCharIdx = 0;
         this._globalWordIdx = 0;
-        this._letters = [];
+        this._chars = [];
         this._wordWraps = [];
 
         this._observer = null;
@@ -35,33 +34,42 @@ class SplitText {
         document.querySelectorAll(this.selector).forEach(el => this._splitIfNeeded(el));
     }
 
+    refresh() {
+        this.init();
+    }
+
     _splitIfNeeded(el) {
         if (this.elMap.has(el)) return;
-        if (!el.textContent.trim()) return;
+        
+        const rawContent = el.textContent.trim();
+        if (!rawContent) return;
 
-        this._globalLetterIdx = 0;
+        el.setAttribute('aria-label', rawContent);
+        el.setAttribute('role', 'text');
+
+        this._globalCharIdx = 0;
         this._globalWordIdx = 0;
-        this._letters = [];
+        this._chars = [];
         this._wordWraps = [];
 
         const type = (el.dataset.splitText || 'both').toLowerCase();
         const mode = this._getSplitFrom(el);
 
-        const fragment = this._processNodes(Array.from(el.childNodes));
+        const fragment = this._processNodes(Array.from(el.childNodes), type);
 
         el.innerHTML = '';
         el.appendChild(fragment);
 
-        this._assignIndices(this._letters, mode, 'letter');
+        this._assignIndices(this._chars, mode, 'char');
         this._assignIndices(this._wordWraps.map(w => w.querySelector('.word')), mode, 'word');
 
-        if (type !== 'letter') el.style.setProperty('--words', this._globalWordIdx);
-        if (type !== 'word') el.style.setProperty('--letters', this._globalLetterIdx);
+        if (type !== 'char') el.style.setProperty('--words', this._globalWordIdx);
+        if (type !== 'word') el.style.setProperty('--chars', this._globalCharIdx);
 
         this.elMap.set(el, { type });
     }
 
-    _processNodes(nodes) {
+    _processNodes(nodes, type) {
         const fragment = document.createDocumentFragment();
 
         nodes.forEach(node => {
@@ -72,15 +80,14 @@ class SplitText {
                         fragment.appendChild(document.createTextNode(word));
                         return;
                     }
-                    const wrap = this._createWordSpan(word);
+                    const wrap = this._createWordSpan(word, type);
                     this._wordWraps.push(wrap);
                     fragment.appendChild(wrap);
                 });
-            } else if (node.nodeType === 1) {
+            } else if (node.nodeType === 1) { 
                 const clone = node.cloneNode(false); 
                 const children = Array.from(node.childNodes);
-                
-                clone.appendChild(this._processNodes(children));
+                clone.appendChild(this._processNodes(children, type));
                 fragment.appendChild(clone);
             }
         });
@@ -88,21 +95,26 @@ class SplitText {
         return fragment;
     }
 
-    _createWordSpan(word) {
+    _createWordSpan(word, type) {
         const wrap = document.createElement('span');
         wrap.className = 'word-wrap';
+        wrap.setAttribute('aria-hidden', 'true');
         
         const wordSpan = document.createElement('span');
         wordSpan.className = 'word';
         wordSpan.dataset.globalIdx = this._globalWordIdx++;
 
-        for (const ch of word) {
-            const l = document.createElement('span');
-            l.className = 'letter';
-            l.textContent = ch;
-            l.dataset.globalIdx = this._globalLetterIdx++;
-            wordSpan.appendChild(l);
-            this._letters.push(l);
+        if (type === 'char' || type === 'both') {
+            for (const ch of word) {
+                const c = document.createElement('span');
+                c.className = 'char';
+                c.textContent = ch;
+                c.dataset.globalIdx = this._globalCharIdx++;
+                wordSpan.appendChild(c);
+                this._chars.push(c);
+            }
+        } else {
+            wordSpan.textContent = word;
         }
 
         wrap.appendChild(wordSpan);
@@ -116,11 +128,15 @@ class SplitText {
 
     _assignIndices(list, mode, cssPrefix) {
         const n = list.length;
+        if (n === 0) return;
+
         const mid = n / 2 - 0.5;
         list.forEach((item, i) => {
+            if (!item) return;
             const idx = mode === 'center'
                 ? Math.floor(Math.abs(i - mid) + (n % 2 === 0 ? 1 : 0))
                 : mode === 'end' ? n - 1 - i : i;
+            
             item.style.setProperty(`--${cssPrefix}-index`, idx);
             item.style.setProperty('--global-index', item.dataset.globalIdx);
         });

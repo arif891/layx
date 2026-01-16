@@ -64,18 +64,18 @@
 
 @keyframes _opacity {
     to {
-        opacity: var(--_kt, 1);
+        opacity: var(--_o, 1);
     }
 }
 
 @keyframes _translate {
     to {
-        translate: var(--_kt, 0);
+        translate: var(--_t, 0);
     }
 }
 
 @keyframes _rotate {
     to {
-        rotate: var(--_kt, 0deg);
+        rotate: var(--_r, 0deg);
     }
 }

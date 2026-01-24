@@ -35,6 +35,7 @@ const optimizableFiles = [
             class: ['x', 'xs', 'y', 'ys'],
             media: true,
             templates: layout.templates,
+            wrapper: '@layer layout.helper'
         }
     },
     {
@@ -42,7 +43,8 @@ const optimizableFiles = [
         optimize: {
             class: ['num-x', 'num-y'],
             media: true,
-            templates: layout.helper.templates
+            templates: layout.helper.templates,
+            wrapper: '@layer layout.helper'
         }
     }
 ];
@@ -216,7 +218,7 @@ async function processOptimizableFile(url, importedFilePath) {
                 const styles = classNums.map(num =>
                     genStyle(template, num)
                 ).join('\n');
-                finalContent.push(styles);
+                info.wrapper ? finalContent.push(wrap(info.wrapper, styles)) : finalContent.push(styles);
             }
         });
     }
@@ -238,7 +240,8 @@ async function processOptimizableFile(url, importedFilePath) {
                         genStyle(template, num, mediaKey)
                     ).join('\n');
 
-                    finalContent.push(wrapMedia(mediaQuery, styles));
+                  const wrappedStyles = wrap(`@media ${mediaQuery}`, styles);
+                  info.wrapper ? finalContent.push(wrap(info.wrapper, wrappedStyles)) : finalContent.push(wrappedStyles);
                 }
             });
         });
@@ -247,8 +250,8 @@ async function processOptimizableFile(url, importedFilePath) {
     return finalContent.join('\n');
 }
 
-function wrapMedia(media, content) {
-    return `@media ${media} {${content}}`
+function wrap(wrapper, content) {
+    return `${wrapper} {${content}}`
 }
 
 function genStyle(template, num, media = '') {

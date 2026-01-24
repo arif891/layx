@@ -191,8 +191,9 @@ async function processImports(content, filePath, type, optimize, isPageFile) {
 
     const topRegex = /\/\*<top>\*\/([\s\S]*?)\/\*<\/top>\*\//;
     const topMatch = content.match(topRegex);
+    let topContent = '';
     if (topMatch) {
-        const topContent = topMatch[1].trim();
+        topContent = topMatch[1].trim();
         content = content.replace(topRegex, '').trim();
     }
 

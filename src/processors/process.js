@@ -193,7 +193,7 @@ async function processImports(content, filePath, type, optimize, isPageFile) {
     const topMatch = content.match(topRegex);
     let topContent = '';
     if (topMatch) {
-        topContent = topMatch[1].trim();
+        topContent = topMatch[0].trim();
         content = content.replace(topRegex, '').trim();
     }
 

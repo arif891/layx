@@ -189,7 +189,14 @@ async function processImports(content, filePath, type, optimize, isPageFile) {
         }
     }));
 
-    return [...importedContents, content].join('\n');
+    const topRegex = /\/\*<top>\*\/([\s\S]*?)\/\*<\/top>\*\//;
+    const topMatch = content.match(topRegex);
+    if (topMatch) {
+        const topContent = topMatch[1].trim();
+        content = content.replace(topRegex, '').trim();
+    }
+
+    return [topContent, ...importedContents, content].join('\n');
 }
 
 async function processOptimizableFile(url, importedFilePath) {

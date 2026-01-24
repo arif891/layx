@@ -1,5 +1,6 @@
-/* Layer order */
+/*<top>*/
 @layer base, layout, components, others, utilities;
+/*</top>*/
 
 /* Main */
 @import url(main/base/variable.css);

@@ -1,3 +1,4 @@
+/* Layer order */
 @layer base, layout, components, others, utilities;
 
 /* Main */

@@ -1,44 +1,46 @@
-container, .container {
-    display: block;
-    margin-inline: var(--edge-offset-x, 0px);
+@layer layout {
+    container, .container {
+        display: block;
+        margin-inline: var(--edge-offset-x, 0px);
 
-    &:not(.sm, .lg, .uwd, .suwd) {
-        --edge-offset-x: .75rem;
-    }
-
-    &.edge {
-        display: grid;
-        grid-template-columns: var(--edge-offset-x, 0px) 1fr var(--edge-offset-x, 0px);
-        margin-inline: unset;
-
-        & > * {
-            grid-column: 2;
+        &:not(.sm, .lg, .uwd, .suwd) {
+            --edge-offset-x: .75rem;
         }
 
-        & > .full { 
-            grid-column: span 3;
-        }
-    }
- 
-    @media (width >= 576px) {
-        &:not(.lg, .uwd, .suwd) {
-            --edge-offset-x: 2.5% !important;
-        }
-    }
+        &.edge {
+            display: grid;
+            grid-template-columns: var(--edge-offset-x, 0px) 1fr var(--edge-offset-x, 0px);
+            margin-inline: unset;
 
-    @media (width >= 992px) {
-        &:not(.uwd, .suwd) {
-        --edge-offset-x: 5% !important;
-        }
-    }
+            &>* {
+                grid-column: 2;
+            }
 
-    @media (aspect-ratio >= 21/9) and (width >= 2000px) {
-        &:not(.suwd) {
-        --edge-offset-x: 15% !important;
+            &>.full {
+                grid-column: span 3;
+            }
         }
-    }
 
-    @media (aspect-ratio >= 32/9) and (width >= 3000px) {
-        --edge-offset-x: 25% !important;
+        @media (width >=576px) {
+            &:not(.lg, .uwd, .suwd) {
+                --edge-offset-x: 2.5% !important;
+            }
+        }
+
+        @media (width >=992px) {
+            &:not(.uwd, .suwd) {
+                --edge-offset-x: 5% !important;
+            }
+        }
+
+        @media (aspect-ratio >=21/9) and (width >=2000px) {
+            &:not(.suwd) {
+                --edge-offset-x: 15% !important;
+            }
+        }
+
+        @media (aspect-ratio >=32/9) and (width >=3000px) {
+            --edge-offset-x: 25% !important;
+        }
     }
 }

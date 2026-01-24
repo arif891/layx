@@ -1,3 +1,4 @@
+@layer components {
 dialog {
   --edge-offset-x: .5rem;
   --edge-offset-y: .5rem;
@@ -184,4 +185,5 @@ dialog {
   100% {
     opacity: 0;
   }
+}
 }

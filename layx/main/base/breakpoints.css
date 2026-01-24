@@ -1,21 +1,32 @@
-/* Define breakpoints for different screen sizes */
-:root {
-    --breakpoint-xs: 0px;       /* Extra small (phones, less than 576px) */
-    --breakpoint-sm: 576px;     /* Small (tablets) */
-    --breakpoint-md: 768px;     /* Medium (desktops) */
-    --breakpoint-lg: 992px;     /* Large (desktops) */
-    --breakpoint-xl: 1200px;    /* Extra large (large desktops) */
-    --breakpoint-xxl: 1400px;   /* Extra extra large (very large desktops) */
-    --breakpoint-xxxl: 1800px;  /* Ultra-wide (extra large desktops) */
-    
-    /* Aspect ratio breakpoints */
-    --breakpoint-wd: 16 / 9;    /* Standard widescreen */
-    --breakpoint-uwd: 21 / 9;   /* Ultrawide */
-    --breakpoint-suwd: 32 / 9;  /* Super ultrawide */
-}
+@layer base {
+    /* Define breakpoints for different screen sizes */
+    :root {
+        --breakpoint-xs: 0px;
+        /* Extra small (phones, less than 576px) */
+        --breakpoint-sm: 576px;
+        /* Small (tablets) */
+        --breakpoint-md: 768px;
+        /* Medium (desktops) */
+        --breakpoint-lg: 992px;
+        /* Large (desktops) */
+        --breakpoint-xl: 1200px;
+        /* Extra large (large desktops) */
+        --breakpoint-xxl: 1400px;
+        /* Extra extra large (very large desktops) */
+        --breakpoint-xxxl: 1800px;
+        /* Ultra-wide (extra large desktops) */
+
+        /* Aspect ratio breakpoints */
+        --breakpoint-wd: 16 / 9;
+        /* Standard widescreen */
+        --breakpoint-uwd: 21 / 9;
+        /* Ultrawide */
+        --breakpoint-suwd: 32 / 9;
+        /* Super ultrawide */
+    }
 
 
-/*
+    /*
 @custom-media --sm (width >= 576px);
 @custom-media --md (width >= 768px);
 @custom-media --lg (width >= 992px);
@@ -38,94 +49,95 @@
 */
 
 
-/* (sm) Small devices (576px and up) */
-@media (width >= 576px) {
-    /* Styles for small devices */
-}
+    /* (sm) Small devices (576px and up) */
+    @media (width >=576px) {
+        /* Styles for small devices */
+    }
 
-/* (md) Medium devices (768px and up) */
-@media (width >= 768px) {
-    /* Styles for medium devices */
-}
+    /* (md) Medium devices (768px and up) */
+    @media (width >=768px) {
+        /* Styles for medium devices */
+    }
 
-/* (lg) Large devices (992px and up) */
-@media (width >= 992px) {
-    /* Styles for large devices */
-}
+    /* (lg) Large devices (992px and up) */
+    @media (width >=992px) {
+        /* Styles for large devices */
+    }
 
-/* (xl) X-Large devices (1200px and up) */
-@media (width >= 1200px) {
-    /* Styles for extra-large devices */
-}
+    /* (xl) X-Large devices (1200px and up) */
+    @media (width >=1200px) {
+        /* Styles for extra-large devices */
+    }
 
-/* (xxl) XX-Large devices (1400px and up) */
-@media (width >= 1400px) {
-    /* Styles for extra-extra large devices */
-}
+    /* (xxl) XX-Large devices (1400px and up) */
+    @media (width >=1400px) {
+        /* Styles for extra-extra large devices */
+    }
 
-/* (xxxl) XXX-Large devices (1800px and up) */
-@media (width >= 1800px) {
-    /* Styles for ultra-wide devices */
-}
+    /* (xxxl) XXX-Large devices (1800px and up) */
+    @media (width >=1800px) {
+        /* Styles for ultra-wide devices */
+    }
 
-/* Aspect ratio-based media queries */
+    /* Aspect ratio-based media queries */
 
-/* Wide screens (16:9 and wider, 1800px and up) */
-@media (aspect-ratio >= 16 / 9) and (width >= 1800px) {
-    /* Styles for widescreen displays */
-}
+    /* Wide screens (16:9 and wider, 1800px and up) */
+    @media (aspect-ratio >=16 / 9) and (width >=1800px) {
+        /* Styles for widescreen displays */
+    }
 
-/* Ultrawide screens (21:9 and wider, 2000px and up) */
-@media (aspect-ratio >= 21 / 9) and (width >= 2000px) {
-    /* Styles for ultrawide displays */
-}
+    /* Ultrawide screens (21:9 and wider, 2000px and up) */
+    @media (aspect-ratio >=21 / 9) and (width >=2000px) {
+        /* Styles for ultrawide displays */
+    }
 
-/* Super ultrawide screens (32:9 and wider, 3000px and up) */
-@media (aspect-ratio >= 32 / 9) and (width >= 3000px) {
-    /* Styles for super ultrawide displays */
-}
+    /* Super ultrawide screens (32:9 and wider, 3000px and up) */
+    @media (aspect-ratio >=32 / 9) and (width >=3000px) {
+        /* Styles for super ultrawide displays */
+    }
 
-/* (xs) Extra small devices (below 576px) */
-@media (width < 576px) {
-    /* Styles for extra small devices */
-}
+    /* (xs) Extra small devices (below 576px) */
+    @media (width < 576px) {
+        /* Styles for extra small devices */
+    }
 
-/* (sm) Small devices (below 768px) */
-@media (width < 768px) {
-    /* Styles for small devices */
-}
+    /* (sm) Small devices (below 768px) */
+    @media (width < 768px) {
+        /* Styles for small devices */
+    }
 
-/* (md) Medium devices (below 992px) */
-@media (width < 992px) {
-    /* Styles for medium devices */
-}
+    /* (md) Medium devices (below 992px) */
+    @media (width < 992px) {
+        /* Styles for medium devices */
+    }
 
-/* (lg) Large devices (below 1200px) */
-@media (width < 1200px) {
-    /* Styles for large devices */
-}
+    /* (lg) Large devices (below 1200px) */
+    @media (width < 1200px) {
+        /* Styles for large devices */
+    }
 
-/* (xl) Extra large devices (below 1400px) */
-@media (width < 1400px) {
-    /* Styles for extra large devices */
-}
+    /* (xl) Extra large devices (below 1400px) */
+    @media (width < 1400px) {
+        /* Styles for extra large devices */
+    }
 
-/* (xxl) Extra extra large devices (below 1800px) */
-@media (width < 1800px) {
-    /* Styles for extra extra large devices */
-}
+    /* (xxl) Extra extra large devices (below 1800px) */
+    @media (width < 1800px) {
+        /* Styles for extra extra large devices */
+    }
 
-/* Smaller than wide screens (below 16:9, 1800px) */
-@media (aspect-ratio < 16 / 9) and (width < 1800px) {
-    /* Styles for smaller than widescreen displays */
-}
+    /* Smaller than wide screens (below 16:9, 1800px) */
+    @media (aspect-ratio < 16 / 9) and (width < 1800px) {
+        /* Styles for smaller than widescreen displays */
+    }
 
-/* Smaller than ultrawide screens (below 21:9, 2000px) */
-@media (aspect-ratio < 21 / 9) and (width < 2000px) {
-    /* Styles for smaller than ultrawide displays */
-}
+    /* Smaller than ultrawide screens (below 21:9, 2000px) */
+    @media (aspect-ratio < 21 / 9) and (width < 2000px) {
+        /* Styles for smaller than ultrawide displays */
+    }
 
-/* Smaller than super ultrawide screens (below 32:9, 3000px) */
-@media (aspect-ratio < 32 / 9) and (width < 3000px) {
-    /* Styles for smaller than super ultrawide displays */
+    /* Smaller than super ultrawide screens (below 32:9, 3000px) */
+    @media (aspect-ratio < 32 / 9) and (width < 3000px) {
+        /* Styles for smaller than super ultrawide displays */
+    }
 }

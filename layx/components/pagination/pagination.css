@@ -1,3 +1,4 @@
+@layer components {
 pagination, .pagination {
   --gap: .5rem;
   --radius: .25rem;
@@ -65,4 +66,5 @@ pagination, .pagination {
       background: var(--item-hover-bg);
     }
   }
+}
 }

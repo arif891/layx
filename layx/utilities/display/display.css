@@ -1,3 +1,4 @@
+@layer utilities {
 .d-inline, .d-i, .inline {
     display: inline !important;
 }
@@ -28,4 +29,5 @@
 
 .d-none, .d-n, .none {
     display: none !important;
+}
 }

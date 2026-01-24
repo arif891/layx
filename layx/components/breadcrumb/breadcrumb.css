@@ -1,22 +1,24 @@
-breadcrumb,.breadcrumb {
-    --separator: '/';
-    --space: .5rem;
-    display: flex;
+@layer components {
+    breadcrumb, .breadcrumb {
+        --separator: '/';
+        --space: .5rem;
+        display: flex;
 
-    .item {
+        .item {
 
-        &.active {
-            a {
-                color: inherit;
-                pointer-events: none;
-                text-decoration: none;
+            &.active {
+                a {
+                    color: inherit;
+                    pointer-events: none;
+                    text-decoration: none;
+                }
             }
-        }
 
-        &:not(:last-child)::after {
-            content: var(--separator);
-            margin-inline: var(--space);
-            color: var(--separator-color, var(--color, #2e2e2e));
+            &:not(:last-child)::after {
+                content: var(--separator);
+                margin-inline: var(--space);
+                color: var(--separator-color, var(--color, #2e2e2e));
+            }
         }
     }
 }

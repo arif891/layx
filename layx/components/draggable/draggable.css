@@ -1,3 +1,4 @@
+@layer components {
 draggable, .draggable {
     --edge-offset: 5px;
     --bg: var(--surface-color, rgb(250, 250, 250));
@@ -64,4 +65,5 @@ draggable, .draggable {
     &.bottom {
         translate: var(--edge-offset, 0px) calc(100dvh - (100% + var(--edge-offset, 0px)));
     }
+}
 }

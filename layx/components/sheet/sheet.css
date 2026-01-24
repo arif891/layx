@@ -1,3 +1,4 @@
+@layer components {
 sheet, .sheet {
   --edge-offset-x: 0;
   --edge-offset-y: 0;
@@ -164,4 +165,5 @@ sheet, .sheet {
     overscroll-behavior: none;
     overflow: hidden;
   }
+}
 }

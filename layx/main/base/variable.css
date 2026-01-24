@@ -1,45 +1,47 @@
-/* Important variables */
-:root {
-    /* Typography */
-    --ff-sans: 'Red Hat Display', sans-serif;
+@layer base {
+    /* Important variables */
+    :root {
+        /* Typography */
+        --ff-sans: 'Red Hat Display', sans-serif;
 
-    --font-family: var(--ff-sans);
-    --font-size: initial;
-    --font-weight: 500;
-    --line-height: initial;
+        --font-family: var(--ff-sans);
+        --font-size: initial;
+        --font-weight: 500;
+        --line-height: initial;
 
-    /* Base Spacing and Sizing */
-    --base-space: .5rem;
-    --base-radius: .5rem;
-    --base-vpu: calc(.1vh + .1vw);
+        /* Base Spacing and Sizing */
+        --base-space: .5rem;
+        --base-radius: .5rem;
+        --base-vpu: calc(.1vh + .1vw);
 
-    /* Animation and Transitions */
-    --base-duration: .6s;
+        /* Animation and Transitions */
+        --base-duration: .6s;
 
-    /* Others */
-    --space: var(--base-space);
-    --radius: var(--base-radius);
-    --vpu: var(--base-vpu);
-    --duration: var(--base-duration);
+        /* Others */
+        --space: var(--base-space);
+        --radius: var(--base-radius);
+        --vpu: var(--base-vpu);
+        --duration: var(--base-duration);
 
-    /* Colors */
-    --color: light-dark(#000, #fff);
-    --bg-color: light-dark(#fff, #000);
+        /* Colors */
+        --color: light-dark(#000, #fff);
+        --bg-color: light-dark(#fff, #000);
 
-    --heading-color: light-dark(#000, #fff);
-    --paragraph-color: light-dark(#353c4a, #f1f1f1);
-    --link-color: light-dark(#2da5e6, #70cdff);
-    --accent-color: light-dark(#bae7ff, #2da5e6);
+        --heading-color: light-dark(#000, #fff);
+        --paragraph-color: light-dark(#353c4a, #f1f1f1);
+        --link-color: light-dark(#2da5e6, #70cdff);
+        --accent-color: light-dark(#bae7ff, #2da5e6);
 
-    --surface-color: hsl(from var(--bg-color) h s calc(l - ((var(--srs, 5) + (var(--si, 1) - 1) * (var(--srs, 5) * 0.5)) * (1.5 - 0.5 * sign(l - .5))) * sign(l - .5)));
+        --surface-color: hsl(from var(--bg-color) h s calc(l - ((var(--srs, 5) + (var(--si, 1) - 1) * (var(--srs, 5) * 0.5)) * (1.5 - 0.5 * sign(l - .5))) * sign(l - .5)));
 
-    color-scheme: light dark;
-}
+        color-scheme: light dark;
+    }
 
-[theme=light] {
-    color-scheme: light;
-}
+    [theme=light] {
+        color-scheme: light;
+    }
 
-[theme=dark] {
-    color-scheme: dark;
+    [theme=dark] {
+        color-scheme: dark;
+    }
 }

@@ -1,7 +1,9 @@
+@layer utilities {
 :root,[theme=light] { 
 
 }
 
 [theme=dark] {
 
+}
 }

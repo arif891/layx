@@ -1,3 +1,4 @@
+@layer components {
 carousel, .carousel {
     --min-height: 300px;
     --edge-offset: .5rem;
@@ -118,4 +119,6 @@ carousel, .carousel {
             }
         }
     }
+}
+
 }

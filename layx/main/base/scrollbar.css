@@ -1,26 +1,29 @@
-/* default Scrollbar Fix */
-:root {
-    --_color: var(--scrollbar-color, var(--color, #000));
-    scrollbar-width: thin;
-    scrollbar-color: rgb(from var(--_color) r g b / .3) var(--bg-color, #fff);
-}
+@layer base {
 
-body {
-    scrollbar-color: rgb(from var(--_color) r g b / .3) transparent;
-}
+    /* default Scrollbar Fix */
+    :root {
+        --_color: var(--scrollbar-color, var(--color, #000));
+        scrollbar-width: thin;
+        scrollbar-color: rgb(from var(--_color) r g b / .3) var(--bg-color, #fff);
+    }
 
-* {
-    scrollbar-width: thin;
-}
+    body {
+        scrollbar-color: rgb(from var(--_color) r g b / .3) transparent;
+    }
 
-.sb-auto {
-    scrollbar-width: auto;
-}
+    * {
+        scrollbar-width: thin;
+    }
 
-.sb-thin {
-    scrollbar-width: thin;
-}
+    .sb-auto {
+        scrollbar-width: auto;
+    }
 
-.sb-none {
-    scrollbar-width: none;
+    .sb-thin {
+        scrollbar-width: thin;
+    }
+
+    .sb-none {
+        scrollbar-width: none;
+    }
 }

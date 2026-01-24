@@ -1,3 +1,4 @@
+@layer components {
 :is(form, label, input, textarea, select, option, .validate-wrapper):not(.default) {
     --padding-x: .85rem;
     --padding-y: 1rem;
@@ -459,4 +460,5 @@ select:not(.default) {
             margin-bottom: unset;
         }
     }
+}
 }

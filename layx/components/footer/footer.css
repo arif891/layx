@@ -1,3 +1,4 @@
+@layer components {
 .footer__section {
     --padding-x: 1rem;
     --padding-y: 1.5rem;
@@ -58,4 +59,5 @@
             }
         }
     }
+}
 }

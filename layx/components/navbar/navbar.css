@@ -1,3 +1,4 @@
+@layer components {
 navbar, .navbar {
     /* Base Variables */
     --transition: .3s;
@@ -351,4 +352,5 @@ navbar, .navbar {
 body:has(:is(navbar, .navbar)[open]) {
     overflow: hidden;
     overscroll-behavior: none;
+}
 }

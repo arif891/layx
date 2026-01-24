@@ -1,3 +1,4 @@
+@layer utilities {
 .static {
     position: static;
 }
@@ -16,4 +17,5 @@
 
 .sticky {
     position: sticky;
+}
 }

@@ -1,3 +1,4 @@
+@layer components {
 card, .card {
   --padding: 1rem;
   --gap: .5rem;
@@ -80,4 +81,5 @@ card, .card {
     padding: calc(var(--padding) * .75);
     border-radius: max(calc(var(--radius) - var(--padding)), min(.2rem, var(--radius)));
   }
+}
 }

@@ -1,21 +1,23 @@
-/* Other color variables (light theme) */
-:root {
-    /* Colors */
-    --brand-color: light-dark(#2DD4BF, #5EEAD4);
-    --primary-color: light-dark(#3B82F6, #60A5FA);
-    --secondary-color: light-dark(#94A3B8, #64748B);
+@layer base {
+    /* Other color variables (light theme) */
+    :root {
+        /* Colors */
+        --brand-color: light-dark(#2DD4BF, #5EEAD4);
+        --primary-color: light-dark(#3B82F6, #60A5FA);
+        --secondary-color: light-dark(#94A3B8, #64748B);
 
-    /* Surface Colors */
-    --surface-color-m: hsl(from var(--bg-color) h s calc(l - 2.5 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
-    --surface-color-2: hsl(from var(--bg-color) h s calc(l - 10 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
-    --surface-color-3: hsl(from var(--bg-color) h s calc(l - 15 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
-    --surface-color-4: hsl(from var(--bg-color) h s calc(l - 20 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
-    --surface-color-5: hsl(from var(--bg-color) h s calc(l - 25 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
-    --surface-color-6: hsl(from var(--bg-color) h s calc(l - 30 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
+        /* Surface Colors */
+        --surface-color-m: hsl(from var(--bg-color) h s calc(l - 2.5 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
+        --surface-color-2: hsl(from var(--bg-color) h s calc(l - 10 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
+        --surface-color-3: hsl(from var(--bg-color) h s calc(l - 15 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
+        --surface-color-4: hsl(from var(--bg-color) h s calc(l - 20 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
+        --surface-color-5: hsl(from var(--bg-color) h s calc(l - 25 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
+        --surface-color-6: hsl(from var(--bg-color) h s calc(l - 30 * (1.5 - 0.5 * sign(l - .5)) * sign(l - .5)));
 
-    /* States */
-    --success-color: light-dark(#10B981, #34D399);
-    --warning-color: light-dark(#F59E0B, #FBBF24);
-    --danger-color: light-dark(#EF4444, #F87171);
-    --info-color: light-dark(#0EA5E9, #38BDF8);
+        /* States */
+        --success-color: light-dark(#10B981, #34D399);
+        --warning-color: light-dark(#F59E0B, #FBBF24);
+        --danger-color: light-dark(#EF4444, #F87171);
+        --info-color: light-dark(#0EA5E9, #38BDF8);
+    }
 }

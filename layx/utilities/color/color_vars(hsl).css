@@ -1,3 +1,4 @@
+@layer utilities {
 :root {
     /* Slate Colors */
     --color-slate-50: hsl(210, 40%, 98%);
@@ -284,4 +285,5 @@
     --color-rose-800: hsl(345, 80%, 39%);
     --color-rose-900: hsl(348, 70%, 32%);
     --color-rose-950: hsl(346, 85%, 19%);
+}
 }

@@ -1,3 +1,4 @@
+@layer components {
 [data-tooltip] {
     position: relative;
     margin-top: 3rem;
@@ -42,4 +43,5 @@
         border-top: .5rem solid var(--tooltip-bg, #000);
         translate: -50% -.5rem;
     }
+}
 }

@@ -14,8 +14,8 @@ class SmoothScroll {
       console.warn('Smooth Scroll already initialized.'); return window.__smoothScrollInstance;
     }
 
-    this.ease = opts.ease ?? document.documentElement.dataset.ease ?? 0.015;
-    this.threshold = opts.threshold ?? document.documentElement.dataset.threshold ?? .1;   // px under which we snap
+    this.lerp = opts.lerp ?? document.documentElement.dataset.lerp ?? .075 / 5;
+    this.threshold = opts.threshold ?? document.documentElement.dataset.threshold ?? 1;   // px under which we snap
     this.easing = this._validateEasing(opts.easing ?? document.documentElement.dataset.easing ?? 'easeOutCubic');
     this.preventWithKeys = opts.preventWithKeys ?? true;
     this.preventWithAttribute = opts.preventWithAttribute ?? false;
@@ -146,11 +146,11 @@ class SmoothScroll {
     }
     const fn = this.easing;
     const norm = Math.min(1, Math.abs(dy) / innerHeight);
-    this.current += dy * this.ease * (1 + fn(1 - norm));
+    this.current += dy * this.lerp * (1 + fn(1 - norm));
     scrollTo(0, this.current);
     this.emit('update', { currentScroll: this.current, diff: dy });
     this.raf = requestAnimationFrame(this._tick);
   }
 }
 
-new SmoothScroll();
+export default new SmoothScroll();

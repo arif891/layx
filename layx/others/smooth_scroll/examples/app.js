@@ -2,6 +2,7 @@ import scroller from '../smooth_scroll.js';
 
 // Expose scroller to window for the button onclick handlers in HTML (for demo purposes)
 window.scroller = scroller;
+scroller.preventWithAttribute = true;
 
 const statusEl = document.getElementById('status');
 

@@ -1,4 +1,4 @@
-export class SyntaxHighlighter {
+class SyntaxHighlighter {
   constructor() {
     this._langs = {};
     this._escapeRx = /[&<>]/g;
@@ -160,4 +160,4 @@ export class SyntaxHighlighter {
   }
 }
 
-new SyntaxHighlighter();
+export default new SyntaxHighlighter();

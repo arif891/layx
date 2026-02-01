@@ -11,20 +11,23 @@ class SmoothScroll {
   /* ---------- ctor -------------------------------------------------- */
   constructor(opts = {}) {
     if (window.__smoothScrollInstance) {
-      console.warn('Smooth Scroll already initialized.'); return window.__smoothScrollInstance;
+      console.warn('Smooth Scroll already initialized.');
+      return window.__smoothScrollInstance;
     }
 
-    this.lerp = opts.lerp ?? document.documentElement.dataset.lerp ?? .075 / 5;
+    this.lerp = opts.lerp ?? document.documentElement.dataset.lerp ?? .1 / 4;
     this.threshold = opts.threshold ?? document.documentElement.dataset.threshold ?? 1;   // px under which we snap
     this.easing = this._validateEasing(opts.easing ?? document.documentElement.dataset.easing ?? 'easeOutCubic');
     this.preventWithKeys = opts.preventWithKeys ?? true;
-    this.preventWithAttribute = opts.preventWithAttribute ?? false;
+    this.preventWithAttribute = opts.preventWithAttribute ?? true;
+    this.targetFPS = opts.targetFPS ?? 60; // Base framerate for calculations
 
     this.target = window.scrollY;           // where we want to be
     this.current = window.scrollY;          // where we are
     this.scrollLocked = false;
     this.isRunning = false;
     this.raf = 0;
+    this.lastTime = 0;                      // for delta time calculation
 
     this.events = { start: [], update: [], complete: [], interrupt: [] };
 
@@ -73,7 +76,7 @@ class SmoothScroll {
   _validateEasing(e) {
     if (typeof e === 'function') return e;
     if (SmoothScroll.EASING[e]) return SmoothScroll.EASING[e];
-    console.warn(`[SmoothScroll] unknown easing “${e}” → linear`);
+    console.warn(`[SmoothScroll] unknown easing "${e}" → linear`);
     return SmoothScroll.EASING.linear;
   }
   _clamp(y) {
@@ -90,7 +93,9 @@ class SmoothScroll {
       if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
     }
     if (this.preventWithAttribute && e.target.closest('[data-smooth-scroll="prevent"]')) {
-      if (this.isRunning) this.emit('interrupt'); this._stop(); return
+      if (this.isRunning) this.emit('interrupt');
+      this._stop();
+      return;
     }
     if (this.scrollLocked) return;
     e.preventDefault();
@@ -126,6 +131,7 @@ class SmoothScroll {
   _start() {
     if (this.isRunning) return;
     this.isRunning = true;
+    this.lastTime = performance.now();
     document.documentElement.style.scrollBehavior = 'auto';
     this.emit('start');
     this.raf = requestAnimationFrame(this._tick);
@@ -135,7 +141,11 @@ class SmoothScroll {
     cancelAnimationFrame(this.raf);
     document.documentElement.style.scrollBehavior = '';
   }
-  _tick() {
+  _tick(currentTime) {
+    const deltaTime = currentTime - this.lastTime;
+    this.lastTime = currentTime;
+    const deltaMultiplier = deltaTime / (1000 / this.targetFPS);
+
     const dy = this.target - this.current;
     if (Math.abs(dy) < this.threshold) {
       this.current = this.target;
@@ -144,9 +154,11 @@ class SmoothScroll {
       this.emit('complete', { finalScroll: this.current });
       return;
     }
+
     const fn = this.easing;
     const norm = Math.min(1, Math.abs(dy) / innerHeight);
-    this.current += dy * this.lerp * (1 + fn(1 - norm));
+    this.current += dy * this.lerp * (1 + fn(1 - norm)) * deltaMultiplier;
+
     scrollTo(0, this.current);
     this.emit('update', { currentScroll: this.current, diff: dy });
     this.raf = requestAnimationFrame(this._tick);

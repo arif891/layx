@@ -14,13 +14,8 @@
         --_t_scale: var(--typography-base-scale, 1);
         margin-block: 0;
 
-        &:not(:last-child) {
+        &:not(:last-child, :only-child) {
             margin-block-end: .5rem;
-        }
-
-        &.base {
-            margin: 0;
-            line-height: 1;
         }
 
         &.bl {

@@ -54,6 +54,7 @@
 				position: absolute;
 				inset: 0 var(--padding) 0 auto;
 				padding: 0 0 0 1rem;
+				border: none;
 				background: linear-gradient(to right, transparent, var(--surface-color) 20% 100%);
 			}
 		}

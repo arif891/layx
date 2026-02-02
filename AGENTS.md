@@ -239,12 +239,12 @@ The build system:
 - Uses `light-dark()` (Chrome 123+, Firefox 120+)
 - Graceful degradation for older browsers
 
-### Dependencies
+### Dev Dependencies
 - **esbuild** - Fast bundling/minification
 - **sharp** - Image optimization
 
 ### Testing
-- Local dev server runs on `localhost:81`
+- Local dev server
 - Test in multiple browsers for CSS compatibility
 - Verify dark mode with `[theme="dark"]` attribute
 

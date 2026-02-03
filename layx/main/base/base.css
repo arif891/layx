@@ -88,6 +88,8 @@
     }
 
     code {
+        white-space: pre;
+        font-family: monospace;
         color: var(--code-color, #d63384);
     }
 

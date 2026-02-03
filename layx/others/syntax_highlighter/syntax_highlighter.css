@@ -1,139 +1,130 @@
-@layer others {
-	[data-code-lang] {
-		--padding: 1rem;
-		font-family: monospace;
-		font-size: 1rem;
-		line-height: 1.5;
-		max-width: 100%;
-		background-color: var(--surface-color);
-		border-radius: var(--radius);
-		white-space: pre;
+[data-code-lang] {
+	--padding: 1rem;
+	font-family: monospace;
+	font-size: 1rem;
+	line-height: 1.5;
+	max-width: 100%;
+	background-color: var(--surface-color);
+	border-radius: var(--radius);
+	white-space: pre;
 
-		&:not(.multiline, .oneline) {
+	&.multiline {
+
+		.header {
+			display: flex;
+			justify-content: space-between;
+			padding: var(--padding);
+			border-bottom: 1px solid var(--bg-color);
+
+			.lang, .copy {
+				line-height: 1;
+				font-size: .9rem;
+			}
+		}
+
+		.wrapper {
+			display: flex;
 			padding: var(--padding);
 		}
+	}
 
-		&.multiline {
-
-			.header {
-				display: flex;
-				justify-content: space-between;
-				padding: var(--padding);
-				border-bottom: 2px solid var(--bg-color);
-
-				.lang, .copy {
-					line-height: 1;
-					font-size: .9rem;
-				}
-
-				.copy {
-					padding: 0;
-				}
-			}
-
-			.wrapper {
-				display: flex;
-				padding: var(--padding);
-				max-width: 100%;
-				overflow-x: auto;
-				scrollbar-width: thin;
-			}
-		}
-
-		&.oneline {
-			position: relative;
-			padding: var(--padding);
-
-			.wrapper {
-				max-width: 100%;
-				overflow-x: auto;
-			}
-
-			.copy {
-				position: absolute;
-				inset: 0 var(--padding) 0 auto;
-				padding: 0 0 0 1rem;
-				border: none;
-				background: linear-gradient(to right, transparent, var(--surface-color) 20% 100%);
-			}
-		}
-
-		.code {
-			color: inherit;
-			font: inherit;
-		}
+	&.oneline {
+		position: relative;
+		padding: var(--padding);
 
 		.copy {
-			&::before {
-				content: 'Copy';
-			}
+			position: absolute;
+			inset: 0 var(--padding) 0 auto;
+			padding: 0 0 0 1rem;
+			background: linear-gradient(to right, transparent, var(--surface-color) 20% 100%);
+		}
+	}
 
-			&.copied::before {
-				content: 'Copied';
-			}
+	.wrapper {
+		max-width: 100%;
+		overflow-x: auto;
+		scrollbar-width: thin;
+	}
+
+	.code {
+		color: inherit;
+		font: inherit;
+	}
+
+	.copy {
+		padding: 0;
+		background: none;
+		border: none;
+
+		&::before {
+			content: 'Copy';
 		}
 
-		.numbers {
-			padding-left: 5px;
-			counter-reset: line;
+		&.copied::before {
+			content: 'Copied';
 		}
+	}
 
-		.numbers div {
-			padding-right: 5px
-		}
+	.numbers {
+		padding-left: 5px;
+		counter-reset: line;
+	}
 
-		.numbers div::before {
-			display: block;
-			content: counter(line);
-			opacity: .6;
-			font: inherit;
-			font-variant-numeric: tabular-nums;
-			text-align: right;
-			margin-right: 5px;
-			counter-increment: line
-		}
+	.numbers div {
+		padding-right: 5px
+	}
 
-		.cmnt {
-			font-style: italic
-		}
+	.numbers div::before {
+		display: block;
+		content: counter(line);
+		opacity: .6;
+		font: inherit;
+		font-variant-numeric: tabular-nums;
+		text-align: right;
+		margin-right: 5px;
+		counter-increment: line
+	}
 
-		.err, .kwd {
-			color: light-dark(#e16, #ff5898)
-		}
+	.cmnt {
+		font-style: italic
+	}
 
-		.num, .class {
-			color: light-dark(#f60, #ff9d5b)
-		}
+	.err, .kwd {
+		color: light-dark(#e16, #ff5898)
+	}
 
-		.numbers, .cmnt {
-			color: light-dark(#999, #acacac)
-		}
+	.num, .class {
+		color: light-dark(#f60, #ff9d5b)
+	}
 
-		.insert, .str {
-			color: light-dark(#7d8, #97ffa8)
-		}
+	.numbers, .cmnt {
+		color: light-dark(#999, #acacac)
+	}
 
-		.bool {
-			color: light-dark(#3bf, #4ea7ff)
-		}
+	.insert, .str {
+		color: light-dark(#7d8, #97ffa8)
+	}
 
-		.type, .oper {
-			color: light-dark(#5af, #8ac5ff)
-		}
+	.bool {
+		color: light-dark(#3bf, #4ea7ff)
+	}
 
-		.section, .func {
-			color: light-dark(#84f, #a672ff)
-		}
+	.type, .oper {
+		color: light-dark(#5af, #8ac5ff)
+	}
 
-		.deleted, .var {
-			color: light-dark(#f44, #a672ff)
-		}
+	.section, .func {
+		color: light-dark(#84f, #a672ff)
+	}
 
-		.http.oneline .kwd {
-			background: #25f;
-			color: #fff;
-			padding: 5px 7px;
-			border-radius: 5px
-		}
+	.deleted, .var {
+		color: light-dark(#f44, #a672ff)
+	}
+
+	.http.oneline .kwd {
+		background: #25f;
+		color: #fff;
+		padding: 5px 7px;
+		border-radius: 5px
 	}
 }

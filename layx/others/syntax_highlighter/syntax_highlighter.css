@@ -5,6 +5,7 @@
 	font-size: 1rem;
 	line-height: 1.5;
 	max-width: 100%;
+	color: inherit;
 	background-color: var(--surface-color);
 	border-radius: var(--radius);
 	white-space: pre;

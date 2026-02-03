@@ -84,7 +84,7 @@
     }
 
     pre {
-        margin-block: unset;
+        margin-block: 0;
     }
 
     code {

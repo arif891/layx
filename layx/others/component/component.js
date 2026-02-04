@@ -16,7 +16,10 @@ class Component {
         }
         this._ctx = {
             ...dataContext,
-            renderList: (items, callback) => items.map(callback).join('')
+            renderList: (items, cb) => items?.map(cb).join('') ?? '',
+            when: (cond, html, otherwise = '') => cond ? html : otherwise,
+            esc: (str) => String(str).replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[s]),
+            classes: (obj) => Object.entries(obj).filter(([_, v]) => v).map(([k]) => k).join(' ')
         };
         this._debug = this.options.debug;
         this._registry = Object.create(null);

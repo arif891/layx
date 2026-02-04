@@ -19,11 +19,11 @@
         }
 
         &.bl {
-            text-wrap: balance;
+            text-wrap-style: balance;
         }
 
         &.pr {
-            text-wrap: pretty;
+            text-wrap-style: pretty;
         }
 
         &.ca {
@@ -40,6 +40,7 @@
         font-weight: var(--heading-font-weight, 500);
         line-height: var(--heading-line-height, 1.2);
         color: var(--heading-color);
+        text-wrap-style: balance;
     }
 
     h1, .h1 {
@@ -72,5 +73,6 @@
         font-weight: var(--paragraph-font-weight, 500);
         line-height: var(--paragraph-line-height, 1.5);
         color: var(--paragraph-color);
+        text-wrap-style: pretty;
     }
 }

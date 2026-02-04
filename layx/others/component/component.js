@@ -14,7 +14,10 @@ class Component {
             debug: true,
             ...options
         }
-        this._ctx = dataContext;
+        this._ctx = {
+            ...dataContext,
+            renderList: (items, callback) => items.map(callback).join('')
+        };
         this._debug = this.options.debug;
         this._registry = Object.create(null);
         this._fetching = new Map();
@@ -219,4 +222,4 @@ class Component {
     }
 }
 
-new Component();
+export default Component;

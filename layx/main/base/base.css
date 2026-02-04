@@ -79,6 +79,22 @@
         }
     }
 
+    b, strong {
+        font-weight: 650;
+    }
+
+    q {
+        font-style: italic;
+        opacity: .8;
+    }
+
+    blockquote {
+        margin: 1rem 0;
+        padding: 0 1rem;
+        border-left: .25rem solid var(--accent-color, #55c1ff);
+        opacity: .8;
+    }
+
     pre, code, kbd, samp {
         font-size: min(calc(.8rem + .15vw), 1rem);
     }

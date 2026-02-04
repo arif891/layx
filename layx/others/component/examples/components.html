@@ -60,7 +60,7 @@
         </thead>
         <tbody>
             <template>
-            ${ list.map(u => `
+            ${ renderList(list, u => `
             <tr style="border-bottom: 1px solid #dddddd;">
                 <td style="padding: 12px 15px;">${u.id}</td>
                 <td style="padding: 12px 15px; font-weight: bold;">${u.name}</td>
@@ -75,7 +75,7 @@
                     </span>
                 </td>
             </tr>
-            `).join('') }
+            `) }
             </template>
         </tbody>
     </table>

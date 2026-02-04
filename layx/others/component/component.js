@@ -14,13 +14,16 @@ class Component {
             debug: true,
             ...options
         }
-        this._ctx = {
-            ...dataContext,
+        // static helpers available in templates
+        this._helpers = {
             renderList: (items, cb) => items?.map(cb).join('') ?? '',
             when: (cond, html, otherwise = '') => cond ? html : otherwise,
-            esc: (str) => String(str).replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[s]),
-            classes: (obj) => Object.entries(obj).filter(([_, v]) => v).map(([k]) => k).join(' ')
+            esc: (str) => String(str).replace(/[&<>"']/g, s => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[s]),
         };
+
+        this._ctx = { ...this._helpers, ...dataContext };
         this._debug = this.options.debug;
         this._registry = Object.create(null);
         this._fetching = new Map();
@@ -95,11 +98,11 @@ class Component {
         return job;
     }
 
-    /* parse <div data-component="…"> or any tag with data-component */
+    /* parse <div component="…"> or any tag with component */
     _registerHTML(html) {
         const doc = new DOMParser().parseFromString(html, 'text/html');
-        doc.querySelectorAll('[data-component]').forEach(node => {
-            const name = node.dataset.component;
+        doc.querySelectorAll('[component]').forEach(node => {
+            const name = node.getAttribute('component')?.trim();
             if (!name) return;
             if (this._registry[name]) console.warn(`[CM] redefining component '${name}'`);
             const clone = node.cloneNode(true);

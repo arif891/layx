@@ -21,9 +21,8 @@ async function build(scriptDir, isRebuild = false, optimize = true) {
                 return build(scriptDir, true);
             }
 
-            if (!buildInfo?.imageOptimized && optimize) {
+            if (optimize) {
                 await optimizeImages(scriptDir);
-                await genBuildInfo({ imageOptimized: true });
             }
         }
 

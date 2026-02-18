@@ -120,7 +120,7 @@
 	}
 
 	.deleted, .var {
-		color: light-dark(#f44, #a672ff)
+		color: light-dark(#f44, #f57)
 	}
 
 	.http.oneline .kwd {

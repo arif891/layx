@@ -92,6 +92,7 @@ class Theme {
 
   _syncUI(theme) {
     document.querySelectorAll('[data-theme-update]').forEach(el => el.setAttribute('data-theme-update', theme));
+    document.querySelectorAll('[data-theme-set]').forEach(el => el.classList.toggle('active', el.dataset.themeSet === theme));
   }
 
   _ensureMeta() {

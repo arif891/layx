@@ -1,5 +1,5 @@
 import md from './md.js'
-import { detectLanguage } from '../detect.js'
+import { detectLanguage } from '../helper/language_detector.js'
 
 export default [
 	{

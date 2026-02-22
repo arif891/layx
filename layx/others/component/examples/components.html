@@ -40,8 +40,7 @@
 
 <!-- 4. Object Prop Component -->
 <!-- When a single object is passed, properties are merged into context -->
-<div component="notification-box" dynamic
-    style="border-left: 4px solid #4caf50; background: #e8f5e9; padding: 15px;">
+<div component="notification-box" dynamic style="border-left: 4px solid #4caf50; background: #e8f5e9; padding: 15px;">
     <h4 style="margin: 0 0 5px 0; color: #2e7d32;">${title}</h4>
     <p style="margin: 0; color: #388e3c;">${message}</p>
 </div>
@@ -60,22 +59,22 @@
         </thead>
         <tbody>
             <template>
-            ${ renderList(list, u => `
-            <tr style="border-bottom: 1px solid #dddddd;">
-                <td style="padding: 12px 15px;">${u.id}</td>
-                <td style="padding: 12px 15px; font-weight: bold;">${u.name}</td>
-                <td style="padding: 12px 15px;">${u.role}</td>
-                <td style="padding: 12px 15px;">
-                    <span style="
+                ${ renderList(list, u => `
+                <tr style="border-bottom: 1px solid #dddddd;">
+                    <td style="padding: 12px 15px;">${u.id}</td>
+                    <td style="padding: 12px 15px; font-weight: bold;">${u.name}</td>
+                    <td style="padding: 12px 15px;">${u.role}</td>
+                    <td style="padding: 12px 15px;">
+                        <span style="
                             padding: 4px 8px; border-radius: 4px; font-size: 0.85em; 
                             background: ${ u.status === 'Active' ? '#c8e6c9' : '#ffcdd2' };
                             color: ${ u.status === 'Active' ? '#2e7d32' : '#c62828' };
                         ">
-                        ${u.status}
-                    </span>
-                </td>
-            </tr>
-            `) }
+                            ${u.status}
+                        </span>
+                    </td>
+                </tr>
+                `) }
             </template>
         </tbody>
     </table>
@@ -90,7 +89,7 @@
     style="border: 2px dashed #999; padding: 20px; margin: 10px 0;">
     <h3 style="color: ${themeColor}">${sectionTitle} (Parent)</h3>
     <p>The parent has received the theme color: <strong>${themeColor}</strong></p>
-    
+
     <!-- Child component uses 'themeColor' from parent context WITHOUT explicit prop passing -->
     <component name="child-info"></component>
 </div>
@@ -102,4 +101,32 @@
     <span style="color: ${themeColor}; font-weight: bold;">
         I inherited the color ${themeColor} from my parent!
     </span>
+</div>
+
+<!-- 7. Content Slot Example -->
+<!-- Renders static HTML inserted between the component tags using <content> -->
+<div component="slotted-card" style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; margin: 10px 0;">
+    <h3 style="margin-top: 0; color: #333;">Card Title</h3>
+    <div style="background: #fafafa; padding: 10px; border-radius: 4px;">
+        <!-- The user's content will replace this tag. If empty, the fallback content below is used. -->
+        <content>
+            <em style="color: #999;">No content provided. This is the fallback content!</em>
+        </content>
+    </div>
+</div>
+
+<!-- 8. Dynamic Content Variable Example -->
+<!-- Renders user's inner HTML explicitly using the $content variable in dynamic mode -->
+<div component="dynamic-wrapper" dynamic
+    style="border-left: 5px solid #ff9800; padding: 15px; background: #fff3e0; margin: 10px 0;">
+    <div style="font-weight: bold; color: #e65100; margin-bottom: 10px;">Dynamic Wrapper ($content)</div>
+
+    <!-- Render content ONLY if showContent is true using the `when` helper -->
+    ${ when(showContent, `
+    <div style="padding: 10px; background: white; border: 1px solid #ffe0b2;">
+        ${$content}
+    </div>
+    `, `
+    <div style="color: #f57c00; font-style: italic;">Content is hidden because showContent is false.</div>
+    `) }
 </div>

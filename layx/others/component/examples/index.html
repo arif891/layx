@@ -73,6 +73,37 @@
             <component src="./components.html" name="parent-info" prop="'Inheritance Demo', '#e91e63'"></component>
         </div>
 
+        <div class="example-section">
+            <h2>7. Content Slots (<code>&lt;content&gt;</code>)</h2>
+            <p>Placing HTML inside the component tags. The content replaces the <code>&lt;content&gt;</code> tag inside
+                the component definition.</p>
+
+            <p><b>With Custom Content:</b></p>
+            <component src="./components.html" name="slotted-card">
+                <p style="color: blue;">This is custom HTML injected into the slot!</p>
+                <button>Click Me</button>
+            </component>
+
+            <p><b>With Fallback Content:</b></p>
+            <component src="./components.html" name="slotted-card"></component>
+        </div>
+
+        <div class="example-section">
+            <h2>8. Dynamic Content Variable (<code>$content</code>)</h2>
+            <p>Evaluating the user's HTML using the <code>$content</code> variable, which allows conditional rendering
+                using helpers.</p>
+
+            <p><b>Shown Content (showContent = true):</b></p>
+            <component src="./components.html" name="dynamic-wrapper" prop="{ showContent: true }">
+                <p>This content is visible because the property <code>showContent</code> is true!</p>
+            </component>
+
+            <p><b>Hidden Content (showContent = false):</b></p>
+            <component src="./components.html" name="dynamic-wrapper" prop="{ showContent: false }">
+                <p>This will NOT be visible.</p>
+            </component>
+        </div>
+
         <script type="module" src="./app.js"></script>
     </body>
 

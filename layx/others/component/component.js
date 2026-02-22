@@ -129,12 +129,20 @@ class Component {
             node.removeAttribute('dynamic');
             node.removeAttribute('prop');
         }
+
+        const contentHtml = placeholder.innerHTML.trim();
+        node.querySelectorAll('content').forEach(slot => {
+            slot.outerHTML = contentHtml || slot.innerHTML;
+        });
+
         return { node, ctx };
     }
 
     /* merge parent context + prop expression */
     _buildCtx(tpl, ph, parentCtx) {
         const ctx = { ...parentCtx };
+
+        ctx.$content = ph.innerHTML.trim();
 
         // 2. Data prop (rich types via evaluation)
         const expr = ph.getAttribute('prop');

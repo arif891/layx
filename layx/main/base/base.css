@@ -35,6 +35,7 @@
     }
 
     iframe {
+        display: block;
         border: 0;
     }
 
@@ -65,16 +66,20 @@
     }
 
     table {
-        width: 100%;
+        display: block;
+        overflow-x: auto;
+        width: fit-content;
+        max-width: 100%;
+        border-collapse: collapse;
 
         tr {
             th, td {
-                text-align: left;
-                padding-block: .25rem;
+                padding: .5rem 1rem;
+                border: 1px solid rgb(from currentColor r g b / .2);
+            }
 
-                &:not(:first-child, :last-child) {
-                    padding-inline: .75rem;
-                }
+            &:nth-child(even) {
+                background-color: rgb(from currentColor r g b / .025);
             }
         }
     }

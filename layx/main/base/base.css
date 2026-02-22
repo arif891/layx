@@ -74,7 +74,7 @@
 
         tr {
             th, td {
-                padding: .5rem 1rem;
+                padding: .75rem 1rem;
                 border: 1px solid rgb(from currentColor r g b / .2);
             }
 

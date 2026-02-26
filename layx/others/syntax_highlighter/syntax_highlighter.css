@@ -32,7 +32,7 @@
 
 	&.oneline {
 		position: relative;
-		padding: var(--padding);
+		padding: var(--padding) calc(var(--padding) + 3.25rem) var(--padding) var(--padding);
 
 		.copy {
 			position: absolute;

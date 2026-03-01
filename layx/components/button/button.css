@@ -1,109 +1,39 @@
 @layer components {
-button:not(.default), .btn {
-    --padding-x: 1em;
-    --padding-y: .6em;
-    --radius: .35em;
-    --bg: var(--surface-color, rgb(250, 250, 250));
+    button, .btn {
+        --padding-x: 1em;
+        --padding-y: .6em;
+        --bg-color: var(--surface-color, #fafafa);
 
-    display: inline-block;
-    padding: var(--padding-y, var(--padding, .5em)) var(--padding-x, var(--padding, .5em));
-    color: var(--color, inherit);
-    background: var(--bg);
-    border: var(--border, unset);
-    border-radius: var(--radius, .35em);
-    font-family: inherit;
-    font-size: var(--font-size, 1rem);
-    font-weight: 500;
-    user-select: none;
-    text-align: center;
-    vertical-align: middle;
-    transition: .15s;
+        display: inline-block;
+        font: inherit;
+        font-size: 1rem;
+        text-align: center;
+        vertical-align: middle;
+        padding: var(--padding-y) var(--padding-x);
+        background-color: var(--bg-color);
+        border: var(--border, unset);
+        border-radius: var(--radius);
 
-    &:not(:disabled) {
-        cursor: pointer;
-    }
-
-    &:focus-visible {
-        outline: 1px solid var(--accent-color, #b7f7ff);
-    }
-
-    &.outlined {
-        --outline-color: rgba(150, 150, 150, .6);
-        --outline-width: 1px;
-        background-color: transparent;
-        outline: var(--outline-width, 1px) solid var(--outline-color, currentcolor);
-        outline-offset: calc(var(--outline-width, 1px) * -1);
-
-        &:hover {
-            background-color: var(--bg);
+        &:not(:disabled) {
+            cursor: pointer;
         }
-    }
 
-    &.wide {
-        --padding-y: .8em;
-    }
-
-    &.lg {
-        --padding-x: 1.2em;
-        --padding-y: .7em;
-        --radius: .4em;
-        --font-size: 1.1rem;
-
-        &.wide {
+        &.w {
             --padding-y: .8em;
         }
-    }
 
-    &.xl {
-        --padding-x: 1.4em;
-        --padding-y: .8em;
-        --radius: .5em;
-        --font-size: 1.2rem;
+        &.r {
+            --radius: 10em;
+        }
 
-        &.wide {
-            --padding-y: 1em;
+        &.o {
+            background: unset;
+            border: 1px solid;
+        }
+
+        &.a {
+          color: var(--bg-color);
+          background-color: var(--color);
         }
     }
-
-    &.r {
-        --radius: 10em;
-    }
-
-    &.dark {
-        --color: rgb(var(--bg-color-rgb));
-        --bg: rgb(var(--color-rgb));
-    }
-
-    &.light {
-        --color: rgb(var(--color-rgb));
-        --bg: rgb(var(--bg-color-rgb));
-    }
-
-    &.close {
-        &:empty {
-            height: 1em;
-            width: fit-content;
-            aspect-ratio: 1;
-            padding: 0;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23888'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: center;
-
-            [theme=dark] & {
-                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23eee'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
-            }
-        }
-    }
-
-    &.as {
-        &:active {
-            scale: .9;
-        }
-    }
-}
-
-a.btn {
-    text-decoration: none;
-    opacity: 1;
-}
 }

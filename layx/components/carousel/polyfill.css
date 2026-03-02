@@ -1,3 +1,4 @@
+/* Polyfill for Safari anf Firefox */
 carousel, .carousel {
     &[indicator] {
         .scroll-marker-group {

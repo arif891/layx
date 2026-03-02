@@ -1,4 +1,4 @@
-
+/* Polyfill for Safari anf Firefox */
 class CarouselPolyfill {
     /**
      * @param {HTMLElement} carousel

@@ -1,5 +1,5 @@
 @layer components {
-    .accordion {
+    [accordion] {
         --padding: 1.25rem;
         --transition: .3s;
         --background: var(--surface-color, #F0F0F0);

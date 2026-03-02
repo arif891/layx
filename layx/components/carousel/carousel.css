@@ -1,124 +1,244 @@
 @layer components {
-carousel, .carousel {
-    --min-height: 300px;
-    --edge-offset: .5rem;
-    --indicator-bg: #fff;
+    carousel, .carousel {
+        --min-height: 300px;
+        --offset: .75rem;
+        --indicator-bg: #fff;
+        --button-bg: rgb(0 0 0 / .3);
+        --button-gap: 1rem;
+        --button-size: 3rem;
+        --button-color: #fff;
 
-    display: block;
-    position: relative;
+        display: grid;
+        gap: 1rem;
+        position: relative;
 
-    &:focus {
-        outline: none;
-    }
-    
-    .scroller {
-        display: flex;
-        min-height: var(--min-height);
-        gap: var(--gap);
-        overflow: auto;
-        padding-inline: var(--edge-offset-x);
-        scrollbar-width: none;
-        scroll-snap-type: x mandatory;
-        scroll-behavior: smooth;
-
-        .dragging & {
-            scroll-behavior: auto !important;
-            scroll-snap-type: none !important;
-        }
-
-        .item {
-            flex-shrink: 0;
-            width: 100%;
-            user-select: none;
-            -webkit-user-drag: none;
-            scroll-snap-align: center;
-            view-timeline: --carousel-item inline;
-
-            &.auto {
-               width: auto;
-            }
-
-            &:first-child {
-                margin-inline-start: var(--edge-offset-x);
-            }
-
-            &:last-child {
-                margin-inline-end: var(--edge-offset-x);
-            }
-        }
-
-    }
-
-    .indicator-wrapper {
-        position: absolute;
-        inset: auto 0 var(--edge-offset, 0);
-        display: flex;
-        gap: var(--indicator-gap, .5rem);
-        padding-inline: 1rem;
-        justify-content: center;
-        pointer-events: none;
-
-        .indicator {
-            padding: 0;
-            height: var(--indicator-height, .2rem);
-            width: var(--indicator-width, 1.5rem);
-            flex-shrink: 1;
-            box-sizing: content-box;
-            border-block: 1rem solid transparent;
-            border-radius: 2px;
-            pointer-events: auto;
-            opacity: .5;
-            background: var(--indicator-bg);
-            background-clip: padding-box;
-            transition: .3s;
-
-            &.active {
-               width: var(--indicator-active-width, 2.5rem);
-               opacity: 1;
-            }
-        }
-
-    }
-
-    .control-wrapper {
-
-        .left,.right {
-            position: absolute;
+        .scroller {
             display: flex;
-            align-items: center;
-            pointer-events: none;
+            min-height: var(--min-height);
+            gap: var(--gap);
+            overflow: auto;
+            padding-inline: var(--edge-offset-x);
+            scrollbar-width: none;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scroll-marker-group: after;
 
-            &.left {
-                inset: 0 auto 0 var(--edge-offset, 0);
-            }
-
-            &.right {
-                inset: 0 var(--edge-offset, 0) 0 auto;
-            }
-
-            * {
-                pointer-events: auto;
-            }
-
-            .prev, .next {
-                padding: 0;
-                height: 2.5rem;
-                width: 2.5rem;
-                background-color: unset;
-                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
-                opacity: .8;
-                transition: .3s;
-
-                &.next {
-                    rotate: 180deg;
+            [button] & {
+                &::scroll-button(left) {
+                    content: "<"/ "Previous";
                 }
 
-                &:hover {
-                    opacity: 1;
+                &::scroll-button(right) {
+                    content: ">"/ "Next";
+                }
+            }
+
+            .item {
+                flex-shrink: 0;
+                width: 100%;
+                user-select: none;
+                -webkit-user-drag: none;
+                scroll-snap-align: center;
+
+                &::scroll-marker {
+                    content: '';
+                }
+
+                &.auto {
+                    width: auto;
+                }
+
+                &:first-child {
+                    margin-inline-start: var(--edge-offset-x);
+                }
+
+                &:last-child {
+                    margin-inline-end: var(--edge-offset-x);
+                }
+            }
+
+        }
+
+        &[indicator] {
+            .indicator-wrapper, ::scroll-marker-group {
+                display: flex;
+                min-height: 1rem;
+                max-width: calc(100% - var(--edge-offset-x, 0) * 2);
+                overflow-x: auto;
+                scrollbar-width: none;
+                gap: 1rem;
+                display: flex;
+                gap: var(--indicator-gap, .5rem);
+                margin-inline: var(--edge-offset-x, 0);
+                justify-content: center;
+                pointer-events: none;
+            }
+
+            &:not([indicator~=top], [indicator~=bottom]) {
+                .indicator-wrapper, ::scroll-marker-group {
+                    position: absolute;
+                    inset: auto 0 0;
+                }
+            }
+
+            &[indicator~=top] {
+                .indicator-wrapper, ::scroll-marker-group {
+                    grid-row: 1 / 2;
+                    grid-column: 1 / 2;
+                    align-self: end;
+                }
+            }
+
+            &[indicator~=right] {
+                .indicator-wrapper, ::scroll-marker-group {
+                    justify-content: end;
+                }
+            }
+
+            &[indicator~=left] {
+                .indicator-wrapper, ::scroll-marker-group {
+                    justify-content: start;
+                }
+            }
+
+            .indicator, ::scroll-marker {
+                padding: 0;
+                height: var(--indicator-height, .2rem);
+                width: var(--indicator-width, 1.5rem);
+                box-sizing: content-box;
+                border-block: 1rem solid transparent;
+                border-radius: 0;
+                pointer-events: auto;
+                flex-shrink: 0;
+                opacity: .5;
+                background: var(--indicator-bg);
+                background-clip: padding-box;
+                transition: .3s;
+            }
+
+            .active, ::scroll-marker:target-current {
+                width: var(--indicator-active-width, 2.5rem);
+                opacity: 1;
+            }
+        }
+
+        &[button] {
+            ::scroll-button(*) {
+                display: grid;
+                place-content: center;
+                height: var(--button-size);
+                width: var(--button-size);
+                font-size: 1rem;
+                border: 0;
+                border-radius: 0;
+                background: var(--button-bg);
+                color: var(--button-color);
+                cursor: pointer;
+                z-index: 2;
+            }
+
+            ::scroll-button(*):disabled {
+                cursor: not-allowed;
+                opacity: .5;
+            }
+
+            &:not([button~=top], [button~=bottom]) {
+                ::scroll-button(*) {
+                    position: absolute;
+                    top: 50%;
+                    translate: 0 -50%;
+                }
+
+                ::scroll-button(left) {
+                    left: max(calc(var(--edge-offset-x) / 4), var(--offset, .5rem));
+                }
+
+                ::scroll-button(right) {
+                    right: max(calc(var(--edge-offset-x) / 4), var(--offset, .5rem));
+                }
+            }
+
+            &[button~=top], &[button~=bottom] {
+                ::scroll-button(*) {
+                    grid-column: 1 / 2;
+                    margin-inline: var(--edge-offset-x);
+                    justify-self: end;
+                }
+
+                ::scroll-button(left) {
+                    translate: calc(-100% - var(--button-gap, 0)) 0;
+                }
+
+                &[button~=left] {
+                    ::scroll-button(*) {
+                        justify-self: start;
+                    }
+
+                    ::scroll-button(left) {
+                        translate: 0 0;
+                    }
+
+                    ::scroll-button(right) {
+                        translate: calc(100% + var(--button-gap, 0)) 0;
+                    }
+                }
+
+                &[button~=center] {
+                    ::scroll-button(*) {
+                        justify-self: center;
+                    }
+
+                    ::scroll-button(left) {
+                        translate: calc(-50% - (var(--button-gap, 0) / 2)) 0;
+                    }
+
+                    ::scroll-button(right) {
+                        translate: calc(50% + (var(--button-gap, 0) / 2)) 0;
+                    }
+                }
+            }
+
+            &[button~=top] {
+                ::scroll-button(*) {
+                    grid-row: 1 / 2;
+                    align-self: end;
+                }
+            }
+
+            &[button~=bottom] {
+                ::scroll-button(*) {
+                    grid-row: 2 / 3;
+                }
+            }
+
+        }
+
+        .content {
+            grid-row: 1 / 2;
+            grid-column: 1 / 2;
+            padding-inline: var(--edge-offset-x);
+
+            [button]:not([button~=left], [button~=center]) & {
+                padding-right: calc(1rem + var(--edge-offset-x, 0) + var(--button-gap, 0) + var(--button-size, 0) * 2);
+            }
+
+            [button~=left] & {
+                padding-left: calc(1rem + var(--edge-offset-x, 0) + var(--button-gap, 0) + var(--button-size, 0) * 2);
+            }
+
+            [button~=center] & {
+                padding-bottom: calc(var(--button-size, 0) + 1rem);
+            }
+
+            &:nth-child(2) {
+                grid-row: 2 / 3;
+
+                [button~=center] & {
+                    padding-bottom: 0;
+                    padding-top: calc(var(--button-size, 0) + 1rem);
                 }
             }
         }
     }
-}
 
 }

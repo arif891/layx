@@ -1,0 +1,166 @@
+carousel, .carousel {
+    &[indicator] {
+        .scroll-marker-group {
+            display: flex;
+            min-height: 1rem;
+            max-width: calc(100% - var(--edge-offset-x, 0) * 2);
+            overflow-x: auto;
+            scrollbar-width: none;
+            gap: 1rem;
+            display: flex;
+            gap: var(--indicator-gap, .5rem);
+            margin-inline: var(--edge-offset-x, 0);
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        &:not([indicator~=top], [indicator~=bottom]) {
+            .scroll-marker-group {
+                position: absolute;
+                inset: auto 0 0;
+            }
+        }
+
+        &[indicator~=top] {
+            .scroll-marker-group {
+                grid-row: 1 / 2;
+                grid-column: 1 / 2;
+                align-self: end;
+            }
+        }
+
+        &[indicator~=right] {
+            .scroll-marker-group {
+                justify-content: end;
+            }
+        }
+
+        &[indicator~=left] {
+            .scroll-marker-group {
+                justify-content: start;
+            }
+        }
+
+        .scroll-marker {
+            padding: 0;
+            height: var(--indicator-height, .2rem);
+            width: var(--indicator-width, 1.5rem);
+            box-sizing: content-box !important;
+            border-block: 1rem solid transparent;
+            border-radius: 0;
+            pointer-events: auto;
+            flex-shrink: 0;
+            opacity: .5;
+            background: var(--indicator-bg);
+            background-clip: padding-box;
+            transition: .3s;
+        }
+
+        .scroll-marker.active {
+            width: var(--indicator-active-width, 2.5rem);
+            opacity: 1;
+        }
+    }
+
+    &[button] {
+        .scroll-button {
+            display: grid;
+            place-content: center;
+            height: var(--button-size);
+            width: var(--button-size);
+            font-size: 1rem;
+            border: 0;
+            border-radius: 0;
+            background: var(--button-bg);
+            color: var(--button-color);
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .scroll-button:disabled {
+            cursor: not-allowed;
+            opacity: .5;
+        }
+
+        .scroll-button.left {
+            &::before {
+                content: "<"/ "Previous";
+            }
+        }
+
+        .scroll-button.right {
+            &::before {
+                content: ">"/ "Next";
+            }
+        }
+
+        &:not([button~=top], [button~=bottom]) {
+            .scroll-button {
+                position: absolute;
+                top: 50%;
+                translate: 0 -50%;
+            }
+
+            .scroll-button.left {
+                left: max(calc(var(--edge-offset-x) / 4), var(--offset, .5rem));
+            }
+
+            .scroll-button.right {
+                right: max(calc(var(--edge-offset-x) / 4), var(--offset, .5rem));
+            }
+        }
+
+        &[button~=top], &[button~=bottom] {
+            .scroll-button {
+                grid-column: 1 / 2;
+                margin-inline: var(--edge-offset-x);
+                justify-self: end;
+            }
+
+            .scroll-button.left {
+                translate: calc(-100% - var(--button-gap, 0)) 0;
+            }
+
+            &[button~=left] {
+                .scroll-button {
+                    justify-self: start;
+                }
+
+                .scroll-button.left {
+                    translate: 0 0;
+                }
+
+                .scroll-button.right {
+                    translate: calc(100% + var(--button-gap, 0)) 0;
+                }
+            }
+
+            &[button~=center] {
+                .scroll-button {
+                    justify-self: center;
+                }
+
+                .scroll-button.left {
+                    translate: calc(-50% - (var(--button-gap, 0) / 2)) 0;
+                }
+
+                .scroll-button.right {
+                    translate: calc(50% + (var(--button-gap, 0) / 2)) 0;
+                }
+            }
+        }
+
+        &[button~=top] {
+            .scroll-button {
+                grid-row: 1 / 2;
+                align-self: end;
+            }
+        }
+
+        &[button~=bottom] {
+            .scroll-button {
+                grid-row: 2 / 3;
+            }
+        }
+    }
+}

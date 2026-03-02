@@ -65,7 +65,9 @@
         </container>
 
         <script type="module">
-            /*  import "./carousel.js"; */
+           if (!CSS.supports('scroll-marker-group', 'after')) {
+            import("./polyfill.js");
+           }
         </script>
 
     </body>

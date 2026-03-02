@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Drag Scroll</title>
+
+        <style>
+            body {
+                margin: 0;
+            }
+
+            .container {
+                display: flex;
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .scrollable {
+                display: flex;
+                gap: 1rem;
+                max-width: 100%;
+                max-height: 50vh;
+
+                &.x {
+                    overflow-x: auto;
+
+                    .scrollable__item {
+                        height: 40vh;
+                        width: 50%;
+                        flex-shrink: 0;
+                    }
+                }
+
+                &.y {
+                    flex-direction: column;
+                    overflow-y: auto;
+
+                    .scrollable__item {
+                        height: 25vh;
+                        flex-shrink: 0;
+                    }
+                }
+
+                &.both {
+                    flex-wrap: nowrap;
+                    width: 100%;
+                    height: 50vh;
+                    overflow: auto;
+
+                    .scrollable__item {
+                        height: 80vh;
+                        width: 60%;
+                        flex-shrink: 0;
+                    }
+                }
+
+                .scrollable__item {
+                    display: grid;
+                    place-content: center;
+                    background-color: aliceblue;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="scrollable x" data-drag-scroll="x" data-drag-scroll-momentum>
+                <div class="scrollable__item">Item 1</div>
+                <div class="scrollable__item">Item 2</div>
+                <div class="scrollable__item">Item 3</div>
+            </div>
+            <div class="scrollable y" data-drag-scroll="y" data-drag-scroll-momentum>
+                <div class="scrollable__item">Item 1</div>
+                <div class="scrollable__item">Item 2</div>
+                <div class="scrollable__item">Item 3</div>
+            </div>
+            <div class="scrollable both" data-drag-scroll="both" data-drag-scroll-momentum>
+                <div class="scrollable__item">Item 1</div>
+                <div class="scrollable__item">Item 2</div>
+                <div class="scrollable__item">Item 3</div>
+            </div>
+        </div>
+        <script src="drag_scroll.js" type="module"></script>
+    </body>
+
+</html>

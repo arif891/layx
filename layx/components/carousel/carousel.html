@@ -41,7 +41,7 @@
     <body>
         <container class="demo__container">
             <carousel class="demo__carousel" indicator button>
-                <div class="scroller">
+                <div class="scroller" data-drag-scroll data-drag-scroll-multiplier="2.5">
                     <div class="item" style="background-image: url(/layx/assets/image/demo/1.webp);">
                         <h3>Slide 1</h3>
                     </div>
@@ -69,6 +69,13 @@
            if (!CSS.supports('scroll-marker-group', 'after')) {
             import("./polyfill.js");
            }
+        </script>
+
+        <script type="module">
+            const hasPointerFine  = window.matchMedia("(pointer: fine)").matches;
+            if (hasPointerFine) {
+                import("/layx/others/drag_scroll/drag_scroll.js");
+            }
         </script>
 
     </body>

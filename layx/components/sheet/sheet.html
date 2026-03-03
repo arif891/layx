@@ -15,44 +15,25 @@
 
     <style>
       body {
-        background-color: antiquewhite;
+        
       }
 
-      sheet {
-        --padding-x: 1.5rem;
-        --padding-y: 1.5rem;
-        --bg: rgba(255, 255, 255, .6);
-
-        .wrapper {
-          display: flex;
-          justify-content: space-between;
-        }
-
-        .other__wrapper {
-          display: grid;
-          place-items: center;
-
-          h4 {
-            opacity: .3;
-          }
-        }
-      }
+      sheet {}
     </style>
   </head>
 
   <body>
-    <button data-sheet-target="#demoSheet">Open Sheet</button>
 
-    <sheet id="demoSheet" class="bottom">
-      <div class="wrapper snap" style="height: 30vh;">
-        <h3>Sheet Demo</h3>
-        <button class="close"></button>
+    <sheet>
+      <div class="wrapper">
+        <h1>Test</h1>
+        <h1>Test</h1>
+        <h1>Test</h1>
       </div>
-      <div class="other__wrapper snap" style="background-color: rgba(215, 250, 236, 0.8); height: 20vh;">
-        <h4>Snap 2</h4>
-      </div>
-      <div class="other__wrapper snap" style="background-color: rgba(212, 253, 255, 0.8); height: 10vh; padding: 0;">
-        <h4>Snap 3</h4>
+      <div class="wrapper">
+        <h1>Test</h1>
+        <h1>Test</h1>
+        <h1>Test</h1>
       </div>
     </sheet>
 

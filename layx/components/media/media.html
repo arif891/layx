@@ -7,6 +7,7 @@
         <title>Document</title>
 
         <link rel="stylesheet" href="media.css">
+        <link rel="stylesheet" href="media_ext.css">
 
         <link rel="stylesheet" href="/layx/main/base/variable.css">
         <link rel="stylesheet" href="/layx/main/base/scrollbar.css">
@@ -37,20 +38,19 @@
             <h3>Demo Media</h3>
 
             <div class="wrapper">
-            <audio src="assets/audio.mp3" controls controlslist="nodownload noplaybackrate" style="--radius:250px"></audio>
-            <audio src="assets/audio.mp3" controls controlslist="nodownload noplaybackrate"></audio>
-            <audio class="vertical" src="assets/audio.mp3" controls controlslist="nodownload noplaybackrate"></audio>
-            <video src="assets/audio.mp3" controls controlslist="nodownload noplaybackrate"
+            <audio src="/layx/assets/media/audio.mp3" controls controlslist="nodownload noplaybackrate"></audio>
+            <audio src="/layx/assets/media/audio.mp3" controls controlslist="nodownload noplaybackrate" vertical></audio>
+            <video src="/layx/assets/media/audio.mp3" controls controlslist="nodownload noplaybackrate" type="audio"
                 style="width: 300px;">
-                <track default label="English" srclang="en" src="assets/video.vtt" />
+                <track default label="English" srclang="en" src="/layx/assets/other/video.vtt"/>
             </video>
-            <video class="poster" src="assets/audio.mp3" controls poster="assets/poster.webp"
-                style="width: 350px;" controlslist="nodownload noplaybackrate">
-                <track default label="English" srclang="en" src="assets/video.vtt" />
+            <video class="poster" src="/layx/assets/media/audio.mp3" controls poster="/layx/assets/image/demo/1.webp"
+                style="width: 350px;" controlslist="nodownload noplaybackrate" type="audio">
+                <track default label="English" srclang="en" src="/layx/assets/other/video.vtt" />
             </video>
-            <video class="fullscreen-cover" src="assets/video.mp4" controls style="width: 475px;"
-                controlslist="nodownload noplaybackrate">
-                <track default label="English " srclang="en" src="assets/video.vtt" />
+            <video class="fullscreen-cover" src="/layx/assets/media/video.mp4" controls style="width: 475px;"
+                controlslist="nodownload noplaybackrate" fullscreen="cover">
+                <track default label="English " srclang="en" src="/layx/assets/other/video.vtt" />
             </video>
             </div>
 

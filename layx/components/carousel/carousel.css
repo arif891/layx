@@ -25,6 +25,7 @@
             scroll-snap-type: x mandatory;
             scroll-behavior: smooth;
             scroll-marker-group: after;
+            cursor: grab;
 
             [button] & {
                 &::scroll-button(left) {

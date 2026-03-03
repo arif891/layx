@@ -1,218 +1,78 @@
 @layer components {
-video, audio {
-    --radius: .5rem;
-    --bg: var(--surface-color, rgb(250, 250, 250));
-    --play-button-color: var(--bg-color);
-    --video-bg: rgb(215, 215, 215);
-    --video-control-bg: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .5));
-    --caption-bg: rgba(0, 0, 0, .6);
-
-    max-width: 100%;
-
-    [theme=dark] & {
-        --video-bg: rgb(65, 65, 65);
-    }
-
-    &::-webkit-media-controls {
-        font: inherit;
-    }
-
-    &::-webkit-media-controls-current-time-display,
-    &::-webkit-media-controls-time-remaining-display {
-        font: inherit;
-        font-size: .9rem;
-        font-weight: 500;
-        font-variant-numeric: tabular-nums;
-    }
-
-    &::-webkit-media-controls-volume-control-hover-background {
-        background-color: rgb(var(--color-rgb));
-    }
-
-    &.no-volume::-webkit-media-controls-volume-control-container {
-        display: none;
-    }
-}
-
-
-video {
-
-    border-radius: var(--radius);
-
-    &.fullscreen-cover:fullscreen {
-        object-fit: cover;
-    }
-
-    &:not([src$=".mp3"]) {
-        &::-webkit-media-controls-panel {
-            flex-direction: column-reverse;
-            justify-content: flex-start;
-            padding: var(--padding-y, var(--padding)) var(--padding-x, var(--padding));
-            margin-top: auto;
-            background: var(--video-control-bg);
-        }
-
-        &::-webkit-media-controls-timeline {
-            padding-block: 1.5rem clamp(.25rem, 1%, 1.25rem);
-        }
-
-        &::-webkit-media-controls-play-button {
-            position: absolute;
-            inset-inline: 0;
-            margin-inline: auto;
-        }
-
-        &::-webkit-media-controls-volume-control-hover-background {
-            background-color: rgba(0,0,0, .5);
-        }
-
-    }
-
-    &::cue {
-        background-color: var(--caption-bg);
-        font-family: inherit !important;
-        font-weight: 500;
-        background-clip: content-box;
-    }
-
-    &::-webkit-media-text-track-container {
-        font: inherit;
-    }
-
-    &::-webkit-media-text-track-display {
-        padding-inline: .5rem;
-        padding-bottom: .35rem;
-    }
-
-    &[src$=".mp3"] {
-        background: var(--video-bg);
-
-        &::-webkit-media-text-track-display {
-            top: 50% !important;
-            padding-bottom: 55px;
-            translate: 0 -50%;
-        }
-
-        &::cue {
-            background-color: transparent;
-            font-size: 1.3rem;
-            font-family: inherit;
-        }
-
-        &.vertical {
-            min-width: 300px;
-            min-height: 190px;
-
-            &::-webkit-media-text-track-display {
-                padding-bottom: 90px;
-            }
-        }
-
-        &.poster {
-            --bg: rgba(var(--bg-color-rgb), .7);
-
-            &::-webkit-media-controls {
-                padding: .5rem;
-                backdrop-filter: blur( var(--blur, 15px));
-            }
-
-            &::-webkit-media-text-track-container {
-                z-index: 1;
-            }
-        }
-    }
-}
-
-
-audio, video[src$=".mp3"] {
-    &::-webkit-media-controls-enclosure {
-        border-radius: var(--radius);
-        padding: var(--padding-y, var(--padding)) var(--padding-x, var(--padding));
-        background: var(--bg);
-    }
-
-    &::-webkit-media-controls-play-button {
-        background-color: var(--play-button-color);
-        border-radius: 50%;
-        order: -1;
-    }
-
-    &::-webkit-media-controls-current-time-display {
-        order: -1;
-        margin-left: 14px;
-    }
-
-    &::-webkit-media-controls-time-remaining-display {
-        clip-path: inset(0 0 0 1ch);
-        margin-left: -1ch;
-    }
-
-    &::-webkit-media-controls-timeline {
-        order: -1;
-        padding-inline: 10px;
-    }
-
-    &::-webkit-media-controls-current-time-display,
-    &::-webkit-media-controls-time-remaining-display {
-        line-height: 1;
-    }
-
-    &.vertical {
-        height: 90px;
-
-        &::-webkit-media-controls-enclosure {
-            max-height: 90px;
-        }
-
-        &::-webkit-media-controls-panel {
-            display: grid;
-            justify-content: stretch;
-            grid-template-rows: auto auto auto 0;
-        }
-
-        &::-webkit-media-controls-timeline {
-            width: auto;
-            padding-inline: 0;
-            padding-top: .5rem;
+    video, audio {
+        &::-webkit-media-controls {
+            font: inherit;
         }
 
         &::-webkit-media-controls-current-time-display,
         &::-webkit-media-controls-time-remaining-display {
-            grid-row-start: 2;
-            grid-column-start: 1;
-            justify-self: start;
-            margin-top: -1rem;
-            margin-left: 0;
-            z-index: -1;
+            font: inherit;
+            font-size: .9rem;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
         }
 
-        &::-webkit-media-controls-time-remaining-display {
-            justify-self: end;
+        &::-webkit-media-text-track-container {
+            font-family: inherit;
+            font-weight: 450;
+        }
+
+        &::cue {
+            background-color: rgb(0 0 0 / .5);
+        }
+    }
+
+    video:not([type=audio]) {
+        background-color: black;
+
+        &:not(:fullscreen) {
+            border-radius: var(--radius, 0);
+        }
+
+        &::-webkit-media-controls-panel {
+            flex-direction: column-reverse;
+            margin-top: auto;
+            background: linear-gradient(transparent, rgb(0 0 0 / .75));
+        }
+
+        &::-webkit-media-controls-timeline {
+            padding-block: .5em .65em;
         }
 
         &::-webkit-media-controls-play-button {
-            grid-row-start: 3;
-            grid-column-start: 1;
-            justify-self: center;
-            width: max-content;
-            scale: 1.25;
-            translate: 0 -25%;
+            position: absolute;
+            inset: auto 0 0;
+            margin-inline: auto;
+            margin-bottom: .25rem;
+            border-radius: 50%;
+            padding: .4rem;
+            background-color: rgb(0 0 0 / .3);
+            background-clip: content-box;
         }
 
-        &::-webkit-media-controls-volume-control-container {
-            grid-row-start: 3;
-            grid-column-start: 1;
-            justify-self: end;
-            width: max-content;
-            margin-right: -8px;
+        &::-webkit-media-controls-volume-control-hover-background {
+            background-color: rgb(0 0 0 / .3);
         }
     }
 
-    &.transparent {
+    audio, video[type=audio] {
         &::-webkit-media-controls-enclosure {
-            background: transparent;
+            border-radius: var(--radius, 0);
+        }
+
+        &::-webkit-media-controls-play-button {
+            background-color: light-dark(#fff, #000);
+            border-radius: 50%;
+        }
+
+        &::-webkit-media-controls-volume-control-hover-background {
+           background-color: light-dark(#000, #fff); 
         }
     }
 
-}
+    video[fullscreen~=cover] {
+        &:fullscreen {
+            object-fit: cover;
+        }
+    }
 }

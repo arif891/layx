@@ -8,23 +8,54 @@ class Sheet {
         this.update();
 
         window.addEventListener('resize', () => {
-            // debounce
-            clearTimeout(this.resizeTimeout);
-            this.resizeTimeout = setTimeout(() => {
-                this.update(true);
-            }, 100);
+            this.update();
         });
     }
 
-    update(resize = false) {
+    open(sheet) {
+        if (!sheet) return;
+        const wrapper = sheet.querySelector('.wrapper');
+        const snapPoints = sheet.querySelectorAll('[snap]');
+
+        if (snapPoints.length > 0) {
+            snapPoints[0].scrollIntoView({ behavior: 'smooth' });
+        } else if (wrapper) {
+            wrapper.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            console.warn('Sheet component requires a child element with class "wrapper" to function properly.');
+        }
+    }
+
+    close(sheet) {
+        if (!sheet) return;
+        if (sheet.hasAttribute('position')) {
+            const position = sheet.getAttribute('position');
+            if (position === 'top') {
+                sheet.scrollTo({ top: sheet.scrollHeight, behavior: 'smooth' });
+            } else if (position === 'left') {
+                sheet.scrollTo({ left: sheet.scrollWidth, behavior: 'smooth' });
+            } else if (position === 'right') {
+                sheet.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                console.warn('Invalid position attribute value. Expected "top", "left", or "right".');
+            }
+        } else {
+            sheet.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    update() {
         this.sheets.forEach(sheet => {
-            if (resize) { sheet.setAttribute('resizing', ''); }
-            sheet.style.setProperty('--el-w', `${sheet.offsetWidth}px`);
-            sheet.style.setProperty('--el-h', `${sheet.offsetHeight}px`);
-            sheet.setAttribute('active', '');
-            sheet.removeAttribute('resizing');
+            const wrapper = sheet.querySelector('.wrapper');
+            if (wrapper) {
+                sheet.style.setProperty('--_w', `${wrapper.offsetWidth}px`);
+                sheet.style.setProperty('--_h', `${wrapper.offsetHeight}px`);
+                sheet.setAttribute('active', '');
+            } else {
+                console.warn('Sheet component requires a child element with class "wrapper" to function properly.');
+            }
         });
     }
 }
 
-new Sheet();
+export { Sheet };

@@ -1,19 +1,15 @@
 @layer components {
   sheet, .sheet {
-    display: flex;
-    flex-direction: column;
     position: fixed;
     inset: auto 0 0;
+    height: var(--_h);
+    display: flex;
+    flex-direction: column;
     overflow: auto;
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
     scrollbar-width: none;
-
-    &:not([resizing]) {
-      &, &::before {
-        height: var(--el-h);
-      }
-    }
+    pointer-events: none;
 
     &:not([active]) {
       visibility: hidden;
@@ -23,29 +19,32 @@
       content: '';
       display: block;
       flex-shrink: 0;
+      height: var(--_h);
       scroll-snap-align: end;
     }
 
     &[position=left], &[position=right] {
       inset: 0 auto 0 0;
+      width: var(--_w);
+      height: 100%;
       flex-direction: row;
       direction: rtl;
       scroll-snap-type: x mandatory;
 
-      &::before {
-        height: auto;
+      .wrapper {
+        direction: unset;
+        flex-direction: row;
       }
 
-      &:not([resizing]) {
-        &, &::before {
-          width: var(--el-w);
-        }
+      &::before {
+        height: 100%;
+        width: var(--_w);
       }
+
     }
 
     &[position=right] {
       inset: 0 0 0 auto;
-      flex-direction: row;
       direction: unset;
     }
 
@@ -54,19 +53,22 @@
       flex-direction: column-reverse;
 
       &[active] {
-        &::before, .wrapper {
-          scroll-snap-align: start;
+        &::before, .wrapper:not(:has([snap])), [snap] {
+          scroll-snap-align: start !important;
         }
       }
     }
 
     .wrapper {
+      display: flex;
+      flex-direction: column;
       pointer-events: auto;
-      background-color: rgb(238, 238, 238);
       direction: unset;
 
       [active] & {
-        scroll-snap-align: end;
+        &:not(:has([snap])), [snap] {
+          scroll-snap-align: end;
+        }
       }
     }
   }

@@ -14,33 +14,43 @@
     <link rel="stylesheet" href="/layx/components/button/button.css">
 
     <style>
-      body {
-        
-      }
+      body {}
 
-      sheet {}
+      sheet {
+      
+        .wrapper {
+          background-color: rgb(238, 238, 238);
+        }
+      }
     </style>
   </head>
 
   <body>
+    <button id="open">Open</button>
 
-    <sheet>
+    <sheet id="sheet" scrollable>
       <div class="wrapper">
+        <button id="close">Close</button>
         <h1>Test</h1>
         <h1>Test</h1>
         <h1>Test</h1>
       </div>
-      <div class="wrapper">
-        <h1>Test</h1>
-        <h1>Test</h1>
-        <h1>Test</h1>
       </div>
     </sheet>
 
   </body>
 
   <script type="module">
-    import "./sheet.js";
+    import {Sheet} from "./sheet.js";
+    const sm = new Sheet();
+      document.getElementById('close').addEventListener('click', () => {
+          const sheet = document.getElementById('sheet');
+          sm.close(sheet);
+      });
+      document.getElementById('open').addEventListener('click', () => {
+          const sheet = document.getElementById('sheet');
+          sm.open(sheet);
+       });
   </script>
 
 </html>

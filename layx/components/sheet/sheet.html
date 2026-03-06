@@ -14,26 +14,206 @@
     <link rel="stylesheet" href="/layx/components/button/button.css">
 
     <style>
-      body {}
+      body {
+        background-image: url(/layx/assets/image/demo/bg-2.avif);
+        background-size: cover;
+        display: grid;
+        place-content: center;
+        gap: .75rem;
+      }
 
       sheet {
-      
         .wrapper {
-          background-color: rgb(238, 238, 238);
+          background-color: rgb(0 0 0 / .3);
+          backdrop-filter: blur(1rem);
+          color: #fff;
+
+          .ex_block {
+            display: grid;
+            place-content: center;
+            min-height: 40vh;
+            min-width: 40vw;
+            position: relative;
+
+            &::before {
+              content: '';
+              position: absolute;
+              inset: 1rem 0 auto;
+              height: .25rem;
+              width: 2.5rem;
+              border-radius: 5rem;
+              margin-inline: auto;
+              background-color: rgba(255, 255, 255, 0.3);
+            }
+
+            [position=left] &,
+            [position=right] & {
+              &::before {
+                height: 2.5rem;
+                width: .25rem;
+                inset: 0 1rem 0 auto;
+                margin-block: auto;
+              }
+            }
+
+            [position=right] & {
+              &::before {
+                inset: 0 auto 0 1rem;
+              }
+            }
+
+            [position=top] & {
+              &::before {
+                inset: auto 0 1rem;
+              }
+            }
+
+            button {
+              position: absolute;
+              top: 0;
+              right: 0;
+              padding: 1rem;
+              background: unset;
+              font-size: 1.5rem;
+
+              [position=right] & {
+                left: 0;
+                right: auto;
+              }
+
+              [position=top] & {
+                top: unset;
+                bottom: 0;
+              }
+
+              @media (pointer: coarse) {
+                display: none;
+              }
+            }
+          }
+        }
+      }
+
+      .snap {
+        .wrapper {
+          width: clamp(250px, calc(100% - 1rem), 800px);
+          margin-inline: auto;
+
+          &::before {
+            content: '';
+            position: absolute;
+            inset: .75rem 0 auto;
+            height: .25rem;
+            width: 2.5rem;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 5rem;
+            margin-inline: auto;
+          }
+
+          [snap] {
+            padding: 1rem;
+
+            &:first-child {
+              border-bottom: 1px solid;
+            }
+
+            .img__wrapper {
+              display: grid;
+              grid-template-columns: 1fr 1fr 1fr;
+              gap: .5rem;
+
+              img {
+                max-height: 5vh;
+                object-fit: cover;
+                width: 100%;
+                -webkit-user-drag: none;
+
+                .second & {
+                  max-height: unset;
+                  height: 30vh;
+                }
+              }
+            }
+          }
+        }
+
+      }
+
+      @keyframes tem {
+        to {
+          opacity: 1;
+          pointer-events: auto;
         }
       }
     </style>
   </head>
 
   <body>
-    <button id="open">Open</button>
+    <button data-target-sheet="bottom">Bottom</button>
+    <button data-target-sheet="left">Left</button>
+    <button data-target-sheet="right">Right</button>
+    <button data-target-sheet="top">Top</button>
+    <button data-target-sheet="snap">Snap</button>
 
-    <sheet id="sheet" scrollable>
+    <sheet id="bottom" data-drag-scroll="y">
       <div class="wrapper">
-        <button id="close">Close</button>
-        <h1>Test</h1>
-        <h1>Test</h1>
-        <h1>Test</h1>
+        <div class="ex_block">
+          <button close>✕</button>
+          <h1>BOTTOM</h1>
+        </div>
+      </div>
+      </div>
+    </sheet>
+
+    <sheet position="left" id="left" data-drag-scroll="x">
+      <div class="wrapper">
+        <div class="ex_block">
+          <button close>✕</button>
+          <h1>LEFT</h1>
+        </div>
+      </div>
+      </div>
+    </sheet>
+
+    <sheet position="right" id="right" data-drag-scroll="x">
+      <div class="wrapper">
+        <div class="ex_block">
+          <button close>✕</button>
+          <h1>RIGHT</h1>
+        </div>
+      </div>
+      </div>
+    </sheet>
+
+    <sheet position="top" id="top" data-drag-scroll="y">
+      <div class="wrapper">
+        <div class="ex_block">
+          <button close>✕</button>
+          <h1>TOP</h1>
+        </div>
+      </div>
+      </div>
+    </sheet>
+
+    <sheet id="snap" data-drag-scroll="y" class="snap">
+      <div class="wrapper">
+        <div class="first" snap>
+          <h4>FIRST</h4>
+          <div class="img__wrapper">
+            <img src="/layx/assets/image/demo/1.webp" alt="">
+            <img src="/layx/assets/image/demo/2.webp" alt="">
+            <img src="/layx/assets/image/demo/3.webp" alt="">
+          </div>
+          <span style="text-align: center; display: block;margin-top: .5rem;">DRAG TOP</span>
+        </div>
+        <div class="second" snap>
+          <h4>Second</h4>
+          <div class="img__wrapper">
+            <img src="/layx/assets/image/demo/4.webp" alt="">
+            <img src="/layx/assets/image/demo/5.webp" alt="">
+            <img src="/layx/assets/image/demo/6.webp" alt="">
+          </div>
+        </div>
       </div>
       </div>
     </sheet>
@@ -41,16 +221,9 @@
   </body>
 
   <script type="module">
-    import {Sheet} from "./sheet.js";
-    const sm = new Sheet();
-      document.getElementById('close').addEventListener('click', () => {
-          const sheet = document.getElementById('sheet');
-          sm.close(sheet);
-      });
-      document.getElementById('open').addEventListener('click', () => {
-          const sheet = document.getElementById('sheet');
-          sm.open(sheet);
-       });
+    import DragScroll from "../../others/drag_scroll/drag_scroll.js";
+    import { Sheet } from "./sheet.js";
+    new Sheet();
   </script>
 
 </html>

@@ -27,8 +27,8 @@
         --color: light-dark(#000, #fff);
         --bg-color: light-dark(#fff, #000);
 
-        --heading-color: light-dark(#000, #fff);
-        --paragraph-color: light-dark(#353c4a, #f1f1f1);
+        --heading-color: inherit;
+        --paragraph-color: inherit;
         --link-color: light-dark(#2da5e6, #70cdff);
         --accent-color: light-dark(#bae7ff, #2da5e6);
 

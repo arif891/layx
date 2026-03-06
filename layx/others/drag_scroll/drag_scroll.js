@@ -25,16 +25,22 @@ class DragScroll {
             scrollL: 0, scrollT: 0,
             velX: 0, velY: 0,
             rafId: null,
+            style: false,
         };
 
         const allowX = config.direction === 'x' || config.direction === 'both';
         const allowY = config.direction === 'y' || config.direction === 'both';
 
         // 1. Helper to restore styles when animation is truly finished
-        const unlockScrollStyles = () => {
+        const removeScrollStyles = () => {
             ele.style.scrollBehavior = '';
             ele.style.scrollSnapType = '';
         };
+
+        const addScrollStyles = () => {
+            ele.style.scrollBehavior = 'auto';
+            ele.style.scrollSnapType = 'none';
+        }
 
         const stopInertia = () => {
             if (state.rafId) {
@@ -58,18 +64,18 @@ class DragScroll {
             state.velX = 0;
             state.velY = 0;
 
-            // 2. Lock styles immediately on touch/click
-            ele.style.scrollBehavior = 'auto';
-            ele.style.scrollSnapType = 'none';
-
-            ele.style.cursor = 'grabbing';
             ele.style.userSelect = 'none';
-            window.addEventListener('pointermove', onPointerMove);
-            window.addEventListener('pointerup', onPointerUp);
+            window.addEventListener('mousemove', onPointerMove);
+            window.addEventListener('mouseup', onPointerUp);
         };
 
         const onPointerMove = (e) => {
             if (!state.isDragging) return;
+
+            if (!state.style) {
+                addScrollStyles();
+                state.style = true;
+            }
 
             const dx = (e.clientX - state.startX) * config.multiplier;
             const dy = (e.clientY - state.startY) * config.multiplier;
@@ -101,23 +107,23 @@ class DragScroll {
             } else {
                 // 3. Animation finished! Clean up.
                 stopInertia();
-                unlockScrollStyles();
+                removeScrollStyles();
             }
         };
 
         const onPointerUp = () => {
             state.isDragging = false;
-            ele.style.cursor = '';
-            ele.style.userSelect = '';
+            state.style = false;
+            removeScrollStyles();
 
-            window.removeEventListener('pointermove', onPointerMove);
-            window.removeEventListener('pointerup', onPointerUp);
+            window.removeEventListener('mousemove', onPointerMove);
+            window.removeEventListener('mouseup', onPointerUp);
 
             if (config.momentum && state.hasMoved) {
                 state.rafId = requestAnimationFrame(applyInertia);
             } else {
                 // If no momentum is applied, unlock immediately
-                unlockScrollStyles();
+                removeScrollStyles();
             }
         };
 
@@ -128,13 +134,13 @@ class DragScroll {
             }
         };
 
-        ele.addEventListener('pointerdown', onPointerDown);
+        ele.addEventListener('mousedown', onPointerDown);
         ele.addEventListener('click', onClick, true);
 
         this.instances.set(ele, () => {
             stopInertia();
-            unlockScrollStyles();
-            ele.removeEventListener('pointerdown', onPointerDown);
+            removeScrollStyles();
+            ele.removeEventListener('mousedown', onPointerDown);
             ele.removeEventListener('click', onClick, true);
         });
     }

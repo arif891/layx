@@ -29,11 +29,11 @@
 
             [button] & {
                 &::scroll-button(left) {
-                    content: "<"/ "Previous";
+                    content: "⟨"/ "Previous";
                 }
 
                 &::scroll-button(right) {
-                    content: ">"/ "Next";
+                    content: "⟩"/ "Next";
                 }
             }
 

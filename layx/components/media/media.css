@@ -36,7 +36,7 @@
         }
 
         &::-webkit-media-controls-timeline {
-            padding-block: .5em .65em;
+            padding-block: 1% min(2rem, 2.25%);
         }
 
         &::-webkit-media-controls-play-button {

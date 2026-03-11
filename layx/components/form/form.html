@@ -7,6 +7,7 @@
         <title>Document</title>
 
         <link rel="stylesheet" href="form.css">
+        <link rel="stylesheet" href="form_ext.css">
 
         <link rel="stylesheet" href="/layx/main/base/variable.css">
         <link rel="stylesheet" href="/layx/main/base/base.css">
@@ -16,26 +17,17 @@
 
 
         <style>
-            * {
-                box-sizing: border-box;
-            }
-
-            body {
-                margin: 0;
-                font-weight: 500;
-                font-family: 'Red Hat Display', Tahoma, Geneva, Verdana, sans-serif;
-            }
-
             form {
                 padding: 0;
+                padding-bottom: 1rem;
             }
 
             .demo__container {
 
                 >div {
                     display: grid;
-                    margin-bottom: 1.5rem;
-                   
+                    gap: .5rem;
+
                     @media (width > 500px) {
                         max-width: 450px;
                         margin-inline: auto;
@@ -55,6 +47,7 @@
             <container class="demo__container">
                 <div>
                     <h5>Text Fields</h5>
+
                     <input type="email" id="text" placeholder="Email">
 
                     <input type="password" name="" id="" placeholder="Password">
@@ -92,24 +85,26 @@
 
                     <input type="checkbox" name="" id="" style="margin-bottom: 1rem;">
 
+                    <input type="checkbox" name="" id="" style="margin-bottom: 1rem;" switch>
+
                     <input type="radio" name="" id="" style="display: block; margin-bottom: 1rem;">
 
-                    <div>
-                        <input class="modern" type="checkbox" name="" id="checkbox" required>
+                    <lselect>
+                        <input type="checkbox" name="" id="checkbox">
                         <label for="checkbox" tabindex="0">Checkbox</label>
-                    </div>
+                    </lselect>
 
-                    <div>
+                    <lselect>
                         <input class="modern" type="radio" name="" id="radio">
                         <label for="radio" tabindex="0">Radio</label>
-                    </div>
+                    </lselect>
 
                 </div>
 
                 <div>
                     <h5>Button</h5>
 
-                    <input type="button" value="Button">
+                    <input type="submit" value="Button">
                 </div>
 
                 <div>
@@ -129,7 +124,7 @@
                 <div>
                     <h5>Text Area</h5>
 
-                    <textarea placeholder="Textarea"></textarea>
+                    <textarea placeholder="Textarea" rows="6"></textarea>
                 </div>
 
             </container>

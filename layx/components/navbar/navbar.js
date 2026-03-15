@@ -2,6 +2,7 @@ class Navbar {
     constructor(selector = 'navbar') {
         this.selector = selector;
         this.togglers = document.querySelectorAll(`${this.selector} [toggle]`);
+        this.closeBtns = document.querySelectorAll(`${this.selector} [close]`);
         this.navbars = document.querySelectorAll(this.selector);
         this.init();
     }
@@ -24,6 +25,12 @@ class Navbar {
                     navbar.removeAttribute('open');
                 });
             }
+        });
+
+        this.closeBtns.forEach(closeBtn => {
+            closeBtn.addEventListener('click', () => {
+                closeBtn.closest(this.selector).removeAttribute('open');
+            });
         });
     }
 }

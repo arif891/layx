@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Navbar Demo</title>
+
+        <link rel="stylesheet" href="/layx/main/base/variable.css">
+        <link rel="stylesheet" href="/layx/main/base/base.css">
+        <link rel="stylesheet" href="/layx/main/typography/typography.css">
+        <link rel="stylesheet" href="/layx/components/button/button.css">
+        <link rel="stylesheet" href="/layx/main/base/scrollbar.css">
+
+        <link rel="stylesheet" href="navbar.css">
+
+        <style>
+            body {
+                background-image: url(/layx/assets/image/demo/bg-2.avif);
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+
+            <navbar>
+                <div class="main">
+                    <span class="h3 logo" style="margin: 0;">Logo</span>
+                    <div class="action">
+                        <button class="a">Action</button>
+                    </div>
+                    <button class="toggle" toggle></button>
+                </div>
+
+                <div class="wrapper">
+                    <a class="link" href="">Home</a>
+                    <a class="link" href="">About</a>
+                    <a class="link" href="">Service</a>
+                    <a class="link" href="">Other</a>
+                </div>
+            </navbar>
+
+        </header>
+
+
+        <script type="module">
+            import '../../navbar.js';
+        </script>
+    </body>
+
+</html>

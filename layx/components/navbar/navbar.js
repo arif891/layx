@@ -4,6 +4,7 @@ class Navbar {
         this.togglers = document.querySelectorAll(`${this.selector} [toggle]`);
         this.closeBtns = document.querySelectorAll(`${this.selector} [close]`);
         this.navbars = document.querySelectorAll(this.selector);
+        this.backdrops = document.querySelectorAll(`${this.selector} backdrop`);
         this.init();
     }
 
@@ -30,6 +31,12 @@ class Navbar {
         this.closeBtns.forEach(closeBtn => {
             closeBtn.addEventListener('click', () => {
                 closeBtn.closest(this.selector).removeAttribute('open');
+            });
+        });
+
+        this.backdrops.forEach(backdrop => {
+            backdrop.addEventListener('click', () => {
+                backdrop.closest(this.selector).removeAttribute('open');
             });
         });
     }

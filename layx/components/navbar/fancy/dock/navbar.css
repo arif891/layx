@@ -1,5 +1,5 @@
 @layer components {
   navbar, .navbar {
-   
+   position: fixed;
   }
 }

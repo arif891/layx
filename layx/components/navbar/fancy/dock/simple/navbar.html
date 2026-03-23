@@ -6,16 +6,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Navbar Demo</title>
 
-        <link rel="stylesheet" href="navbar.css">
-
         <link rel="stylesheet" href="/layx/main/base/variable.css">
         <link rel="stylesheet" href="/layx/main/base/base.css">
         <link rel="stylesheet" href="/layx/main/typography/typography.css">
         <link rel="stylesheet" href="/layx/components/button/button.css">
         <link rel="stylesheet" href="/layx/main/base/scrollbar.css">
 
+        <link rel="stylesheet" href="navbar.css">
+
         <style>
-            body {}
+            body {
+                background-image: url(/layx/assets/image/demo/bg-2.avif);
+            }
         </style>
     </head>
 
@@ -23,29 +25,30 @@
         <header>
 
             <navbar>
-                <div class="wrapper">
-                    <div class="main">
-                        <div class="start">
-                            <button toggle><span class="icon"></span><span class="text">MENU</span></button>
-                        </div>
-                        <div class="center">
-                            <span class="logo">LOGO</span>
-                        </div>
-                        <div class="end">
-                            <button class="a">Action</button>
-                        </div>
+                <div class="main">
+                    <div class="start">
+                        <span class="h4 logo">LOGO</span>
+                    </div>
+                    <div class="end">
+                        <button toggle></button>
                     </div>
                 </div>
                 <div class="menu">
-
+                    <div class="link-wrapper">
+                        <a class="link" href="">Home</a>
+                        <a class="link" href="">About</a>
+                        <a class="link" href="">Service</a>
+                        <a class="link" href="">Other</a>
+                    </div>
                 </div>
+                <backdrop></backdrop>
             </navbar>
 
         </header>
 
 
         <script type="module">
-            import './navbar.js';
+            import '../../../navbar.js';
         </script>
     </body>
 

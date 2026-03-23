@@ -1,0 +1,83 @@
+@layer components {
+  navbar, .navbar {
+    --padding-x: 1rem;
+    --padding-y: 1rem;
+
+    position: fixed;
+    inset: .5rem 0 auto;
+    width: fit-content;
+    margin-inline: auto;
+    min-width: min(80%, 400px);
+
+    .main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: var(--padding-y) var(--padding-x);
+      background-color: #fff;
+
+      .end {
+        [toggle] {
+          background: unset;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: .5rem;
+
+          &::before, &::after {
+            content: '';
+            height: .15rem;
+            width: 2rem;
+            background-color: currentColor;
+            opacity: .6;
+            transition: .3s;
+          }
+
+          [open] & {
+            &::before {
+              rotate: 45deg;
+              translate: 0 200%;
+            }
+
+            &::after {
+              rotate: -45deg;
+              translate: 0 -200%;
+            }
+          }
+        }
+      }
+    }
+
+    .menu {
+      background-color: #fff;
+      padding: var(--padding-y) var(--padding-x);
+      clip-path: inset(0 0 100% 0);
+      transition: clip-path .3s;
+      margin-top: .5rem;
+
+      [open] & {
+       clip-path: inset(0);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .link-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .link {
+          font-size: 4rem;
+        }
+      }
+    }
+  }
+
+  backdrop {
+    z-index: -1;
+  }
+}

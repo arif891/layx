@@ -1,4 +1,7 @@
-import scroller from '../smooth_scroll.js';
+import SmoothScroll from '../smooth_scroll.js';
+
+// Initialize
+const scroller = new SmoothScroll();
 
 // Expose scroller to window for the button onclick handlers in HTML (for demo purposes)
 window.scroller = scroller;

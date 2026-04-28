@@ -11,16 +11,23 @@ class SmoothScroll {
   /* ---------- ctor -------------------------------------------------- */
   constructor(opts = {}) {
     if (window.__smoothScrollInstance) {
-      console.warn('Smooth Scroll already initialized.');
+      console.warn('[SmoothScroll] already initialized.');
       return window.__smoothScrollInstance;
     }
 
-    this.lerp              = opts.lerp              ?? document.documentElement.dataset.lerp      ?? .1 / 4;
-    this.threshold         = opts.threshold         ?? document.documentElement.dataset.threshold ?? 1;
-    this.easing            = this._validateEasing(opts.easing ?? document.documentElement.dataset.easing ?? 'easeOutCubic');
-    this.preventWithKeys   = opts.preventWithKeys   ?? true;
+    const docData = document.documentElement.dataset;
+    const parseNum = (val, fallback) => {
+      if (val == null || val === '') return fallback;
+      const n = Number(val);
+      return !isNaN(n) ? n : fallback;
+    };
+
+    this.lerp              = parseNum(opts.lerp ?? docData.lerp, 0.025);
+    this.threshold         = parseNum(opts.threshold ?? docData.threshold, 1);
+    this.targetFPS         = parseNum(opts.targetFPS ?? docData.targetFps, 60);
+    this.preventWithKeys   = opts.preventWithKeys ?? true;
     this.preventWithAttribute = opts.preventWithAttribute ?? true;
-    this.targetFPS         = opts.targetFPS         ?? 60;
+    this.easing            = this._validateEasing(opts.easing ?? docData.easing ?? 'easeOutCubic');
 
     this.target      = window.scrollY;
     this.current     = window.scrollY;
@@ -31,13 +38,7 @@ class SmoothScroll {
 
     // Per-element scroll state: Map<Element, { target, current, raf, lastTime, isRunning }>
     this.elements = new Map();
-
     this.events = { start: [], update: [], complete: [], interrupt: [] };
-
-    this._wheel  = this._wheel.bind(this);
-    this._native = this._native.bind(this);
-    this._keys   = this._keys.bind(this);
-    this._tick   = this._tick.bind(this);
 
     this._addListeners();
     window.__smoothScrollInstance = this;
@@ -61,12 +62,13 @@ class SmoothScroll {
 
   destroy() {
     this._stop();
-    // Cancel any in-flight element animations
     for (const state of this.elements.values()) cancelAnimationFrame(state.raf);
     this.elements.clear();
-    removeEventListener('wheel', this._wheel, { passive: false });
-    removeEventListener('scroll', this._native);
-    removeEventListener('keydown', this._keys);
+    
+    window.removeEventListener('wheel', this._wheel, { passive: false });
+    window.removeEventListener('scroll', this._native);
+    window.removeEventListener('keydown', this._keys);
+    
     document.documentElement.style.scrollBehavior = '';
     delete window.__smoothScrollInstance;
   }
@@ -78,61 +80,89 @@ class SmoothScroll {
     console.warn(`[SmoothScroll] unknown easing "${e}" → linear`);
     return SmoothScroll.EASING.linear;
   }
+
   _clamp(y) {
-    return Math.max(0, Math.min(y, document.documentElement.scrollHeight - innerHeight));
+    return Math.max(0, Math.min(y, document.documentElement.scrollHeight - window.innerHeight));
   }
+
   _clampEl(el, y) {
     return Math.max(0, Math.min(y, el.scrollHeight - el.clientHeight));
   }
+
   _addListeners() {
-    addEventListener('wheel', this._wheel, { passive: false });
-    addEventListener('scroll', this._native, { passive: true });
-    addEventListener('keydown', this._keys);
+    window.addEventListener('wheel', this._wheel, { passive: false });
+    window.addEventListener('scroll', this._native, { passive: true });
+    window.addEventListener('keydown', this._keys);
   }
 
-  /* ---------- private – wheel handler ------------------------------ */
-  _wheel(e) {
+  /* ---------- private – handlers ----------------------------------- */
+  _wheel = (e) => {
     if (this.preventWithKeys && (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey)) return;
 
-    // "prevent" zone – bail out of smooth scroll entirely
-    if (this.preventWithAttribute && e.target.closest('[data-smooth-scroll="prevent"]')) {
-      if (this.isRunning) this.emit('interrupt');
-      this._stop();
-      return;
-    }
-
-    // "self" zone – scroll the element, not the root
-    const selfEl = e.target.closest('[data-smooth-scroll="self"]');
-    if (selfEl) {
-      // Only intercept if the element can actually scroll in that direction
-      const canScroll =
-        (e.deltaY > 0 && selfEl.scrollTop < selfEl.scrollHeight - selfEl.clientHeight) ||
-        (e.deltaY < 0 && selfEl.scrollTop > 0);
-      if (canScroll) {
-        e.preventDefault();
-        this._scrollElement(selfEl, e.deltaY);
+    // Evaluate single DOM traversal for scroll-behavior rules
+    const attrEl = e.target.closest('[data-smooth-scroll]');
+    if (attrEl) {
+      const type = attrEl.dataset.smoothScroll;
+      
+      if (this.preventWithAttribute && type === 'prevent') {
+        if (this.isRunning) this.emit('interrupt');
+        this._stop();
         return;
       }
-      // Element is at its boundary → fall through to root scroll
+      
+      if (type === 'self') {
+        const canScroll = (e.deltaY > 0 && attrEl.scrollTop < attrEl.scrollHeight - attrEl.clientHeight) ||
+                          (e.deltaY < 0 && attrEl.scrollTop > 0);
+        if (canScroll) {
+          e.preventDefault();
+          this._scrollElement(attrEl, e.deltaY);
+          return;
+        }
+      }
     }
 
     if (this.scrollLocked) return;
+    
     e.preventDefault();
     this.target = this._clamp(this.target + e.deltaY);
     this._start();
-  }
+  };
+
+  _native = () => {
+    if (!this.isRunning) this.current = this.target = window.scrollY;
+  };
+
+  _keys = (e) => {
+    if (this.scrollLocked) return;
+    const tag = e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+
+    let delta = 0;
+    let absolute = false;
+    
+    switch (e.key) {
+      case 'PageUp':    delta = -window.innerHeight; break;
+      case 'PageDown':
+      case ' ':         delta = window.innerHeight; break;
+      case 'Home':      absolute = true; delta = 0; break;
+      case 'End':       absolute = true; delta = document.documentElement.scrollHeight; break;
+      case 'ArrowUp':   delta = -50; break;
+      case 'ArrowDown': delta = 50; break;
+      default:          return;
+    }
+
+    e.preventDefault();
+    if (this.isRunning) this.emit('interrupt');
+    
+    this.target = this._clamp(absolute ? delta : this.target + delta);
+    this._start();
+  };
 
   /* ---------- private – per-element smooth scroll ------------------ */
   _scrollElement(el, delta) {
     let state = this.elements.get(el);
     if (!state) {
-      state = {
-        target:    el.scrollTop,
-        current:   el.scrollTop,
-        raf:       0,
-        lastTime:  0,
-        isRunning: false,
-      };
+      state = { target: el.scrollTop, current: el.scrollTop, raf: 0, lastTime: 0, isRunning: false };
       this.elements.set(el, state);
     }
 
@@ -147,8 +177,8 @@ class SmoothScroll {
   }
 
   _tickElement(el, state, currentTime) {
-    const deltaTime      = currentTime - state.lastTime;
-    state.lastTime       = currentTime;
+    const deltaTime = Math.min(currentTime - state.lastTime, 100);
+    state.lastTime  = currentTime;
     const deltaMultiplier = deltaTime / (1000 / this.targetFPS);
 
     const dy = state.target - state.current;
@@ -159,31 +189,14 @@ class SmoothScroll {
       return;
     }
 
-    const norm      = Math.min(1, Math.abs(dy) / el.clientHeight);
-    state.current  += dy * this.lerp * (1 + this.easing(1 - norm)) * deltaMultiplier;
-    el.scrollTop    = state.current;
-    state.raf       = requestAnimationFrame(t => this._tickElement(el, state, t));
+    const norm = Math.min(1, Math.abs(dy) / el.clientHeight);
+    state.current += dy * this.lerp * (1 + this.easing(1 - norm)) * deltaMultiplier;
+    el.scrollTop   = state.current;
+    
+    state.raf = requestAnimationFrame(t => this._tickElement(el, state, t));
   }
 
   /* ---------- private – root tick ---------------------------------- */
-  _native() {
-    if (!this.isRunning) this.current = this.target = window.scrollY;
-  }
-  _keys(e) {
-    const map = {
-      PageUp: -window.innerHeight, PageDown: window.innerHeight,
-      Home: 0, End: document.documentElement.scrollHeight,
-      ArrowUp: -50, ArrowDown: 50, ' ': window.innerHeight,
-    };
-    if (this.scrollLocked) return;
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
-    if (map[e.key] == null) return;
-    e.preventDefault();
-    if (this.isRunning) this.emit('interrupt');
-    this.target = ['Home', 'End'].includes(e.key) ? map[e.key] : this.target + map[e.key];
-    this.target = this._clamp(this.target);
-    this._start();
-  }
   _start() {
     if (this.isRunning) return;
     this.isRunning = true;
@@ -192,31 +205,34 @@ class SmoothScroll {
     this.emit('start');
     this.raf = requestAnimationFrame(this._tick);
   }
+
   _stop() {
     this.isRunning = false;
     cancelAnimationFrame(this.raf);
     document.documentElement.style.scrollBehavior = '';
   }
-  _tick(currentTime) {
-    const deltaTime       = currentTime - this.lastTime;
-    this.lastTime         = currentTime;
+
+  _tick = (currentTime) => {
+    const deltaTime = Math.min(currentTime - this.lastTime, 100);
+    this.lastTime   = currentTime;
     const deltaMultiplier = deltaTime / (1000 / this.targetFPS);
 
     const dy = this.target - this.current;
     if (Math.abs(dy) < this.threshold) {
       this.current = this.target;
-      scrollTo(0, this.current);
+      window.scrollTo(0, this.current);
       this._stop();
       this.emit('complete', { finalScroll: this.current });
       return;
     }
 
-    const norm = Math.min(1, Math.abs(dy) / innerHeight);
+    const norm = Math.min(1, Math.abs(dy) / window.innerHeight);
     this.current += dy * this.lerp * (1 + this.easing(1 - norm)) * deltaMultiplier;
-    scrollTo(0, this.current);
+    window.scrollTo(0, this.current);
+    
     this.emit('update', { currentScroll: this.current, diff: dy });
     this.raf = requestAnimationFrame(this._tick);
-  }
+  };
 }
 
 export default SmoothScroll;

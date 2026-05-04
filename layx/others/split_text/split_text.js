@@ -1,14 +1,14 @@
 /**
  * SplitText
  * 
- * A utility class to split text content into words and/or letters for animation purposes.
+ * A utility class to split text content into words and/or chars for animation purposes.
  * It wraps text in spans and assigns CSS variables for staggered animations.
  * 
  * Features:
- * - Splits text into words, letters, or both.
+ * - Splits text into words, chars, or both.
  * - Supports custom selectors (default: [data-split-text]).
  * - Auto-refreshes on DOM changes (optional).
- * - Assigns CSS variables: --word-index, --letter-index, --global-index.
+ * - Assigns CSS variables: --word-index, --char-index, --global-index.
  * - Supports split direction: start, center, end (via data-split-from).
  */
 class SplitText {
@@ -122,7 +122,7 @@ class SplitText {
     }
 
     _getSplitFrom(el) {
-        const v = (el.dataset.splitFrom || 'start').toLowerCase();
+        const v = (el.dataset.splitTextFrom || 'start').toLowerCase();
         return ['start', 'center', 'end'].includes(v) ? v : 'start';
     }
 
@@ -134,7 +134,7 @@ class SplitText {
         list.forEach((item, i) => {
             if (!item) return;
             const idx = mode === 'center'
-                ? Math.floor(Math.abs(i - mid) + (n % 2 === 0 ? 1 : 0))
+                ? Math.floor(Math.abs(i - mid))
                 : mode === 'end' ? n - 1 - i : i;
             
             item.style.setProperty(`--${cssPrefix}-index`, idx);

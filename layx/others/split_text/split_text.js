@@ -22,11 +22,6 @@ class SplitText {
         this._chars = [];
         this._wordWraps = [];
 
-        this._observer = null;
-        if (this.opts.autoRefresh && window.MutationObserver) {
-            this._observer = new MutationObserver(() => this.refresh());
-            this._observer.observe(document.body, { childList: true, subtree: true });
-        }
         this.init();
     }
 

@@ -62,13 +62,14 @@ async function processFiles(scriptDir, optimize) {
             ]);
 
             const finalContent = await processContent(sourceContent, config.source, type, optimize);
+            const finalBaseContent = type === 'css' ? await processContent(baseContent, config.base, type, optimize) : baseContent;
 
             await Promise.all([
                 writeFile(config.output, finalContent),
                 writeFile(config.baseOutput, baseContent),
                 type === 'js'
                     ? writeFile(config.base, `import '../../${dirConfig.js.source}';` + baseContent)
-                    : writeFile(config.base, minify(finalContent + baseContent, type))
+                    : writeFile(config.base, minify(finalContent + finalBaseContent, type))
             ]);
             console.log(`Processed LayX base ${type}`);
 

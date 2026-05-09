@@ -67,6 +67,8 @@ class Sheet {
             closeButtons.forEach(button => {
                 button.addEventListener('click', () => this.close(sheet));
             });
+
+            sheet.addEventListener('scroll', () => this.handleSheetScroll(sheet));
         });
 
         window.addEventListener('keydown', e => {
@@ -95,6 +97,35 @@ class Sheet {
     }
 
     /**
+     * Handle sheet scroll event to remove open attribute when scrolled closed
+     */
+    handleSheetScroll(sheet) {
+        if (!sheet.hasAttribute(Sheet.SELECTORS.OPEN_ATTR)) return;
+
+        const position = sheet.getAttribute(Sheet.SELECTORS.POSITION_ATTR) || Sheet.POSITIONS.BOTTOM;
+        let isClosed = false;
+
+        switch (position) {
+            case Sheet.POSITIONS.TOP:
+                isClosed = sheet.scrollTop >= sheet.scrollHeight - sheet.clientHeight;
+                break;
+            case Sheet.POSITIONS.LEFT:
+                isClosed = sheet.scrollLeft >= sheet.scrollWidth - sheet.clientWidth;
+                break;
+            case Sheet.POSITIONS.RIGHT:
+                isClosed = sheet.scrollLeft <= 0;
+                break;
+            case Sheet.POSITIONS.BOTTOM:
+                isClosed = sheet.scrollTop <= 0;
+                break;
+        }
+
+        if (isClosed) {
+            sheet.removeAttribute(Sheet.SELECTORS.OPEN_ATTR);
+        }
+    }
+
+    /**
      * Open a sheet by scrolling to its content
      */
     open(sheet) {
@@ -105,7 +136,7 @@ class Sheet {
 
         const snapPoints = sheet.querySelectorAll(Sheet.SELECTORS.SNAP_POINTS);
         const target = snapPoints.length > 0 ? snapPoints[0] : wrapper;
-        
+
 
         target.scrollIntoView({ behavior: Sheet.SCROLL_BEHAVIOR, block: 'nearest', inline: 'nearest' });
         sheet.setAttribute(Sheet.SELECTORS.OPEN_ATTR, '');
@@ -189,6 +220,7 @@ class Sheet {
             sheet.querySelectorAll(Sheet.SELECTORS.CLOSE_BUTTONS).forEach(button => {
                 button.removeEventListener('click', () => this.close(sheet));
             });
+            sheet.removeEventListener('scroll', () => this.handleSheetScroll(sheet));
         });
 
         this.wrapperCache.clear();

@@ -95,9 +95,12 @@
       }
 
       .snap {
+        timeline-scope: --sheet;
+
         .wrapper {
           width: clamp(250px, calc(100% - 1rem), 800px);
           margin-inline: auto;
+          view-timeline: --sheet;
 
           &::before {
             content: '';
@@ -137,12 +140,29 @@
           }
         }
 
+        backdrop {
+          z-index: -1;
+          visibility: visible;
+
+          [open] & {
+            opacity: 1;
+          }
+
+          @supports (animation-timeline: --sheet) {
+            animation: tem linear both;
+            animation-timeline: --sheet;
+            animation-range: entry;
+
+            [open] & {
+              opacity: 0;
+            }
+          }
+        }
       }
 
       @keyframes tem {
         to {
           opacity: 1;
-          pointer-events: auto;
         }
       }
     </style>
@@ -215,7 +235,7 @@
           </div>
         </div>
       </div>
-      </div>
+      <backdrop close></backdrop>
     </sheet>
 
   </body>

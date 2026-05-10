@@ -26,6 +26,7 @@
             scroll-behavior: smooth;
             scroll-marker-group: after;
             cursor: grab;
+            will-change: scroll-position;
 
             [controls] & {
                 &::scroll-button(left) {

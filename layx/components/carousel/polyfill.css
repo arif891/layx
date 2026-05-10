@@ -1,7 +1,7 @@
 /* Polyfill for Safari anf Firefox */
 @layer components {
     carousel, .carousel {
-        &[indicator] {
+        &[indicators] {
             .scroll-marker-group {
                 display: flex;
                 min-height: 1rem;
@@ -16,14 +16,14 @@
                 pointer-events: none;
             }
 
-            &:not([indicator~=top], [indicator~=bottom]) {
+            &:not([indicators~=top], [indicators~=bottom]) {
                 .scroll-marker-group {
                     position: absolute;
                     inset: auto 0 0;
                 }
             }
 
-            &[indicator~=top] {
+            &[indicators~=top] {
                 .scroll-marker-group {
                     grid-row: 1 / 2;
                     grid-column: 1 / 2;
@@ -31,13 +31,13 @@
                 }
             }
 
-            &[indicator~=right] {
+            &[indicators~=right] {
                 .scroll-marker-group {
                     justify-content: end;
                 }
             }
 
-            &[indicator~=left] {
+            &[indicators~=left] {
                 .scroll-marker-group {
                     justify-content: start;
                 }
@@ -49,6 +49,7 @@
                 width: var(--indicator-width, 1.5rem);
                 box-sizing: content-box !important;
                 border-block: 1rem solid transparent;
+                border-inline: 0;
                 border-radius: 0;
                 pointer-events: auto;
                 flex-shrink: 0;
@@ -56,6 +57,7 @@
                 background: var(--indicator-bg);
                 background-clip: padding-box;
                 transition: .3s;
+                cursor: pointer;
             }
 
             .scroll-marker.active {
@@ -64,7 +66,7 @@
             }
         }
 
-        &[button] {
+        &[controls] {
             .scroll-button {
                 display: grid;
                 place-content: center;
@@ -86,17 +88,17 @@
 
             .scroll-button.left {
                 &::before {
-                    content: "<"/ "Previous";
+                    content: "⟨"/ "Previous";
                 }
             }
 
             .scroll-button.right {
                 &::before {
-                    content: ">"/ "Next";
+                    content: "⟩"/ "Next";
                 }
             }
 
-            &:not([button~=top], [button~=bottom]) {
+            &:not([controls~=top], [controls~=bottom]) {
                 .scroll-button {
                     position: absolute;
                     top: 50%;
@@ -112,7 +114,7 @@
                 }
             }
 
-            &[button~=top], &[button~=bottom] {
+            &[controls~=top], &[controls~=bottom] {
                 .scroll-button {
                     grid-column: 1 / 2;
                     margin-inline: var(--edge-offset-x);
@@ -123,7 +125,7 @@
                     translate: calc(-100% - var(--button-gap, 0)) 0;
                 }
 
-                &[button~=left] {
+                &[controls~=left] {
                     .scroll-button {
                         justify-self: start;
                     }
@@ -137,7 +139,7 @@
                     }
                 }
 
-                &[button~=center] {
+                &[controls~=center] {
                     .scroll-button {
                         justify-self: center;
                     }
@@ -152,14 +154,14 @@
                 }
             }
 
-            &[button~=top] {
+            &[controls~=top] {
                 .scroll-button {
                     grid-row: 1 / 2;
                     align-self: end;
                 }
             }
 
-            &[button~=bottom] {
+            &[controls~=bottom] {
                 .scroll-button {
                     grid-row: 2 / 3;
                 }

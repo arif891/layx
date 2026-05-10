@@ -1,149 +1,129 @@
-/* Polyfill for Safari anf Firefox */
+/* Polyfill for Safari and Firefox */
 class CarouselPolyfill {
     /**
-     * @param {HTMLElement} carousel
+     * @param {string} [selector='carousel, .carousel']
      */
-    constructor(carousel) {
-        this.carousel = carousel;
-        this.scroller = carousel.querySelector('.scroller');
-        this.items = Array.from(this.scroller.querySelectorAll('.item'));
-
-        this.markerGroup = null;
-        this.markers = [];
-        this.btnLeft = null;
-        this.btnRight = null;
-
-        this._scrolling = false;
-        this._scrollTimeout = null;
-
+    constructor(selector = 'carousel, .carousel') {
+        // Each entry: { carousel, scroller, items, markers, btnLeft, btnRight, scrollTimeout }
+        this._carousels = Array.from(document.querySelectorAll(selector)).map(carousel => ({
+            carousel,
+            scroller: carousel.querySelector('.scroller'),
+            items: Array.from(carousel.querySelectorAll('.scroller .item')),
+            markers: [],
+            btnLeft: null,
+            btnRight: null,
+            scrollTimeout: null,
+        }));
+ 
         this._init();
     }
-
+ 
     _init() {
-        if (this.carousel.hasAttribute('indicator')) {
-            this._buildIndicators();
-        }
-
-        if (this.carousel.hasAttribute('button')) {
-            this._buildButtons();
-        }
-
-        this._bindScroll();
-        this._update();
+        this._carousels.forEach(state => {
+            if (state.carousel.hasAttribute('indicators')) this._buildIndicators(state);
+            if (state.carousel.hasAttribute('controls'))    this._buildButtons(state);
+            this._bindScroll(state);
+            this._update(state);
+        });
     }
-
+ 
     // ── Indicators ────────────────────────────────────────────────────────────
-
-    _buildIndicators() {
+ 
+    _buildIndicators(state) {
         const group = document.createElement('div');
         group.className = 'scroll-marker-group';
-
-        this.items.forEach((_, i) => {
+ 
+        state.items.forEach((_, i) => {
             const marker = document.createElement('button');
             marker.className = 'scroll-marker';
             marker.setAttribute('aria-label', `Go to slide ${i + 1}`);
-            marker.addEventListener('click', () => this._scrollToIndex(i));
+            marker.addEventListener('click', () => this._scrollToIndex(state, i));
             group.appendChild(marker);
-            this.markers.push(marker);
+            state.markers.push(marker);
         });
-
-        this.carousel.appendChild(group);
-
-        this.markerGroup = group;
+ 
+        state.carousel.appendChild(group);
     }
-
+ 
     // ── Buttons ───────────────────────────────────────────────────────────────
-
-    _buildButtons() {
+ 
+    _buildButtons(state) {
         const btnLeft = document.createElement('button');
         btnLeft.className = 'scroll-button left';
         btnLeft.setAttribute('aria-label', 'Previous');
-
+ 
         const btnRight = document.createElement('button');
         btnRight.className = 'scroll-button right';
         btnRight.setAttribute('aria-label', 'Next');
-
-        btnLeft.addEventListener('click', () => this._step(-1));
-        btnRight.addEventListener('click', () => this._step(1));
-
-        this.carousel.appendChild(btnLeft);
-        this.carousel.appendChild(btnRight);
-
-        this.btnLeft = btnLeft;
-        this.btnRight = btnRight;
+ 
+        btnLeft.addEventListener('click',  () => this._step(state, -1));
+        btnRight.addEventListener('click', () => this._step(state,  1));
+ 
+        state.carousel.appendChild(btnLeft);
+        state.carousel.appendChild(btnRight);
+ 
+        state.btnLeft  = btnLeft;
+        state.btnRight = btnRight;
     }
-
+ 
     // ── Scroll helpers ────────────────────────────────────────────────────────
-
-    /** Scroll the scroller so that item at `index` is centred. */
-    _scrollToIndex(index) {
-        const item = this.items[index];
+ 
+    _scrollToIndex(state, index) {
+        const item = state.items[index];
         if (!item) return;
-
-        // Use scrollIntoView-style calculation to centre the item inside the scroller
-        const scrollerRect = this.scroller.getBoundingClientRect();
-        const itemRect = item.getBoundingClientRect();
-
+ 
+        const scrollerRect = state.scroller.getBoundingClientRect();
+        const itemRect     = item.getBoundingClientRect();
+ 
         const targetScrollLeft =
-            this.scroller.scrollLeft +
+            state.scroller.scrollLeft +
             (itemRect.left - scrollerRect.left) -
             (scrollerRect.width - itemRect.width) / 2;
-
-        this.scroller.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
+ 
+        state.scroller.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
     }
-
-    /** Step forward (+1) or backward (-1) by one item relative to the most-visible item. */
-    _step(direction) {
-        const current = this._currentIndex();
-        const next = Math.max(0, Math.min(this.items.length - 1, current + direction));
-        this._scrollToIndex(next);
+ 
+    _step(state, direction) {
+        const current = this._currentIndex(state);
+        const next    = Math.max(0, Math.min(state.items.length - 1, current + direction));
+        this._scrollToIndex(state, next);
     }
-
-    /** Return the index of the item whose centre is closest to the scroller centre. */
-    _currentIndex() {
-        const scrollerRect = this.scroller.getBoundingClientRect();
+ 
+    _currentIndex(state) {
+        const scrollerRect   = state.scroller.getBoundingClientRect();
         const scrollerCentre = scrollerRect.left + scrollerRect.width / 2;
-
+ 
         let bestIndex = 0;
-        let bestDist = Infinity;
-
-        this.items.forEach((item, i) => {
-            const rect = item.getBoundingClientRect();
+        let bestDist  = Infinity;
+ 
+        state.items.forEach((item, i) => {
+            const rect       = item.getBoundingClientRect();
             const itemCentre = rect.left + rect.width / 2;
-            const dist = Math.abs(scrollerCentre - itemCentre);
-            if (dist < bestDist) {
-                bestDist = dist;
-                bestIndex = i;
-            }
+            const dist       = Math.abs(scrollerCentre - itemCentre);
+            if (dist < bestDist) { bestDist = dist; bestIndex = i; }
         });
-
+ 
         return bestIndex;
     }
-
+ 
     // ── State sync ────────────────────────────────────────────────────────────
-
-    _update() {
-        const index = this._currentIndex();
-
-        // Sync markers
-        this.markers.forEach((m, i) => {
-            m.classList.toggle('active', i === index);
-        });
-
-        // Sync buttons disabled state
-        if (this.btnLeft) this.btnLeft.disabled = index === 0;
-        if (this.btnRight) this.btnRight.disabled = index === this.items.length - 1;
+ 
+    _update(state) {
+        const index = this._currentIndex(state);
+ 
+        state.markers.forEach((m, i) => m.classList.toggle('active', i === index));
+ 
+        if (state.btnLeft)  state.btnLeft.disabled  = index === 0;
+        if (state.btnRight) state.btnRight.disabled = index === state.items.length - 1;
     }
-
-    _bindScroll() {
-        this.scroller.addEventListener('scroll', () => {
-            // Debounce: update state after scrolling settles
-            clearTimeout(this._scrollTimeout);
-            this._scrollTimeout = setTimeout(() => this._update(), 80);
+ 
+    _bindScroll(state) {
+        state.scroller.addEventListener('scroll', () => {
+            clearTimeout(state.scrollTimeout);
+            state.scrollTimeout = setTimeout(() => this._update(state), 80);
         }, { passive: true });
     }
 }
-
+ 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
-const carousels = document.querySelectorAll('carousel, .carousel');
-carousels.forEach(el => new CarouselPolyfill(el));
+new CarouselPolyfill();

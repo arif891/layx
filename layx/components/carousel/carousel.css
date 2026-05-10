@@ -27,7 +27,7 @@
             scroll-marker-group: after;
             cursor: grab;
 
-            [button] & {
+            [controls] & {
                 &::scroll-button(left) {
                     content: "⟨"/ "Previous";
                 }
@@ -63,7 +63,7 @@
 
         }
 
-        &[indicator] {
+        &[indicators] {
             ::scroll-marker-group {
                 display: flex;
                 min-height: 1rem;
@@ -78,14 +78,14 @@
                 pointer-events: none;
             }
 
-            &:not([indicator~=top], [indicator~=bottom]) {
+            &:not([indicators~=top], [indicators~=bottom]) {
                 ::scroll-marker-group {
                     position: absolute;
                     inset: auto 0 0;
                 }
             }
 
-            &[indicator~=top] {
+            &[indicators~=top] {
                 ::scroll-marker-group {
                     grid-row: 1 / 2;
                     grid-column: 1 / 2;
@@ -93,13 +93,13 @@
                 }
             }
 
-            &[indicator~=right] {
+            &[indicators~=right] {
                 ::scroll-marker-group {
                     justify-content: end;
                 }
             }
 
-            &[indicator~=left] {
+            &[indicators~=left] {
                 ::scroll-marker-group {
                     justify-content: start;
                 }
@@ -126,7 +126,7 @@
             }
         }
 
-        &[button] {
+        &[controls] {
             ::scroll-button(*) {
                 display: grid;
                 place-content: center;
@@ -146,7 +146,7 @@
                 opacity: .5;
             }
 
-            &:not([button~=top], [button~=bottom]) {
+            &:not([controls~=top], [controls~=bottom]) {
                 ::scroll-button(*) {
                     position: absolute;
                     top: 50%;
@@ -162,7 +162,7 @@
                 }
             }
 
-            &[button~=top], &[button~=bottom] {
+            &[controls~=top], &[controls~=bottom] {
                 ::scroll-button(*) {
                     grid-column: 1 / 2;
                     margin-inline: var(--edge-offset-x);
@@ -173,7 +173,7 @@
                     translate: calc(-100% - var(--button-gap, 0)) 0;
                 }
 
-                &[button~=left] {
+                &[controls~=left] {
                     ::scroll-button(*) {
                         justify-self: start;
                     }
@@ -187,7 +187,7 @@
                     }
                 }
 
-                &[button~=center] {
+                &[controls~=center] {
                     ::scroll-button(*) {
                         justify-self: center;
                     }
@@ -202,14 +202,14 @@
                 }
             }
 
-            &[button~=top] {
+            &[controls~=top] {
                 ::scroll-button(*) {
                     grid-row: 1 / 2;
                     align-self: end;
                 }
             }
 
-            &[button~=bottom] {
+            &[controls~=bottom] {
                 ::scroll-button(*) {
                     grid-row: 2 / 3;
                 }
@@ -222,22 +222,22 @@
             grid-column: 1 / 2;
             padding-inline: var(--edge-offset-x);
 
-            [button]:not([button~=left], [button~=center]) & {
+            [controls]:not([controls~=left], [controls~=center]) & {
                 padding-right: calc(1rem + var(--edge-offset-x, 0) + var(--button-gap, 0) + var(--button-size, 0) * 2);
             }
 
-            [button~=left] & {
+            [controls~=left] & {
                 padding-left: calc(1rem + var(--edge-offset-x, 0) + var(--button-gap, 0) + var(--button-size, 0) * 2);
             }
 
-            [button~=center] & {
+            [controls~=center] & {
                 padding-bottom: calc(var(--button-size, 0) + 1rem);
             }
 
             &:nth-child(2) {
                 grid-row: 2 / 3;
 
-                [button~=center] & {
+                [controls~=center] & {
                     padding-bottom: 0;
                     padding-top: calc(var(--button-size, 0) + 1rem);
                 }

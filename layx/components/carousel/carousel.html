@@ -19,13 +19,15 @@
             }
 
             .demo__carousel {
-                --min-height: 500px;
+                 padding-top: 1rem;
+                --min-height: 45svh;
                 --gap: .5rem;
 
                 .item {
                     display: grid;
                     place-items: center;
                     background-size: cover;
+                    background-position: center;
 
                     h3 {
                         user-select: none;
@@ -40,7 +42,30 @@
     <body>
         <container class="demo__container">
             <carousel class="demo__carousel" indicators controls>
-                <div class="scroller" data-drag-scroll data-drag-scroll-multiplier="2.5">
+                <div class="scroller" data-drag-scroll="x" data-drag-scroll-multiplier="2.5">
+                    <div class="item" style="background-image: url(/layx/assets/image/demo/1.webp);">
+                        <h3>Slide 1</h3>
+                    </div>
+                    <div class="item" style="background-image: url(/layx/assets/image/demo/2.webp);">
+                        <h3>Slide 2</h3>
+                    </div>
+                    <div class="item" style="background-image: url(/layx/assets/image/demo/6.webp);">
+                        <h3>Slide 3</h3>
+                    </div>
+                    <div class="item" style="background-image: url(/layx/assets/image/demo/11.webp);">
+                        <h3>Slide 4</h3>
+                    </div>
+                    <div class="item" style="background-image: url(/layx/assets/image/demo/17.webp);">
+                        <h3>Slide 5</h3>
+                    </div>
+                    <div class="item" style="background-image: url(/layx/assets/image/demo/18.webp);">
+                        <h3>Slide 6</h3>
+                    </div>
+                </div>
+            </carousel>
+
+            <carousel class="demo__carousel" indicators controls snap="none">
+                <div class="scroller" data-drag-scroll="x" data-drag-scroll-momentum="1">
                     <div class="item" style="background-image: url(/layx/assets/image/demo/1.webp);">
                         <h3>Slide 1</h3>
                     </div>
@@ -65,13 +90,14 @@
 
         <!-- Polyfill for Safari anf Firefox -->
         <script type="module">
-           if (!CSS.supports('scroll-marker-group', 'after')) {
-            import("./polyfill.js");
-           }
+            if (!CSS.supports('scroll-marker-group', 'after')) {
+                import("./polyfill.js");
+            }
         </script>
 
+        <!-- Optional drag scroll -->
         <script type="module">
-            const hasPointerFine  = window.matchMedia("(pointer: fine)").matches;
+            const hasPointerFine = window.matchMedia("(pointer: fine)").matches;
             if (hasPointerFine) {
                 import("/layx/others/drag_scroll/drag_scroll.js");
             }

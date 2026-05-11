@@ -1,5 +1,5 @@
 /* Polyfill for Safari anf Firefox */
-@import './polyfill.css' layer(components) supports(not (scroll-marker-group: after));
+@import './polyfill.css'layer(components) supports(not (scroll-marker-group: after));
 
 @layer components {
     carousel, .carousel {
@@ -45,20 +45,24 @@
                 -webkit-user-drag: none;
                 scroll-snap-align: center;
 
-                &::scroll-marker {
-                    content: '';
-                }
-
                 &.auto {
                     width: auto;
                 }
 
-                &:first-child {
-                    margin-inline-start: var(--edge-offset-x);
+                [snap~=left] & {
+                    scroll-snap-align: start;
                 }
 
-                &:last-child {
-                    margin-inline-end: var(--edge-offset-x);
+                [snap~=right] & {
+                    scroll-snap-align: end;
+                }
+
+                [snap~=none] & {
+                    scroll-snap-align: none;
+                }
+
+                &::scroll-marker {
+                    content: '';
                 }
             }
 

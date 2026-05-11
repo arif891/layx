@@ -120,7 +120,7 @@ class CarouselPolyfill {
     _bindScroll(state) {
         state.scroller.addEventListener('scroll', () => {
             clearTimeout(state.scrollTimeout);
-            state.scrollTimeout = setTimeout(() => this._update(state), 80);
+            state.scrollTimeout = setTimeout(() => this._update(state), 50);
         }, { passive: true });
     }
 }

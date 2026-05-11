@@ -88,21 +88,18 @@
             </carousel>
         </container>
 
-        <!-- Polyfill for Safari anf Firefox -->
         <script type="module">
+            // Polyfill for Safari anf Firefox
             if (!CSS.supports('scroll-marker-group', 'after')) {
-                import("./polyfill.js");
+                import("/layx/components/carousel/polyfill.js");
             }
-        </script>
 
-        <!-- Optional drag scroll -->
-        <script type="module">
+            // Optional drag scroll
             const hasPointerFine = window.matchMedia("(pointer: fine)").matches;
             if (hasPointerFine) {
                 import("/layx/others/drag_scroll/drag_scroll.js");
             }
         </script>
-
     </body>
 
 </html>

@@ -183,7 +183,7 @@
             }
 
             &[indicators~=bottom][controls~=top] {
-                .scroll-button {
+                .scroll-marker-group {
                     grid-row: 3 / 4;
                 }
             }

@@ -1,4 +1,4 @@
-/* Polyfill for Safari anf Firefox */
+/* Polyfill for Safari and Firefox */
 @layer components {
     carousel, .carousel {
         &[indicators] {

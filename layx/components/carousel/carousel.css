@@ -1,5 +1,5 @@
 /* Polyfill for Safari anf Firefox */
-@import './polyfill.css'layer(components) supports(not (scroll-marker-group: after));
+@import './polyfill.css' layer(components) supports(not (scroll-marker-group: after));
 
 @layer components {
     carousel, .carousel {

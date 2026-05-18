@@ -7,7 +7,7 @@
         &::-webkit-media-controls-current-time-display,
         &::-webkit-media-controls-time-remaining-display {
             font: inherit;
-            font-size: .3lh;
+            font-size: .9rem;
             font-weight: 500;
             font-variant-numeric: tabular-nums;
         }
@@ -35,8 +35,13 @@
             background: linear-gradient(transparent, rgb(0 0 0 / .75));
         }
 
+        &::-webkit-media-controls-current-time-display,
+        &::-webkit-media-controls-time-remaining-display {
+            font-size: .3lh;
+        }
+
         &::-webkit-media-controls-timeline {
-            padding-block: 1rem min(2rem, 2.25%);
+            padding-block: 1rem min(2rem, 2%);
         }
 
         &::-webkit-media-controls-play-button {

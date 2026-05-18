@@ -7,7 +7,7 @@
         &::-webkit-media-controls-current-time-display,
         &::-webkit-media-controls-time-remaining-display {
             font: inherit;
-            font-size: .9rem;
+            font-size: .3lh;
             font-weight: 500;
             font-variant-numeric: tabular-nums;
         }

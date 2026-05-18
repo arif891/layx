@@ -41,7 +41,7 @@
         }
 
         &::-webkit-media-controls-timeline {
-            padding-block: 1rem min(2rem, 2%);
+            padding-block: 1rem min(2rem, 2.25%);
         }
 
         &::-webkit-media-controls-play-button {

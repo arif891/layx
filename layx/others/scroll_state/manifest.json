@@ -1,0 +1,10 @@
+{
+  "name": "Scroll State",
+  "version": "1.0.0",
+  "description": "Monitors window scroll direction and position attributes",
+  "category": "module",
+  "js": [
+    "scroll_state.js"
+  ],
+  "html": []
+}

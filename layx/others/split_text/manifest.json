@@ -1,0 +1,10 @@
+{
+  "name": "Split Text",
+  "version": "1.0.0",
+  "description": "Splits text strings into characters, words, or lines for typography animations",
+  "category": "module",
+  "js": [
+    "split_text.js"
+  ],
+  "html": []
+}

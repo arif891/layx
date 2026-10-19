@@ -1,0 +1,15 @@
+{
+  "name": "Sheet",
+  "version": "1.0.0",
+  "description": "Modal bottom-sheet and slide-over panel component",
+  "category": "component",
+  "css": [
+    "sheet.css"
+  ],
+  "js": [
+    "sheet.js"
+  ],
+  "html": [
+    "sheet.html"
+  ]
+}

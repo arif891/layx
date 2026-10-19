@@ -1,0 +1,15 @@
+{
+  "name": "Draggable",
+  "version": "1.0.0",
+  "description": "Interactive drag-and-drop container component",
+  "category": "component",
+  "css": [
+    "draggable.css"
+  ],
+  "js": [
+    "draggable.js"
+  ],
+  "html": [
+    "draggable.html"
+  ]
+}

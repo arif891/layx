@@ -1,0 +1,15 @@
+{
+  "name": "Footer",
+  "version": "1.0.0",
+  "description": "Multi-column landing page footer with links, copyright, and social icons",
+  "category": "component",
+  "css": [
+    "footer.css"
+  ],
+  "html": [
+    "footer.html"
+  ],
+  "dependencies": {
+    "others": ["icon"]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "PWA Module",
+  "version": "1.0.0",
+  "description": "Progressive Web App service worker, offline fallback, and caching utilities",
+  "category": "module",
+  "css": [
+    "assets/pwa.css"
+  ],
+  "js": [
+    "assets/pwa.js"
+  ],
+  "html": [
+    "pages/fallback.html",
+    "pages/offline_activity.html"
+  ]
+}

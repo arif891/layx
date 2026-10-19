@@ -1,0 +1,12 @@
+{
+  "name": "Smooth Scroll",
+  "version": "1.0.0",
+  "description": "Momentum smooth scrolling utility with easing options",
+  "category": "module",
+  "js": [
+    "smooth_scroll.js"
+  ],
+  "html": [
+    "examples/index.html"
+  ]
+}

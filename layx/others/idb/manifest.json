@@ -1,0 +1,10 @@
+{
+  "name": "IndexedDB Helper",
+  "version": "1.0.0",
+  "description": "Promise-based lightweight wrapper around browser IndexedDB",
+  "category": "module",
+  "js": [
+    "idb.js"
+  ],
+  "html": []
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Partial Render",
+  "version": "1.0.0",
+  "description": "Lightweight client-side HTML partial fetcher and DOM swapper",
+  "category": "module",
+  "js": [
+    "partial_render.js"
+  ],
+  "html": [
+    "partial_render.html",
+    "partial/partial_render.html",
+    "partial/test.html",
+    "partial/test2.html"
+  ]
+}

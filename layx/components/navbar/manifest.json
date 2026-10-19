@@ -1,0 +1,21 @@
+{
+  "name": "Navbar",
+  "version": "1.0.0",
+  "description": "Responsive navigation header with mobile drawer and theme toggle support",
+  "category": "component",
+  "css": [
+    "normal/center/navbar.css"
+  ],
+  "js": [
+    "navbar.js"
+  ],
+  "html": [
+    "normal/center/navbar.html",
+    "normal/split/navbar.html",
+    "fancy/dock/simple/navbar.html"
+  ],
+  "dependencies": {
+    "components": ["button"],
+    "others": ["icon", "theme"]
+  }
+}

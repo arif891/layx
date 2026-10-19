@@ -1,0 +1,19 @@
+{
+  "name": "Form",
+  "version": "1.0.0",
+  "description": "Modern styled input fields, floating labels, selects, and submit controls",
+  "category": "component",
+  "css": [
+    "form.css",
+    "form_ext.css"
+  ],
+  "js": [
+    "form.js"
+  ],
+  "html": [
+    "form.html"
+  ],
+  "dependencies": {
+    "components": ["button"]
+  }
+}

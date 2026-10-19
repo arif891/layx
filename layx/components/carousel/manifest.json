@@ -1,0 +1,16 @@
+{
+  "name": "Carousel",
+  "version": "1.0.0",
+  "description": "CSS scroll-driven interactive carousel and slider",
+  "category": "component",
+  "css": [
+    "carousel.css",
+    "polyfill.css"
+  ],
+  "js": [
+    "polyfill.js"
+  ],
+  "html": [
+    "carousel.html"
+  ]
+}

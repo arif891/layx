@@ -1,0 +1,12 @@
+{
+  "name": "Accordion",
+  "version": "1.0.0",
+  "description": "Expandable and collapsible content panels",
+  "category": "component",
+  "css": [
+    "accordion.css"
+  ],
+  "html": [
+    "accordion.html"
+  ]
+}

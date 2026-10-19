@@ -1,0 +1,12 @@
+{
+  "name": "Mouse Tracker",
+  "version": "1.0.0",
+  "description": "Tracks pointer coordinates and exposes CSS custom properties for dynamic hover effects",
+  "category": "module",
+  "js": [
+    "mouse_tracker.js"
+  ],
+  "html": [
+    "examples/mouse_tracker.html"
+  ]
+}

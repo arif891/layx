@@ -1,0 +1,12 @@
+{
+  "name": "Drag Scroll",
+  "version": "1.0.0",
+  "description": "Click-and-drag mouse scrolling for overflow containers",
+  "category": "module",
+  "js": [
+    "drag_scroll.js"
+  ],
+  "html": [
+    "drag_scroll.html"
+  ]
+}

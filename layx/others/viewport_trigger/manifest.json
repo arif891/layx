@@ -1,0 +1,12 @@
+{
+  "name": "Viewport Trigger",
+  "version": "1.0.0",
+  "description": "IntersectionObserver utility to trigger animations when elements scroll into view",
+  "category": "module",
+  "js": [
+    "viewport_trigger.js"
+  ],
+  "html": [
+    "viewport_trigger.html"
+  ]
+}

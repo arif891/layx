@@ -65,7 +65,7 @@ describe('Component Addition Engine (layx add -c / -o)', () => {
 
         assert.match(stdout, /Found "accordion" in local package/);
         assert.match(stdout, /Registered CSS/);
-        assert.match(stdout, /HTML Usage Example/);
+        assert.match(stdout, /HTML Usage/);
 
         // Verify files copied
         const accordionCssPath = path.join(testProjectPath, 'layx/components/accordion/accordion.css');
@@ -74,6 +74,25 @@ describe('Component Addition Engine (layx add -c / -o)', () => {
         // Verify auto-wiring in layx.css
         const layxCss = await fs.readFile(path.join(testProjectPath, 'layx/layx.css'), 'utf8');
         assert.match(layxCss, /@import url\(components\/accordion\/accordion\.css\);/);
+    });
+
+    test('adds component with multiple CSS files (carousel) and wires all of them', async () => {
+        const { stdout } = await execFileAsync(
+            'node',
+            [cliPath, 'add', '-c', 'carousel'],
+            { cwd: testProjectPath }
+        );
+
+        assert.match(stdout, /Registered CSS: @import url\(components\/carousel\/carousel\.css\);/);
+        assert.match(stdout, /Registered CSS: @import url\(components\/carousel\/polyfill\.css\);/);
+        assert.match(stdout, /Registered JS: import '\.\/components\/carousel\/polyfill\.js';/);
+
+        const layxCss = await fs.readFile(path.join(testProjectPath, 'layx/layx.css'), 'utf8');
+        assert.match(layxCss, /components\/carousel\/carousel\.css/);
+        assert.match(layxCss, /components\/carousel\/polyfill\.css/);
+
+        const layxJs = await fs.readFile(path.join(testProjectPath, 'layx/layx.js'), 'utf8');
+        assert.match(layxJs, /components\/carousel\/polyfill\.js/);
     });
 
     test('adds other module via -o and auto-wires JS under /* Other */', async () => {

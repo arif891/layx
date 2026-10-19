@@ -1,0 +1,13 @@
+{
+  "name": "Component Loader",
+  "version": "1.0.0",
+  "description": "Dynamic client-side component loader for HTML custom elements",
+  "category": "module",
+  "js": [
+    "component.js"
+  ],
+  "html": [
+    "examples/components.html",
+    "examples/index.html"
+  ]
+}

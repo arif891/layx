@@ -1,0 +1,15 @@
+{
+  "name": "Chart",
+  "version": "1.0.0",
+  "description": "Lightweight CSS and canvas-based chart components",
+  "category": "component",
+  "css": [
+    "chart.css"
+  ],
+  "js": [
+    "chart.js"
+  ],
+  "html": [
+    "chart.html"
+  ]
+}

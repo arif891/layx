@@ -8,10 +8,9 @@ import { registerCssImport, registerJsImport } from './wire.js';
 import { downloadFile } from '../../utils/download.js';
 import { processDependencies } from './utils.js';
 import { readFile } from '../../utils/fs.js';
-
 import { addSingleOther } from './other.js';
 
-export { componentAdd };
+export { componentAdd, addSingleComponent };
 
 async function componentAdd(components) {
     if (!components || components.length === 0) {
@@ -49,41 +48,107 @@ async function addSingleComponent(name) {
         // Copy component folder to project layx/components/<name>
         await fs.cp(localComponentDir, targetComponentDir, { recursive: true });
 
-        // Auto-wire imports based on registry mapping or folder contents
-        const mapping = registryConfig.components[name];
-        let cssPath = mapping?.css || `components/${name}/${name}.css`;
-        let jsPath = mapping?.js;
-
-        // Auto-detect CSS if default doesn't exist
-        if (!existsSync(path.join(projectPaths.layx, cssPath))) {
-            const foundCss = await findFirstFileWithExtension(targetComponentDir, '.css');
-            if (foundCss) {
-                cssPath = path.relative(projectPaths.layx, foundCss).replace(/\\/g, '/');
+        // Load manifest.json if present
+        let manifest = null;
+        const manifestPath = path.join(localComponentDir, 'manifest.json');
+        if (existsSync(manifestPath)) {
+            try {
+                manifest = JSON.parse(await readFile(manifestPath));
+            } catch (err) {
+                console.warn(pc.yellow(`Warning: Invalid manifest.json in "${name}": ${err.message}`));
             }
         }
 
-        // Auto-detect JS if not specified in mapping
-        if (!jsPath) {
-            const foundJs = await findFirstFileWithExtension(targetComponentDir, '.js');
-            if (foundJs) {
-                jsPath = path.relative(projectPaths.layx, foundJs).replace(/\\/g, '/');
+        if (manifest) {
+            // Process CSS (supports string or array)
+            const cssList = normalizeArray(manifest.css || manifest.entry?.css);
+            for (const cssRel of cssList) {
+                const fullRel = path.join('components', name, cssRel).replace(/\\/g, '/');
+                const added = await registerCssImport(fullRel);
+                if (added) console.log(pc.green(`✔ Registered CSS: @import url(${fullRel}); in layx.css`));
             }
-        }
 
-        // Register CSS import
-        if (existsSync(path.join(projectPaths.layx, cssPath))) {
-            const added = await registerCssImport(cssPath);
-            if (added) console.log(pc.green(`✔ Registered CSS: @import url(${cssPath}); in layx.css`));
-        }
+            // Process JS (supports string or array)
+            const jsList = normalizeArray(manifest.js || manifest.entry?.js);
+            for (const jsRel of jsList) {
+                const fullRel = path.join('components', name, jsRel).replace(/\\/g, '/');
+                const added = await registerJsImport(fullRel);
+                if (added) console.log(pc.green(`✔ Registered JS: import './${fullRel}'; in layx.js`));
+            }
 
-        // Register JS import if present
-        if (jsPath && existsSync(path.join(projectPaths.layx, jsPath))) {
-            const added = await registerJsImport(jsPath);
-            if (added) console.log(pc.green(`✔ Registered JS: import './${jsPath}'; in layx.js`));
-        }
+            // Process Assets
+            if (Array.isArray(manifest.assets)) {
+                for (const asset of manifest.assets) {
+                    if (asset.from && asset.to) {
+                        const srcAsset = path.join(localComponentDir, asset.from);
+                        const destAsset = path.join(projectPaths.root, asset.to);
+                        if (existsSync(srcAsset)) {
+                            await fs.mkdir(path.dirname(destAsset), { recursive: true });
+                            await fs.copyFile(srcAsset, destAsset);
+                            console.log(pc.green(`✔ Copied asset: ${asset.to}`));
+                        }
+                    }
+                }
+            }
 
-        // Display HTML snippet if available
-        await displaySnippet(name, mapping, targetComponentDir);
+            // Process Dependencies
+            if (manifest.dependencies) {
+                if (Array.isArray(manifest.dependencies.components)) {
+                    for (const dep of manifest.dependencies.components) {
+                        const targetDep = path.join(projectPaths.layx, 'components', dep);
+                        if (!existsSync(targetDep)) {
+                            console.log(pc.cyan(`Installing required component dependency: "${dep}"...`));
+                            await addSingleComponent(dep);
+                        }
+                    }
+                }
+                if (Array.isArray(manifest.dependencies.others)) {
+                    for (const dep of manifest.dependencies.others) {
+                        const targetDep = path.join(projectPaths.layx, 'others', dep);
+                        if (!existsSync(targetDep)) {
+                            console.log(pc.cyan(`Installing required module dependency: "${dep}"...`));
+                            await addSingleOther(dep);
+                        }
+                    }
+                }
+            }
+
+            // Display HTML snippets (supports string or array)
+            const htmlList = normalizeArray(manifest.html || manifest.entry?.html);
+            await displaySnippets(name, htmlList, targetComponentDir);
+
+        } else {
+            // Fallback for components without manifest.json
+            const mapping = registryConfig.components[name];
+            let cssPath = mapping?.css || `components/${name}/${name}.css`;
+            let jsPath = mapping?.js;
+
+            if (!existsSync(path.join(projectPaths.layx, cssPath))) {
+                const foundCss = await findFirstFileWithExtension(targetComponentDir, '.css');
+                if (foundCss) {
+                    cssPath = path.relative(projectPaths.layx, foundCss).replace(/\\/g, '/');
+                }
+            }
+
+            if (!jsPath) {
+                const foundJs = await findFirstFileWithExtension(targetComponentDir, '.js');
+                if (foundJs) {
+                    jsPath = path.relative(projectPaths.layx, foundJs).replace(/\\/g, '/');
+                }
+            }
+
+            if (existsSync(path.join(projectPaths.layx, cssPath))) {
+                const added = await registerCssImport(cssPath);
+                if (added) console.log(pc.green(`✔ Registered CSS: @import url(${cssPath}); in layx.css`));
+            }
+
+            if (jsPath && existsSync(path.join(projectPaths.layx, jsPath))) {
+                const added = await registerJsImport(jsPath);
+                if (added) console.log(pc.green(`✔ Registered JS: import './${jsPath}'; in layx.js`));
+            }
+
+            await displaySnippets(name, mapping?.html ? [mapping.html] : [], targetComponentDir);
+        }
 
         console.log(pc.green(`\nComponent "${name}" added successfully!\n`));
         return;
@@ -132,16 +197,28 @@ async function addRemoteComponent(name) {
     console.log(pc.green(`✔ Component "${name}" downloaded and registered successfully!\n`));
 }
 
-async function displaySnippet(name, mapping, targetDir) {
+function normalizeArray(val) {
+    if (!val) return [];
+    if (Array.isArray(val)) return val.filter(Boolean);
+    return [val].filter(Boolean);
+}
+
+async function displaySnippets(name, htmlFiles, targetDir) {
     try {
-        let htmlFile = mapping?.html ? path.join(projectPaths.layx, mapping.html) : null;
-        if (!htmlFile || !existsSync(htmlFile)) {
-            htmlFile = await findFirstFileWithExtension(targetDir, '.html');
+        const filesToDisplay = [];
+        for (const rel of htmlFiles) {
+            const fullPath = path.isAbsolute(rel) ? rel : path.join(targetDir, rel);
+            if (existsSync(fullPath)) filesToDisplay.push({ name: rel, path: fullPath });
         }
 
-        if (htmlFile && existsSync(htmlFile)) {
-            const snippet = await readFile(htmlFile);
-            console.log(pc.yellow('\nHTML Usage Example:'));
+        if (filesToDisplay.length === 0) {
+            const fallback = await findFirstFileWithExtension(targetDir, '.html');
+            if (fallback) filesToDisplay.push({ name: path.basename(fallback), path: fallback });
+        }
+
+        for (const file of filesToDisplay) {
+            const snippet = await readFile(file.path);
+            console.log(pc.yellow(`\nHTML Usage (${file.name}):`));
             console.log(pc.dim('----------------------------------------'));
             console.log(snippet.trim());
             console.log(pc.dim('----------------------------------------'));

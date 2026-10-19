@@ -1,0 +1,12 @@
+{
+  "name": "Button",
+  "version": "1.0.0",
+  "description": "Customizable landing page action buttons with multiple styles",
+  "category": "component",
+  "css": [
+    "button.css"
+  ],
+  "html": [
+    "button.html"
+  ]
+}

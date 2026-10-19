@@ -1,0 +1,12 @@
+{
+  "name": "Icon",
+  "version": "1.0.0",
+  "description": "Inline SVG icon helper and sizing utilities",
+  "category": "module",
+  "css": [
+    "icon.css"
+  ],
+  "html": [
+    "icon.html"
+  ]
+}

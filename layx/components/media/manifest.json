@@ -1,0 +1,13 @@
+{
+  "name": "Media",
+  "version": "1.0.0",
+  "description": "Responsive video players, image frames, and aspect-ratio wrappers",
+  "category": "component",
+  "css": [
+    "media.css",
+    "media_ext.css"
+  ],
+  "html": [
+    "media.html"
+  ]
+}

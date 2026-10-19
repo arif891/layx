@@ -38,41 +38,100 @@ async function addSingleOther(name) {
         // Copy other module folder to project layx/others/<name>
         await fs.cp(localOtherDir, targetOtherDir, { recursive: true });
 
-        // Auto-wire imports based on registry mapping or folder contents
-        const mapping = registryConfig.others?.[name];
-        let cssPath = mapping?.css || `others/${name}/${name}.css`;
-        let jsPath = mapping?.js || `others/${name}/${name}.js`;
-
-        // Check CSS
-        const targetCss = path.join(projectPaths.layx, cssPath);
-        if (existsSync(targetCss)) {
-            const added = await registerCssImport(cssPath);
-            if (added) console.log(pc.green(`✔ Registered CSS: @import url(${cssPath}); in layx.css under /* Other */`));
-        } else {
-            const foundCss = await findFirstFileWithExtension(targetOtherDir, '.css');
-            if (foundCss) {
-                const relCss = path.relative(projectPaths.layx, foundCss).replace(/\\/g, '/');
-                const added = await registerCssImport(relCss);
-                if (added) console.log(pc.green(`✔ Registered CSS: @import url(${relCss}); in layx.css under /* Other */`));
+        // Load manifest.json if present
+        let manifest = null;
+        const manifestPath = path.join(localOtherDir, 'manifest.json');
+        if (existsSync(manifestPath)) {
+            try {
+                manifest = JSON.parse(await readFile(manifestPath));
+            } catch (err) {
+                console.warn(pc.yellow(`Warning: Invalid manifest.json in "${name}": ${err.message}`));
             }
         }
 
-        // Check JS
-        const targetJs = path.join(projectPaths.layx, jsPath);
-        if (existsSync(targetJs)) {
-            const added = await registerJsImport(jsPath);
-            if (added) console.log(pc.green(`✔ Registered JS: import './${jsPath}'; in layx.js under /* Other */`));
-        } else {
-            const foundJs = await findFirstFileWithExtension(targetOtherDir, '.js');
-            if (foundJs) {
-                const relJs = path.relative(projectPaths.layx, foundJs).replace(/\\/g, '/');
-                const added = await registerJsImport(relJs);
-                if (added) console.log(pc.green(`✔ Registered JS: import './${relJs}'; in layx.js under /* Other */`));
+        if (manifest) {
+            // Process CSS (supports string or array)
+            const cssList = normalizeArray(manifest.css || manifest.entry?.css);
+            for (const cssRel of cssList) {
+                const fullRel = path.join('others', name, cssRel).replace(/\\/g, '/');
+                const added = await registerCssImport(fullRel);
+                if (added) console.log(pc.green(`✔ Registered CSS: @import url(${fullRel}); in layx.css under /* Other */`));
             }
-        }
 
-        // Display HTML snippet if available
-        await displaySnippet(name, mapping, targetOtherDir);
+            // Process JS (supports string or array)
+            const jsList = normalizeArray(manifest.js || manifest.entry?.js);
+            for (const jsRel of jsList) {
+                const fullRel = path.join('others', name, jsRel).replace(/\\/g, '/');
+                const added = await registerJsImport(fullRel);
+                if (added) console.log(pc.green(`✔ Registered JS: import './${fullRel}'; in layx.js under /* Other */`));
+            }
+
+            // Process Assets
+            if (Array.isArray(manifest.assets)) {
+                for (const asset of manifest.assets) {
+                    if (asset.from && asset.to) {
+                        const srcAsset = path.join(localOtherDir, asset.from);
+                        const destAsset = path.join(projectPaths.root, asset.to);
+                        if (existsSync(srcAsset)) {
+                            await fs.mkdir(path.dirname(destAsset), { recursive: true });
+                            await fs.copyFile(srcAsset, destAsset);
+                            console.log(pc.green(`✔ Copied asset: ${asset.to}`));
+                        }
+                    }
+                }
+            }
+
+            // Process Dependencies
+            if (manifest.dependencies) {
+                if (Array.isArray(manifest.dependencies.others)) {
+                    for (const dep of manifest.dependencies.others) {
+                        const targetDep = path.join(projectPaths.layx, 'others', dep);
+                        if (!existsSync(targetDep)) {
+                            console.log(pc.cyan(`Installing required module dependency: "${dep}"...`));
+                            await addSingleOther(dep);
+                        }
+                    }
+                }
+            }
+
+            // Display HTML snippets (supports string or array)
+            const htmlList = normalizeArray(manifest.html || manifest.entry?.html);
+            await displaySnippets(name, htmlList, targetOtherDir);
+
+        } else {
+            // Fallback for modules without manifest.json
+            const mapping = registryConfig.others?.[name];
+            let cssPath = mapping?.css || `others/${name}/${name}.css`;
+            let jsPath = mapping?.js || `others/${name}/${name}.js`;
+
+            const targetCss = path.join(projectPaths.layx, cssPath);
+            if (existsSync(targetCss)) {
+                const added = await registerCssImport(cssPath);
+                if (added) console.log(pc.green(`✔ Registered CSS: @import url(${cssPath}); in layx.css under /* Other */`));
+            } else {
+                const foundCss = await findFirstFileWithExtension(targetOtherDir, '.css');
+                if (foundCss) {
+                    const relCss = path.relative(projectPaths.layx, foundCss).replace(/\\/g, '/');
+                    const added = await registerCssImport(relCss);
+                    if (added) console.log(pc.green(`✔ Registered CSS: @import url(${relCss}); in layx.css under /* Other */`));
+                }
+            }
+
+            const targetJs = path.join(projectPaths.layx, jsPath);
+            if (existsSync(targetJs)) {
+                const added = await registerJsImport(jsPath);
+                if (added) console.log(pc.green(`✔ Registered JS: import './${jsPath}'; in layx.js under /* Other */`));
+            } else {
+                const foundJs = await findFirstFileWithExtension(targetOtherDir, '.js');
+                if (foundJs) {
+                    const relJs = path.relative(projectPaths.layx, foundJs).replace(/\\/g, '/');
+                    const added = await registerJsImport(relJs);
+                    if (added) console.log(pc.green(`✔ Registered JS: import './${relJs}'; in layx.js under /* Other */`));
+                }
+            }
+
+            await displaySnippets(name, mapping?.html ? [mapping.html] : [], targetOtherDir);
+        }
 
         console.log(pc.green(`\nModule "${name}" added successfully!\n`));
         return;
@@ -81,16 +140,28 @@ async function addSingleOther(name) {
     console.warn(pc.yellow(`Module "${name}" not found in local package layx/others.`));
 }
 
-async function displaySnippet(name, mapping, targetDir) {
+function normalizeArray(val) {
+    if (!val) return [];
+    if (Array.isArray(val)) return val.filter(Boolean);
+    return [val].filter(Boolean);
+}
+
+async function displaySnippets(name, htmlFiles, targetDir) {
     try {
-        let htmlFile = mapping?.html ? path.join(projectPaths.layx, mapping.html) : null;
-        if (!htmlFile || !existsSync(htmlFile)) {
-            htmlFile = await findFirstFileWithExtension(targetDir, '.html');
+        const filesToDisplay = [];
+        for (const rel of htmlFiles) {
+            const fullPath = path.isAbsolute(rel) ? rel : path.join(targetDir, rel);
+            if (existsSync(fullPath)) filesToDisplay.push({ name: rel, path: fullPath });
         }
 
-        if (htmlFile && existsSync(htmlFile)) {
-            const snippet = await readFile(htmlFile);
-            console.log(pc.yellow('\nHTML Usage / Example:'));
+        if (filesToDisplay.length === 0) {
+            const fallback = await findFirstFileWithExtension(targetDir, '.html');
+            if (fallback) filesToDisplay.push({ name: path.basename(fallback), path: fallback });
+        }
+
+        for (const file of filesToDisplay) {
+            const snippet = await readFile(file.path);
+            console.log(pc.yellow(`\nHTML Usage (${file.name}):`));
             console.log(pc.dim('----------------------------------------'));
             console.log(snippet.trim());
             console.log(pc.dim('----------------------------------------'));

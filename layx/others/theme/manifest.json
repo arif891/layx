@@ -1,0 +1,15 @@
+{
+  "name": "Theme",
+  "version": "1.0.0",
+  "description": "Light, dark, and system color theme switcher and persistence",
+  "category": "module",
+  "css": [
+    "theme.css"
+  ],
+  "js": [
+    "theme.js"
+  ],
+  "html": [
+    "theme.html"
+  ]
+}

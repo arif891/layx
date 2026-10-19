@@ -1,0 +1,16 @@
+{
+  "name": "Syntax Highlighter",
+  "version": "1.0.0",
+  "description": "Pure client-side syntax highlighter for multi-language code snippets",
+  "category": "module",
+  "css": [
+    "syntax_highlighter.css"
+  ],
+  "js": [
+    "syntax_highlighter.js",
+    "syntax_highlighter_exp.js"
+  ],
+  "html": [
+    "examples/index.html"
+  ]
+}

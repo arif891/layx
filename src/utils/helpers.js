@@ -1,4 +1,4 @@
-import { breakPoints } from "../core/config.js";
+import { breakPoints } from "../core/constants.js";
 
 export { getCssContentBlock, minify, extractClasses, extractImportUrls };
 
@@ -16,7 +16,6 @@ function minify(content, type = 'css') {
 
     /* ---------- HTML / XML ---------- */
     if (mode === 'html' || mode === 'xml') {
-        // 1.  Protect <pre> and <code> blocks ------------------------------------
         const stash = [];
         let counter = 0;
         const key = () => `__MINIFY_STASH_${counter++}__`;
@@ -28,7 +27,6 @@ function minify(content, type = 'css') {
                 return k;
             });
 
-        // 2.  Minify everything else ---------------------------------------------
         const minified = safe
             .replace(/<!--[\s\S]*?-->/g, '')       // comments
             .replace(/\/\*[\s\S]*?\*\//g, '')      // css comments
@@ -36,18 +34,17 @@ function minify(content, type = 'css') {
             .replace(/\s{2,}/g, ' ')               // collapse inner runs
             .trim();
 
-        // 3.  Restore protected blocks ------------------------------------------
         return stash.reduce((out, [k, original]) => out.replace(k, original), minified);
     }
 
-    /* ---------- CSS ---------- */
+    /* ---------- CSS (Custom, zero-loss modern CSS minification) ---------- */
     if (mode === 'css') {
         return content
-            .replace(/\/\*[\s\S]*?\*\//g, '')
-            .replace(/\s*([{}:;,])\s*/g, '$1')
-            .replace(/\s*\n\s*/g, '')
-            .replace(/;\}/g, '}')
-            .trim()
+            .replace(/\/\*[\s\S]*?\*\//g, '')      // remove comments
+            .replace(/\s*([{}:;,])\s*/g, '$1')     // remove whitespace around separators
+            .replace(/\s*\n\s*/g, '')              // remove newlines
+            .replace(/;\}/g, '}')                  // remove trailing semicolon
+            .trim();
     }
 
     /* ---------- JS / JSON ---------- */
@@ -59,7 +56,6 @@ function minify(content, type = 'css') {
             .trim();
     }
 
-    /* ---------- Unknown ---------- */
     return content;
 }
 

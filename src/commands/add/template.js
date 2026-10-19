@@ -1,5 +1,6 @@
+import pc from 'picocolors';
 import { downloadFile } from '../../utils/download.js';
-import { layx } from '../../core/config.js';
+import { projectPaths } from '../../core/paths.js';
 import { processDependencies } from './utils.js';
 
 export { templateAdd };
@@ -15,14 +16,14 @@ async function templateAdd(templates) {
 
         const templateNames = templates.map(t => t.toLowerCase());
 
-        console.log('\nAdding templates...\n\n');
+        console.log(pc.cyan('\nAdding templates...\n'));
 
         for (const templateName of templateNames) {
             try {
                 const templateInfo = infoObj[templateName];
 
                 if (!templateInfo?.path) {
-                    console.error(`Skipping invalid template: '${templateName}'`);
+                    console.error(pc.yellow(`Skipping invalid template: '${templateName}'`));
                     continue;
                 }
 
@@ -49,17 +50,17 @@ async function templateAdd(templates) {
                 }
 
                 // Process dependencies
-                await processDependencies(templateInfo, 'css', layx.files.layxCss);
-                await processDependencies(templateInfo, 'js', layx.files.layxJs);
+                await processDependencies(templateInfo, 'css', projectPaths.layxCss);
+                await processDependencies(templateInfo, 'js', projectPaths.layxJs);
 
-                console.log(`\nTemplate '${templateInfo.name}' version: ${templateInfo.version} added successfully!`);
+                console.log(pc.green(`\nTemplate '${templateInfo.name}' v${templateInfo.version} added successfully!`));
             } catch (error) {
-                console.error(`Error processing template '${templateName}': ${error.message}`);
+                console.error(pc.red(`Error processing template '${templateName}': ${error.message}`));
             }
         }
 
-        console.log('\n\nTemplate processing completed.');
+        console.log('\nTemplate processing completed.\n');
     } catch (error) {
-        console.error(`Error fetching template information: ${error.message}`);
+        console.error(pc.red(`Error fetching template information: ${error.message}`));
     }
 }

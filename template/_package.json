@@ -1,0 +1,14 @@
+{
+  "name": "{{PROJECT_NAME}}",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "layx build",
+    "unbuild": "layx unbuild",
+    "optimize": "layx optimize"
+  },
+  "devDependencies": {
+    "layx-css": "^0.1.0"
+  }
+}

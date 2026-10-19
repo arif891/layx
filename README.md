@@ -148,29 +148,39 @@ Key directories:
 - `assets/[css|js]/pages/`: For page-specific content. Inside this dir all CSS and JS file will be minified and original one
   moved to `layx/assets/[css|js]/pages/`.
 
-## Installation
+## Installation & Quick Start
 
-To install Layx on your system:
+You can use Layx directly without installing anything globally via `npx`, or install the CLI globally via `npm`:
 
-1. Download the Layx setup file from our [download](https://layx.xyz/download) page.
-2. Extract the contents of the ZIP file.
-3. Open a terminal or command prompt and navigate to the extracted directory.
-4. Run the following command or click `layx.bat`:
+### Option 1: Quick Start with `npx` (Recommended)
 
-    ```bash
-    layx install
-    ```
+To create a new Layx landing page anywhere:
 
-    <strong>Note:</strong> On Linux and macOS, before installation, you need to run <code>chmod +x ./layx.sh</code> to
-            make it executable. Once installed, all commands remain the same.
+```bash
+npx layx create my-landing-page
+# or
+npm create layx@latest my-landing-page
+```
 
-## 🚀 Quick Start Guide
+### Option 2: Global Installation
+
+Install the Layx CLI globally to have the `layx` command available everywhere:
+
+```bash
+npm install -g layx-css
+```
+
+Once installed, run `layx` without arguments to open the interactive CLI menu:
+
+```bash
+layx
+```
+
+## 🚀 Commands Guide
 
 1. **Create a New Landing Page:**
-   Open your terminal, navigate to your desired folder, and run:
-
    ```bash
-   layx create
+   layx create [project-name]
    ```
 
 2. **Start Building:**

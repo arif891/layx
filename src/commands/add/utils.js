@@ -10,20 +10,22 @@ async function processDependencies(info, type, filePath) {
     try {
         let content = await readFile(filePath);
         const importUrls = extractImportUrls(content, type);
-
-        content += '\n\n/* ' + info.name + ' dependencies */';
+        let additions = '';
 
         for (const dep of deps) {
-            const path = type === 'js' ? dep.path : dep;
-            if (importUrls.includes(path)) continue;
+            const depPath = type === 'js' ? dep.path : dep;
+            if (importUrls.includes(depPath)) continue;
 
-            console.log(`Adding ${type.toUpperCase()} dependency:`, path);
-            content += type === 'js'
-                ? `\nimport ${dep.name} from '${path}';`
-                : `\n@import url(${path});`;
+            console.log(`Adding ${type.toUpperCase()} dependency:`, depPath);
+            additions += type === 'js'
+                ? `\nimport ${dep.name} from '${depPath}';`
+                : `\n@import url(${depPath});`;
+        }
 
+        if (additions) {
+            content += `\n\n/* ${info.name} dependencies */` + additions;
             await writeFile(filePath, content);
-            console.log(`Added ${type.toUpperCase()} dependency to ${filePath}`);
+            console.log(`Added ${type.toUpperCase()} dependencies to ${filePath}`);
         }
     } catch (err) {
         console.error(`Failed to process ${type} dependencies:`, err.message);

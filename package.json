@@ -1,14 +1,52 @@
 {
+  "name": "layx-css",
+  "version": "0.1.0",
+  "description": "CSS-first framework and build tool for modern high-performance landing pages",
   "type": "module",
+  "author": "arif891",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arif891/Layx.git"
+  },
+  "homepage": "https://github.com/arif891/Layx#readme",
+  "keywords": [
+    "css",
+    "framework",
+    "landing-page",
+    "build-tool",
+    "html",
+    "web",
+    "zero-runtime",
+    "performance"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "bin": {
-    "layx": "./src/cli.js"
+    "layx": "./src/cli.js",
+    "create-layx": "./src/cli-create.js"
   },
+  "main": "./layx/layx.js",
+  "style": "./layx/layx.css",
+  "files": [
+    "layx",
+    "src",
+    "template",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
+    "test": "node --test test/**/*.test.js",
     "build": "node src/cli.js build",
-    "unbuild": "node src/cli.js unbuild"
+    "unbuild": "node src/cli.js unbuild",
+    "optimize": "node src/cli.js optimize",
+    "snippets": "node src/cli.js snippets"
   },
-  "devDependencies": {
+  "dependencies": {
+    "@clack/prompts": "^1.8.1",
     "esbuild": "^0.27.0",
+    "picocolors": "^1.1.1",
     "sharp": "^0.34.5"
   }
 }

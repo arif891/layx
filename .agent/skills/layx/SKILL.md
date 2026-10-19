@@ -53,9 +53,7 @@ root/
 ├── pages/                   # Additional HTML pages
 ├── index.html               # Main HTML entry point
 ├── config.mjs               # Build configuration (esbuild options)
-├── layx.bat                 # Windows CLI installer
-├── layx(linux).sh           # Linux CLI installer
-└── layx(macOS).sh           # macOS CLI installer
+└── package.json             # NPM package and CLI binary definition
 ```
 
 ---

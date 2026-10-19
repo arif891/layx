@@ -1,41 +1,47 @@
-import CommandLineInterface from '../utils/cli-helper.js';
-import { processFiles } from '../processors/process.js';
-import { processHtmlFiles } from '../processors/html.js';
-import { genBuildInfo, getBuildInfo } from '../utils/build-info.js';
+import pc from 'picocolors';
+import { bundleCss } from '../engine/css-bundler.js';
+import { bundleJs } from '../engine/js-bundler.js';
+import { processHtmlFiles } from '../engine/html-transformer.js';
+import { optimizeImages } from '../engine/image-optimizer.js';
+import { setBuildState, getBuildState } from '../utils/build-state.js';
 import { unbuild } from './unbuild.js';
-import { optimizeImages } from './optimize.js';
-
-const cli = new CommandLineInterface();
-const { fg, bg } = cli;
+import { projectPaths } from '../core/paths.js';
 
 export { build };
 
-async function build(scriptDir, isRebuild = false, optimize = true) {
-    console.log(cli.style('Starting build process...', fg.cyan));
+async function build(options = {}) {
+    const isRebuild = options.isRebuild === true;
+    const optimize = options.optimize !== false;
+
+    console.log(pc.cyan('Starting build process...'));
+
     try {
         if (!isRebuild) {
-            const buildInfo = await getBuildInfo();
-            if (buildInfo?.build) {
-                console.log(cli.style('Existing build detected. Initiating rebuild...', fg.yellow));
-                await unbuild(true);
-                return build(scriptDir, true);
+            const state = await getBuildState();
+            if (state?.build) {
+                console.log(pc.yellow('Existing build detected. Initiating rebuild...'));
+                await unbuild({ isRebuild: true });
+                return build({ isRebuild: true, optimize });
             }
 
             if (optimize) {
-                await optimizeImages(scriptDir);
+                await optimizeImages();
             }
         }
 
-        await processFiles(scriptDir, optimize);
+        // Bundle CSS and JS
+        await bundleCss(optimize);
+        await bundleJs();
 
+        // Transform HTML entry points to comment out dev layx references
         if (!isRebuild) {
-            await processHtmlFiles('./');
+            await processHtmlFiles(projectPaths.root, 'comment');
         }
 
-        await genBuildInfo({ build: true });
-        console.log(cli.style('Build process completed successfully.', fg.green));
+        await setBuildState({ build: true, lastBuilt: new Date().toISOString() });
+        console.log(pc.green('Build process completed successfully.'));
     } catch (error) {
-        console.error('Build process failed:', error);
+        console.error(pc.red(`Build process failed: ${error.message}`));
         await handleBuildFailure();
         throw error;
     }
@@ -43,9 +49,9 @@ async function build(scriptDir, isRebuild = false, optimize = true) {
 
 async function handleBuildFailure() {
     try {
-        await genBuildInfo({ build: false });
-        console.log('Build state reset due to failure');
+        await setBuildState({ build: false });
+        console.log(pc.yellow('Build state reset due to failure.'));
     } catch (error) {
-        console.error('Failed to reset build state:', error);
+        console.error('Failed to reset build state:', error.message);
     }
 }

@@ -103,5 +103,5 @@
 		"scope": "html",
 		"prefix": "demo",
 		"body": "<demo class=\" __demo\"></demo>"
-	},
+	}
 }

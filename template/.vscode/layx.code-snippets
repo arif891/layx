@@ -1,0 +1,107 @@
+{
+	"layX Document": {
+		"scope": "html",
+		"prefix": "layx-doc",
+		"body": "<!DOCTYPE html>\r<html lang=\"en\">\r  <head>\r    <meta charset=\"UTF-8\">\r    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r    <title>LayX Document</title>\r\r    <link rel=\"stylesheet\" href=\"/layx/layx.css\">\r\r    <link rel=\"stylesheet\" href=\"/assets/css/base.css\">\r    <link rel=\"stylesheet\" href=\"/assets/css/pages/page.css\">\r  </head>\r\r  <body>\r\r    <script src=\"/layx/layx.js\" type=\"module\"></script>\r\r    <script src=\"/assets/js/base.js\" type=\"module\"></script>\r    <script src=\"/assets/js/pages/page.js\" type=\"module\"></script>\r  </body>\r</html>"
+	},
+	"Section": {
+		"scope": "html",
+		"prefix": "section",
+		"body": "<section class=\"__section\"></section>"
+	},
+	"Section Full": {
+		"scope": "html",
+		"prefix": "section-full",
+		"body": "<section class=\"__section\">\r    <container class=\"__container\">\r        <layout class=\"__layout\">\r\r        </layout>\r    </container>\r</section>"
+	},
+	"Container Component": {
+		"scope": "html",
+		"prefix": "container",
+		"body": "<container class=\"__container\"></container>"
+	},
+	"Container Edge Component": {
+		"scope": "html",
+		"prefix": "container-edge",
+		"body": "<container class=\"edge __container\"></container>"
+	},
+	"Layout Component": {
+		"scope": "html",
+		"prefix": "layout",
+		"body": "<layout class=\"__layout\"></layout>"
+	},
+	"Layout Edge Component": {
+		"scope": "html",
+		"prefix": "layout-edge",
+		"body": "<layout class=\"edge __layout\"></layout>"
+	},
+	"Navbar Component": {
+		"scope": "html",
+		"prefix": "navbar",
+		"body": "<navbar class=\"__navbar\">\r    <div class=\"wrapper\">\r        <div class=\"main\">\r            <div class=\"brand\">\r                <h5 class=\"logo-text\">Logo</h5>\r                <button class=\"toggler\"></button>\r            </div>\r            <div class=\"warp-able left\">\r                <button class=\"close\"></button>\r                <nav class=\"link-wrapper\">\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                </nav>\r                <div>\r                    <button class=\"dark\">Button</button>\r                </div>\r            </div>\r        </div>\r    </div>\r</navbar>"
+	},
+	"Navbar Center Component": {
+		"scope": "html",
+		"prefix": "navbar-center",
+		"body": "<navbar class=\"__navbar\">\r    <div class=\"wrapper\">\r        <div class=\"main center\">\r            <div class=\"brand\">\r                <h5 class=\"logo-text\">Logo</h5>\r                <button class=\"toggler\"></button>\r            </div>\r            <div class=\"warp-able left\">\r                <button class=\"close\"></button>\r                <nav class=\"link-wrapper\">\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                    <a href=\"\" class=\"link\">link</a>\r                </nav>\r                <div>\r                    <button class=\"dark\">Button</button>\r                </div>\r            </div>\r        </div>\r    </div>\r</navbar>"
+	},
+	"Accordion Component": {
+		"scope": "html",
+		"prefix": "accordion",
+		"body": "<accordion class=\"__accordion\">\r    <div class=\"item\">\r        <button class=\"title\">Title</button>\r\r        <div class=\"content\">\r            <p>Content</p>\r        </div>\r    </div>\r    <div class=\"item\">\r        <button class=\"title\">Title</button>\r\r        <div class=\"content\">\r            <p>Content</p>\r        </div>\r    </div>\r    <div class=\"item\">\r        <button class=\"title\">Title</button>\r        \r        <div class=\"content\">\r            <p>Content</p>\r        </div>\r    </div>\r</accordion>"
+	},
+	"Accordion Item ": {
+		"scope": "html",
+		"prefix": "accordion-item",
+		"body": "<div class=\"item\">\r    <button class=\"title\">Title</button>\r\r    <div class=\"content\">\r        <p>Content</p>\r    </div>\r</div>"
+	},
+	"Alert Component": {
+		"scope": "html",
+		"prefix": "alert",
+		"body": "<alert class=\"modern __alert\">\r    A simple alert—check it out!\r    <button class=\"close\"></button>\r</alert>"
+	},
+	"Breadcrumb Component": {
+		"scope": "html",
+		"prefix": "breadcrumb",
+		"body": "<breadcrumb>\r    <div class=\"item\"><a href=\"#\">Home</a></div>\r    <div class=\"item\"><a href=\"#\">Libary</a></div>\r    <div class=\"item active\"><a href=\"#\">Data</a></div>\r</breadcrumb>"
+	},
+	"Breadcrumb Item": {
+		"scope": "html",
+		"prefix": "breadcrumb-item",
+		"body": "<div class=\"item\"><a href=\"#\">item</a></div>"
+	},
+	"Carousel Component": {
+		"scope": "html",
+		"prefix": "carousel",
+		"body": "<carousel class=\"__carousel\">\r    <div class=\"main\">\r        <div class=\"item\">\r            <h3>First slide</h3>\r        </div>\r        <div class=\"item\">\r            <h3>Second slide</h3>\r        </div>\r        <div class=\"item\">\r            <h3>Third slide</h3>\r        </div>\r    </div>\r    <div class=\"indicator-wrapper\">\r        <button class=\"indicator\" index=\"0\"></button>\r        <button class=\"indicator\" index=\"1\"></button>\r        <button class=\"indicator\" index=\"2\"></button>\r    </div>\r    <div class=\"control-wrapper\">\r        <div class=\"left\">\r            <button class=\"prev\"></button>\r        </div>\r        <div class=\"right\">\r            <button class=\"next\"></button>\r        </div>\r    </div>\r</carousel>"
+	},
+	"Carousel Vertical Component": {
+		"scope": "html",
+		"prefix": "carousel-vertical",
+		"body": "<carousel class=\"__carousel\">\r    <div class=\"main vertical\">\r        <div class=\"item\">\r            <h3>First slide</h3>\r        </div>\r        <div class=\"item\">\r            <h3>Second slide</h3>\r        </div>\r        <div class=\"item\">\r            <h3>Third slide</h3>\r        </div>\r    </div>\r    <div class=\"indicator-wrapper\">\r        <button class=\"indicator\" index=\"0\"></button>\r        <button class=\"indicator\" index=\"1\"></button>\r        <button class=\"indicator\" index=\"2\"></button>\r    </div>\r    <div class=\"control-wrapper\">\r        <div class=\"left\">\r            <button class=\"prev\"></button>\r        </div>\r        <div class=\"right\">\r            <button class=\"next\"></button>\r        </div>\r    </div>\r</carousel>"
+	},
+	"Carousel Auto Component": {
+		"scope": "html",
+		"prefix": "carousel-auto",
+		"body": "<carousel class=\"__carousel\" controls indicators>\r    <div class=\"main\">\r        <div class=\"item\">\r            <h3>First slide</h3>\r        </div>\r        <div class=\"item\">\r            <h3>Second slide</h3>\r        </div>\r        <div class=\"item\">\r            <h3>Third slide</h3>\r        </div>\r    </div>\r</carousel>"
+	},
+	"Dialog Component": {
+		"scope": "html",
+		"prefix": "dialog",
+		"body": "<dialog class=\"modern __dialog\">\r    <div class=\"content\">\r        <div class=\"header\">\r            <h5 class=\"title\">Some demo title</h5>\r            <button class=\"close\"></button>\r        </div>\r        <div class=\"main\">\r            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugit mollitia illum perferendis\r                molestiae voluptate debitis provident veritatis ipsam autem aut quaerat recusandae</p>\r        </div>\r        <div class=\"footer grow\">\r            <button class=\"lg light wide\" type=\"button\">Demo</button>\r            <button class=\"lg dark wide\" type=\"button\">Book</button>\r        </div>\r    </div>\r</dialog>"
+	},
+	"Icon SVG": {
+		"scope": "html",
+		"prefix": "icon",
+		"body": "<svg class=\"icon\">\r    <use href=\"/assets/image/svg/icons.svg#icon-id\" />\r</svg>"
+	},
+    "Footer Section": {
+		"scope": "html",
+		"prefix": "footer-sec",
+		"body": "<footer class=\"footer__section\">\r    <container class=\"footer__container\">\r        <layout class=\"footer__layout gap-x gap-y-3\">\r            <div class=\"x-12 sub-x footer__start\"></div>\r            <div class=\"x-12 sub-x footer__middle\">\r                <div class=\"x-12 x-lg-4 brand\">\r                    <h3>Logo</h3>\r                    <p>Some brand text.</p>\r                </div>\r                <div class=\"x-12 x-lg-8 link__block\">\r                    <div class=\"link__wrapper\">\r                        <h5 class=\"link__hading\">Section</h5>\r                        <a class=\"link\" href=\"\">Home</a>\r                        <a class=\"link\" href=\"\">Features</a>\r                        <a class=\"link\" href=\"\">Pricing</a>\r                        <a class=\"link\" href=\"\">FAQs</a>\r                        <a class=\"link\" href=\"\">About</a>\r                    </div>\r                    <div class=\"link__wrapper\">\r                        <h5 class=\"link__hading\">Section</h5>\r                        <a class=\"link\" href=\"\">Home</a>\r                        <a class=\"link\" href=\"\">Features</a>\r                        <a class=\"link\" href=\"\">Pricing</a>\r                        <a class=\"link\" href=\"\">FAQs</a>\r                        <a class=\"link\" href=\"\">About</a>\r                    </div>\r                    <div class=\"link__wrapper\">\r                        <h5 class=\"link__hading\">Section</h5>\r                        <a class=\"link\" href=\"\">Home</a>\r                        <a class=\"link\" href=\"\">Features</a>\r                        <a class=\"link\" href=\"\">Pricing</a>\r                        <a class=\"link\" href=\"\">FAQs</a>\r                        <a class=\"link\" href=\"\">About</a>\r                    </div>\r                </div>\r            </div>\r            <div class=\"x-12 sub-x footer__end\">\r                <span>© 2024 Company, Inc</span>\r                <div class=\"legal\">\r                  <a href=\"\">Terms</a>\r                  |\r                  <a href=\"\">Privacy</a>\r                </div>\r            </div>\r        </layout>\r    </container>\r</footer>"
+	},
+	"Demo Component": {
+		"scope": "html",
+		"prefix": "demo",
+		"body": "<demo class=\" __demo\"></demo>"
+	}
+}

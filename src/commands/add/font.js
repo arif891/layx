@@ -1,53 +1,25 @@
 import path from 'node:path';
-import CommandLineInterface from '../../utils/cli-helper.js';
+import pc from 'picocolors';
 import { ensureDirectoryExists, readFile, writeFile } from '../../utils/fs.js';
 import { downloadFile } from '../../utils/download.js';
-import { layx } from '../../core/config.js';
+import { projectPaths, packagePaths } from '../../core/paths.js';
 
 export { fontAdd };
 
-const cli = new CommandLineInterface();
-const { fg, bg } = cli;
-
-async function fontAdd(fonts, scriptDir) {
+async function fontAdd(fonts) {
     try {
-        // Assuming scriptDir is passed or we can resolve it relative to this file
-        // If scriptDir is the root of the project, then info/font_info_GF.json should be there?
-        // In original code: path.join(scriptDir, "/info/font_info_GF.json")
-        // scriptDir was import.meta.dirname in main.mjs.
-        // Here we might need to adjust. Let's assume scriptDir is passed correctly.
-
-        // However, in the new structure, `info` might be in `src/../info`?
-        // The original `scriptDir` was `main/`. `info` was in `main/info`.
-        // Now `src/` is the root of code. `info` folder should probably be moved to `src/info` or kept in `info` at root?
-        // The `layx` object has `directories.info: 'info/'`.
-        // Let's assume `info` is at project root or we use `layx.directories.info`.
-
-        // But wait, `font_info_GF.json` was read from `path.join(scriptDir, "/info/font_info_GF.json")`.
-        // If `scriptDir` is the project root, then it's `project/info/font_info_GF.json`.
-        // I should probably check where `info` folder is.
-        // In the file list, I didn't see `info` folder at root.
-        // `main` had `main/info`? No, `main` had `main/main.mjs`.
-        // Let's check `main` directory content again.
-
-        // Actually, `main/core/vars.mjs` had `info: 'info/'`.
-        // `main/helper/add/font.mjs` used `path.join(scriptDir, "/info/font_info_GF.json")`.
-        // If `scriptDir` was `main/`, then it was `main/info/font_info_GF.json`.
-        // I should check if `main/info` exists.
-
-        const fontInfoGF = await readFile(path.join(scriptDir, "info/font_info_GF.json"));
+        const fontInfoGF = await readFile(packagePaths.fontInfo);
         const fontInfoObj = JSON.parse(fontInfoGF);
 
-        console.log(cli.style(`Last font info update: ${fontInfoObj.lastUpdate}`, fg.yellow));
+        console.log(pc.yellow(`Last font info update: ${fontInfoObj.lastUpdate}`));
 
         await Promise.all(
             fonts.map(font => processFontFamily(font, fontInfoObj))
         );
     } catch (error) {
-        console.error(cli.style(`Error processing fonts: ${error.message}`, fg.red));
+        console.error(pc.red(`Error processing fonts: ${error.message}`));
     }
 }
-
 
 async function processFontFamily(fontName, fontInfoObj) {
     const result = searchFont(fontInfoObj, fontName.toLowerCase());
@@ -57,12 +29,12 @@ async function processFontFamily(fontName, fontInfoObj) {
         return;
     }
 
-    const formattedFamilyName = result.family.replace(' ', '_');
-    const fontDir = `${layx.directories.font}${formattedFamilyName}`;
+    const formattedFamilyName = result.family.replace(/\s+/g, '_');
+    const fontDir = path.join(projectPaths.font, formattedFamilyName);
     const isVariable = isVariableFont(result.axes);
 
     try {
-        console.log(cli.style(`Adding "${result.family}" ${isVariable ? 'variable' : 'static'} font family...`, fg.cyan));
+        console.log(pc.cyan(`Adding "${result.family}" ${isVariable ? 'variable' : 'static'} font family...`));
 
         // Ensure the font directory exists
         await ensureDirectoryExists(fontDir);
@@ -73,30 +45,31 @@ async function processFontFamily(fontName, fontInfoObj) {
         );
 
         if (isVariable) {
-            console.log(cli.style(`It is a variable font and available axes: ${result.axes.map(axis =>
-                `${axis.tag} (${axis.start}-${axis.end}).`
-            ).join(', ')}`, fg.yellow));
+            console.log(pc.yellow(`Variable font available axes: ${result.axes.map(axis =>
+                `${axis.tag} (${axis.start}-${axis.end})`
+            ).join(', ')}`));
         } else {
-            console.log(cli.style(`Available variants: ${result.variants.join(', ')}.`, fg.yellow));
+            console.log(pc.yellow(`Available variants: ${result.variants.join(', ')}`));
         }
 
         // Download all font files in parallel
         await Promise.all(
             Object.entries(result.files).map(async ([variant, url]) => {
-                const filePath = `${fontDir}/${formattedFamilyName}_${variant}_${isVariable ? 'variable_' : ''}${result.version}.woff2`;
+                const fileName = `${formattedFamilyName}_${variant}_${isVariable ? 'variable_' : ''}${result.version}.woff2`;
+                const filePath = path.join(fontDir, fileName);
                 console.log(`Downloading ${variant} variant...`);
                 await downloadFile(url, filePath);
             })
         );
 
-        // Save the fontFaces to a CSS file
+        // Save fontFaces to CSS
+        await writeFile(path.join(fontDir, 'font-face.css'), fontFaces.join('\n\n'));
+        const typoCssPath = path.join(projectPaths.layx, 'main/typography/typography.css');
+        await writeFile(typoCssPath, `\n\n/*<${result.family}>*/\n${fontFaces.join('\n')}\n/*</${result.family}>*/`, 'a');
 
-        await writeFile(`${fontDir}/font-face.css`, fontFaces.join('\n\n'));
-        await writeFile('layx/main/typography/typography.css', `\n\n\n/*<${result.family}>*/${fontFaces.join('\n')}\n/*</${result.family}>*/`, 'a');
-
-        console.log(cli.style(`Added "${result.family}" font family successfully.`, fg.green));
+        console.log(pc.green(`Added "${result.family}" font family successfully.`));
     } catch (error) {
-        console.error(cli.style(`Failed to add "${result.family}". Error:`, error.message), fg.red);
+        console.error(pc.red(`Failed to add "${result.family}": ${error.message}`));
     }
 }
 
@@ -119,69 +92,50 @@ function searchFont(fontsData, familyName) {
         found: true,
         family: font.family,
         variants: font.variants,
-        category: font.category,
-        subsets: font.subsets,
+        files: font.files,
         axes: font.axes,
         version: font.version,
-        files: font.files,
-        font
     };
 }
 
 function isVariableFont(axes) {
-    return Boolean(axes && axes.length > 0);
-}
-
-function getWeightRange(axes) {
-    if (!axes) return '400';
-
-    const weightAxis = axes.find(axis => axis.tag === 'wght');
-    if (weightAxis) {
-        return `${weightAxis.start} ${weightAxis.end}`;
-    }
-
-    return '400';
-}
-
-function getWeightValue(variant) {
-    const weightMap = {
-        '100': '100',
-        '300': '300',
-        'regular': '400',
-        '500': '500',
-        '700': '700',
-        '900': '900'
-    };
-
-    return weightMap[variant] || '400';
-}
-
-function isItalicVariant(variant) {
-    return variant.includes('italic');
+    return Array.isArray(axes) && axes.length > 0;
 }
 
 function createFontFaceDeclaration(fontInfo, variant) {
-    const formattedFamilyName = fontInfo.family.replace(' ', '_');
+    const family = fontInfo.family;
+    const formattedFamily = family.replace(/\s+/g, '_');
     const isVariable = isVariableFont(fontInfo.axes);
+    const fileName = `${formattedFamily}_${variant}_${isVariable ? 'variable_' : ''}${fontInfo.version}.woff2`;
+    const fontPath = `/assets/font/${formattedFamily}/${fileName}`;
 
-    if (isVariable) {
-        const weightRange = getWeightRange(fontInfo.axes);
-        return `
-  @font-face {
-  font-family: '${fontInfo.family}';
-  font-style: ${isItalicVariant(variant) ? 'italic' : 'normal'};
-  font-weight: ${weightRange};
-  font-display: swap;
-  src: url(/assets/font/${formattedFamilyName}/${formattedFamilyName}_${variant}_variable_${fontInfo.version}.woff2) format('woff2');
-  }`;
+    let weight = 'normal';
+    let style = 'normal';
+
+    if (variant === 'regular') {
+        weight = '400';
+    } else if (variant === 'italic') {
+        style = 'italic';
+        weight = '400';
+    } else if (variant.endsWith('italic')) {
+        style = 'italic';
+        weight = variant.replace('italic', '');
+    } else {
+        weight = variant;
     }
 
-    return `
-  @font-face {
-  font-family: '${fontInfo.family}';
-  font-style: ${isItalicVariant(variant) ? 'italic' : 'normal'};
-  font-weight: ${getWeightValue(variant.replace('italic', ''))};
+    if (isVariable) {
+        const wghtAxis = fontInfo.axes?.find(axis => axis.tag === 'wght');
+        if (wghtAxis) {
+            weight = `${wghtAxis.start} ${wghtAxis.end}`;
+        }
+    }
+
+    return `@font-face {
+  font-family: '${family}';
+  font-style: ${style};
+  font-weight: ${weight};
   font-display: swap;
-  src: url(/assets/font/${formattedFamilyName}/${formattedFamilyName}_${variant}_${fontInfo.version}.woff2) format('woff2');
-  }`;
+  src: url('${fontPath}') format('woff2');
+}`;
 }

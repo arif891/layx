@@ -1,240 +1,201 @@
-# Layx
+# LayX
+
+[![npm version](https://img.shields.io/npm/v/layx-css.svg)](https://www.npmjs.com/package/layx-css)
+[![npm license](https://img.shields.io/npm/l/layx-css.svg)](LICENSE)
+[![node version](https://img.shields.io/node/v/layx-css.svg)](package.json)
 
 ![Layx Social Preview](.github/layx_social_preview.png)
 
-Layx is a powerful and extensible CSS framework designed specifically for creating modern landing pages. It combines advanced layout capabilities with high customizability, making it ideal for building high-converting, responsive landing pages with minimal effort. With its modular architecture and landing-page-focused components, Layx helps you create stunning, fast-loading pages that deliver results.
+**LayX** is a modern, CSS-first framework and build tool purpose-built for creating blazing-fast, high-converting landing pages. It combines semantic HTML layouts with a zero-runtime CSS core, an interactive CLI, and automated production bundling.
 
-> **Main Point:** "Build stunning landing pages faster. No bloat, no runtime overhead—just pure performance."
+> **Core Philosophy:** "Build stunning landing pages faster. No framework bloat, no runtime overhead — just pure performance and developer ergonomics."
+
+---
+
+> [!WARNING]
+> ### 🚧 Active Development Stage (Alpha)
+> LayX (`layx-css`) is currently in active early development (**alpha stage**).
+> - APIs, directory structures, and CLI commands may change before the `1.0.0` stable release.
+> - Breaking changes can occur between minor/alpha updates.
+> - We actively welcome early testers, bug reports, and design discussions! Please submit feedback via [GitHub Issues](https://github.com/arif891/Layx/issues).
+
+---
 
 ## ✨ Highlights
 
-- 🚫 **Zero Runtime** - No JavaScript dependencies required
-- 📦 **Landing Page Ready** - Pre-built components optimized for conversions
-- 🎨 **Highly Customizable** - Easy theming with CSS variables
-- ⚡ **Lightning Fast** - Optimized for performance and SEO
-- 📱 **Mobile-First** - Fully responsive designs that look perfect on all devices
+- 🚫 **Zero Runtime** — Pure modern CSS architecture. No bulky client-side JavaScript runtime or Virtual DOM overhead.
+- 📦 **Landing-Page Focused** — Optimized for conversion with hero sections, pricing tables, testimonials, CTAs, and responsive navbars.
+- 🧩 **Hybrid Component System** — Starter projects ship lean with essential defaults (`button`, `navbar`, `footer`). Add components on-demand (`layx add -c accordion`) with automatic CSS imports.
+- ⚡ **Non-Destructive Bundler** — Preserves modern CSS features (`@layer`, `@starting-style`, dynamic viewport units, relative colors) while stripping unused grid classes.
+- 🔄 **Two-Way Lifecycle (`build` & `unbuild`)** — Bundle for production deployment, then revert back to source files at any time with `layx unbuild`.
+- 🖼️ **Integrated Image Optimizer** — Automatically converts images to next-gen AVIF/WebP formats and minifies SVG sprites.
+- 💻 **Interactive CLI** — Beautiful, modern interactive terminal interface built with `@clack/prompts`.
 
-> **Note:** Layx is currently in the development stage and available for testing. We welcome your feedback and contributions!
+---
 
-## Table of Contents
+## 🚀 Quick Start
 
-- [Layx](#layx)
-  - [✨ Highlights](#-highlights)
-  - [Table of Contents](#table-of-contents)
-  - [🚀 Key Features](#-key-features)
-  - [🧠 Approach](#-approach)
-  - [💡 Why Start from Scratch?](#-why-start-from-scratch)
-  - [🎨 Syntax](#-syntax)
-    - [Container](#container)
-    - [Main Layout System](#main-layout-system)
-    - [Components (e.g., Navbar)](#components-eg-navbar)
-  - [📁 Project Structure](#-project-structure)
-  - [Installation](#installation)
-  - [🚀 Quick Start Guide](#-quick-start-guide)
-  - [📚 Documentation](#-documentation)
-  - [🤝 Contributing](#-contributing)
-  - [📄 License](#-license)
+### Option 1: Run with `npx` (No Global Install Required)
 
-## 🚀 Key Features
-
-- 📦 **Landing Page Components:** Pre-designed, conversion-focused components like hero sections, CTAs, testimonials, and pricing tables.
-- 🎨 **Rapid Development:** Build complete landing pages in minutes, not days.
-- 📱 **Fully Responsive:** Mobile-optimized layouts that adapt perfectly to any screen size.
-- ⚡ **Performance Optimized:** Lightweight CSS and zero runtime overhead for blazing-fast load times.
-- 🔧 **Built-in Sections:** Hero, features, pricing, testimonials, FAQ, footer—everything you need.
-- 🛠️ **Build Tool:** Bundle your project and remove unused code for optimal file size.
-- 🖼️ **Image Optimization:** Boost performance with the integrated image optimizer.
-- 💻 **Command-Line Interface (CLI):** Efficiently manage your landing page projects with our intuitive CLI.
-- 🚀 **SEO Ready:** Semantic HTML and optimized structure for search engines.
-- 🌐 **File-Based Routing:** File-based routing supported in Apache and similar servers like LightSpeed (common in Cpanel hosting).
-
-## 🧠 Approach
-
-Layx is purpose-built for landing pages with a focus on conversion and performance:
-
-- **Landing Page Optimized:** Purpose-built components designed for high-conversion landing pages, not general web apps.
-- **Performance First:** Leverages modern CSS without JavaScript runtime, ensuring lightning-fast load times.
-- **Conversion Focused:** Pre-designed sections and patterns that follow landing page best practices.
-- **Full-Width Designs:** Layout and container elements that extend to screen edges for modern aesthetics.
-- **Zero Bloat:** Only what you need—no unnecessary features or code.
-- **SEO Friendly:** Built with semantic HTML and structured data in mind.
-
-## 💡 Why Start from Scratch?
-
-With Layx, you don't build from zero:
-
-- **Pre-Built Starting Point:** Every project comes with a ready-to-use structure, components, and best practices already in place.
-- **Automated Optimizations:** The built-in build tool automatically minifies CSS/JS, optimizes images, and removes unused code—no manual setup needed.
-- **Repetitive Tasks Handled:** Stop writing boilerplate code. Layx handles responsive design, cross-browser compatibility, and SEO optimization out of the box.
-- **Convention Over Configuration:** Follow proven patterns and conventions, allowing you to focus on your unique content and design tweaks, not infrastructure.
-- **Ready for Production:** Deploy with confidence—your landing page is already optimized for performance, accessibility, and conversions.
-
-## 🎨 Syntax
-
-Layx introduces intuitive syntax for common landing page elements:
-
-### Container
-
-```html
-<container>
-   <div class='content'></div>
-</container>
-```
-
-### Main Layout System
-
-```html
-<layout>
-  <div class='x-6'></div>
-  <div class='x-6'></div>
-</layout>
-```
-
-### Components (e.g., Navbar)
-
-```html
-<navbar>
-  <nav class='link-wrapper'>
-    <a class='link' href='#'>link</a>
-    <a class='link' href='#'>link</a>
-  </nav>
-</navbar>
-```
-
-## 📁 Project Structure
-
-Layx is organized into a well-structured directory hierarchy:
-
-<details>
-<summary>Click to expand project structure</summary>
-
-```
-root
-    │   index.html
-    │
-    │
-    ├───assets
-    │   ├───brand
-    │   ├───css
-    │   ├───font
-    │   ├───images
-    │   ├───js
-    │   └───media
-    │
-    ├───layx
-    │   │   layx.css
-    │   │   layx.js
-    │   │ 
-    │   ├───assets
-    │   │   ├───css
-    │   │   └───js
-    │   │  
-    │   ├───components
-    │   ├───main
-    │   ├───others
-    │   └───utilities
-    │
-    └───pages
-```
-
-</details>
-
-Key directories:
-
-- `layx/`: The core of the framework, including components, main styles, and utilities.
-- `assets/`: Here you can put your all assets like CSS, JS, images, and media files.
-- `assets/[css|js]/base.[css|js]`: Here you can write your base CSS and JS which are common, it will be added after `layx`
-   CSS or JS in build time. This original CSS or JS file will be moved inside `layx/assets/[css|js]/user_base.[css|js]`.
-- `assets/[css|js]/pages/`: For page-specific content. Inside this dir all CSS and JS file will be minified and original one
-  moved to `layx/assets/[css|js]/pages/`.
-
-## Installation & Quick Start
-
-You can use Layx directly without installing anything globally via `npx`, or install the CLI globally via `npm`:
-
-### Option 1: Quick Start with `npx` (Recommended)
-
-To create a new Layx landing page anywhere:
+Scaffold a brand new landing page in seconds:
 
 ```bash
-npx layx create my-landing-page
+npx layx-css create my-landing-page
 # or
-npm create layx@latest my-landing-page
+npm create layx my-landing-page
 ```
 
-### Option 2: Global Installation
+### Option 2: Install Globally via `npm`
 
-Install the Layx CLI globally to have the `layx` command available everywhere:
+Install the CLI globally to have the `layx` command directly available anywhere on your machine:
 
 ```bash
 npm install -g layx-css
 ```
 
-Once installed, run `layx` without arguments to open the interactive CLI menu:
+Once installed globally, you can launch the interactive menu by running:
 
 ```bash
 layx
 ```
 
-## 🚀 Commands Guide
+---
 
-1. **Create a New Landing Page:**
-   ```bash
-   layx create [project-name]
-   ```
+## 🛠️ CLI Commands Guide
 
-2. **Start Building:**
-   Dive into your new project and begin designing your landing page!
+### 1. `layx create [name]`
+Scaffolds a new LayX landing page project with all necessary configurations, pre-configured fonts, essential components, and build scripts.
+```bash
+layx create my-landing-page
+```
 
-3. **Build Your Project:**
-   When you're ready to deploy, run:
+### 2. `layx add`
+Extend your project on-demand with components, Google Fonts, wireframes, or landing page templates:
 
-   ```bash
-   layx build
-   ```
+```bash
+# Add components (offline-first from local package, with remote fallback)
+layx add -c accordion modal tabs
 
-4. **Modify Your Project After Build:**
-   Need to make changes? Use the `unbuild` command:
+# Download & bundle Google Fonts locally into assets/font/
+layx add -f "Red Hat Display" "Inter"
 
-   ```bash
-   layx unbuild
-   ```
+# Add wireframe presets
+layx add -w hero features pricing
 
-5. **Add Components, Templates, or Fonts:**
-   Easily extend your project with the `add` command:
+# Add starter landing page templates
+layx add -t saas-landing
+```
 
-   ```bash
-   # Add a component
-   layx add -c <component-name>
+*Note: Adding components automatically copies the component assets into `layx/components/` and auto-wires `@import` statements into `layx/layx.css`.*
 
-   # Add a template
-   layx add -t <template-name>
+### 3. `layx build`
+Compiles and prepares your landing page for high-performance production deployment:
+- Strips unused grid layout classes.
+- Bundles and minifies JavaScript using `esbuild`.
+- Minifies modern CSS without altering cutting-edge CSS syntax.
+- Rewires HTML references to point to production bundles.
+- Converts images in `assets/image/` to AVIF/WebP and optimizes SVGs.
 
-   # Add a font
-   layx add -f <font-name>
-   ```
+```bash
+layx build
+```
 
-6. **Optimize Images:**
-   Compress and optimize your images for better performance:
+### 4. `layx unbuild`
+Need to make edits after a build? Restore your project back to its original development state:
+```bash
+layx unbuild
+```
 
-   ```bash
-   layx optimizeImages
-   ```
+### 5. `layx optimize`
+Manually compress and optimize images in `assets/image/` without performing a full build:
+```bash
+layx optimize
+```
 
-## 📚 Documentation
+### 6. `layx snippets [--global]`
+Install LayX HTML, CSS, and JS code snippets for VS Code:
+```bash
+# Install into the current project workspace (.vscode/)
+layx snippets
 
-For comprehensive guides and API references, visit our [official documentation](https://layx.xyz/pages/docs/getting_started/introduction.html).
-
-## 🤝 Contributing
-
-We welcome contributions of all kinds! To get started, please read our [Contributing Guide](https://layx.xyz/docs/about/contributing).
-
-## 📄 License
-
-Layx is open source software [licensed as MIT](LICENSE).
+# Install globally into your user VS Code profile
+layx snippets --global
+```
 
 ---
 
-⭐ If you find Layx helpful, consider giving it a star on GitHub!
+## 🎨 Syntax & Design Patterns
 
-[Report Bug](https://github.com/arif891/Layx/issues) · [Request Feature](https://github.com/arif891/Layx/issues) · [Join our Community](https://discord.gg/layx)
+LayX uses clean, semantic syntax for common landing page layout needs:
+
+### Responsive Container
+```html
+<container>
+  <div class="content">
+    <h1>Welcome to LayX</h1>
+  </div>
+</container>
+```
+
+### 12-Column Responsive Layout Grid
+```html
+<layout>
+  <div class="x-8">Main content column</div>
+  <div class="x-4">Sidebar column</div>
+</layout>
+```
+
+### Semantic Components
+```html
+<navbar>
+  <div class="brand">MyLogo</div>
+  <nav class="link-wrapper">
+    <a class="link" href="#features">Features</a>
+    <a class="link" href="#pricing">Pricing</a>
+  </nav>
+  <button class="btn btn-primary">Get Started</button>
+</navbar>
+```
+
+---
+
+## 📁 Project Directory Structure
+
+```
+my-landing-page/
+├── assets/
+│   ├── brand/               # Logos and branding assets
+│   ├── css/
+│   │   ├── base.css         # Project-wide custom CSS
+│   │   └── pages/home.css   # Page-specific styles
+│   ├── font/                # Local web fonts (WOFF2)
+│   ├── image/               # Project images and SVG sprites
+│   └── js/
+│       ├── base.js          # Project-wide custom JS
+│       └── pages/home.js    # Page-specific JS
+├── layx/                    # LayX framework core
+│   ├── layx.css             # Framework CSS entry point
+│   ├── layx.js              # Framework JS entry point
+│   ├── components/          # Active components (button, navbar, etc.)
+│   ├── main/                # Base reset, layout grid, variables
+│   └── utilities/           # Utility classes (spacing, flex, grid)
+├── pages/                   # Additional landing sub-pages
+├── config.mjs               # LayX bundler configuration
+├── index.html               # Main landing page entry point
+└── package.json             # Project dependencies and build scripts
+```
+
+---
+
+## 🤝 Contributing & Feedback
+
+LayX is open-source and welcoming contributions, bug reports, and ideas!
+
+- **Found a bug or have a suggestion?** Open an issue on [GitHub Issues](https://github.com/arif891/Layx/issues).
+- **Want to contribute code or components?** Fork the repository and open a Pull Request.
+
+---
+
+## 📄 License
+
+LayX is open-source software licensed under the [MIT License](LICENSE).

@@ -49,6 +49,6 @@
     "@clack/prompts": "^1.8.1",
     "esbuild": "^0.27.0",
     "picocolors": "^1.1.1",
-    "sharp": "^0.34.5"
+    "sharp": "^0.35.5"
   }
 }

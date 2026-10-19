@@ -68,6 +68,7 @@ async function createProject(targetName, isInteractive = true) {
         const templateDir = packagePaths.template;
         const frameworkDir = packagePaths.framework;
         const componentsBase = path.join(frameworkDir, 'components');
+        const othersBase = path.join(frameworkDir, 'others');
 
         // 1. Copy starter template files (assets, pages, index.html, config.mjs, .htaccess, .vscode)
         if (existsSync(templateDir)) {
@@ -80,7 +81,7 @@ async function createProject(targetName, isInteractive = true) {
             });
         }
 
-        // 2. Copy framework directory (layx/) with selective default components
+        // 2. Copy framework directory (layx/) with selective default components and others
         if (existsSync(frameworkDir)) {
             await fs.cp(frameworkDir, path.join(targetDir, 'layx'), {
                 recursive: true,
@@ -89,23 +90,43 @@ async function createProject(targetName, isInteractive = true) {
                     if (base === 'node_modules' || base === '.git') return false;
 
                     // Filter components so only defaultComponents are initially copied
-                    const rel = path.relative(componentsBase, src);
-                    if (!rel.startsWith('..') && rel !== '') {
-                        const compName = rel.split(/[/\\]/)[0];
+                    const relComp = path.relative(componentsBase, src);
+                    if (!relComp.startsWith('..') && relComp !== '') {
+                        const compName = relComp.split(/[/\\]/)[0];
                         if (compName && !registryConfig.defaultComponents.includes(compName)) {
                             return false;
                         }
                     }
+
+                    // Filter others so only defaultOthers are initially copied
+                    const relOther = path.relative(othersBase, src);
+                    if (!relOther.startsWith('..') && relOther !== '') {
+                        const otherName = relOther.split(/[/\\]/)[0];
+                        if (otherName && !registryConfig.defaultOthers.includes(otherName)) {
+                            return false;
+                        }
+                    }
+
                     return true;
                 }
             });
         }
 
-        // 3. Auto-wire default components in the project's layx.css and layx.js
+        // 3. Auto-wire default components and others in the project's layx.css and layx.js
         const projectLayxCss = path.join(targetDir, 'layx/layx.css');
         const projectLayxJs = path.join(targetDir, 'layx/layx.js');
         for (const comp of registryConfig.defaultComponents) {
             const mapping = registryConfig.components[comp];
+            if (mapping?.css) {
+                await registerCssImport(mapping.css, projectLayxCss);
+            }
+            if (mapping?.js) {
+                await registerJsImport(mapping.js, projectLayxJs);
+            }
+        }
+
+        for (const other of registryConfig.defaultOthers) {
+            const mapping = registryConfig.others?.[other];
             if (mapping?.css) {
                 await registerCssImport(mapping.css, projectLayxCss);
             }

@@ -55,12 +55,18 @@ npx layx snippets
 
 ---
 
-## 🧩 Adding Components
+## 🧩 Adding Components & Modules
 
-By default, new projects include core components (`button`, `navbar`, `footer`). To add other components:
+By default, new projects include core components (`button`, `navbar`, `footer`) and core others (`icon`, `theme`).
 
+To add more components:
 ```bash
 npx layx add -c accordion modal tabs
 ```
 
-LayX will copy the component files into `layx/components/` and automatically wire them into `layx/layx.css`.
+To add optional feature modules:
+```bash
+npx layx add -o smooth_scroll split_text syntax_highlighter
+```
+
+LayX will copy the files into `layx/` and automatically wire them into `layx/layx.css` and `layx/layx.js`.

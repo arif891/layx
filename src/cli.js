@@ -66,6 +66,7 @@ async function runInteractiveMenu() {
                 message: 'What would you like to add?',
                 options: [
                     { label: 'Component', value: '-c' },
+                    { label: 'Other module', value: '-o' },
                     { label: 'Font', value: '-f' },
                     { label: 'Template', value: '-t' }
                 ]
@@ -109,7 +110,7 @@ ${pc.yellow(pc.bold('COMMANDS:'))}
   ${pc.green('build')}                  Build and optimize project for production
   ${pc.green('unbuild')}                Restore original development source files
   ${pc.green('optimize')}               Optimize images (AVIF/WebP) in assets/image/
-  ${pc.green('add')} [options]          Add components (-c), fonts (-f), templates (-t)
+  ${pc.green('add')} [options]          Add components (-c), other modules (-o), fonts (-f), templates (-t)
   ${pc.green('snippets')} [--global]    Install LayX VS Code snippets (locally or globally)
 
 ${pc.yellow(pc.bold('OPTIONS:'))}

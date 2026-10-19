@@ -9,6 +9,8 @@ import { downloadFile } from '../../utils/download.js';
 import { processDependencies } from './utils.js';
 import { readFile } from '../../utils/fs.js';
 
+import { addSingleOther } from './other.js';
+
 export { componentAdd };
 
 async function componentAdd(components) {
@@ -31,7 +33,14 @@ async function componentAdd(components) {
 
 async function addSingleComponent(name) {
     const localComponentDir = path.join(packagePaths.framework, 'components', name);
+    const localOtherDir = path.join(packagePaths.framework, 'others', name);
     const targetComponentDir = path.join(projectPaths.layx, 'components', name);
+
+    // 0. Check if it is an others module
+    if (!existsSync(localComponentDir) && existsSync(localOtherDir)) {
+        await addSingleOther(name);
+        return;
+    }
 
     // 1. Check Local Package (Approach 3 - Hybrid, Fast Offline Path)
     if (existsSync(localComponentDir)) {

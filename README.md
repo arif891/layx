@@ -70,11 +70,14 @@ layx create my-landing-page
 ```
 
 ### 2. `layx add`
-Extend your project on-demand with components, Google Fonts, wireframes, or landing page templates:
+Extend your project on-demand with components, optional feature modules (`others`), Google Fonts, wireframes, or landing page templates:
 
 ```bash
 # Add components (offline-first from local package, with remote fallback)
 layx add -c accordion modal tabs
+
+# Add optional feature modules (smooth scroll, syntax highlighter, mouse tracker, etc.)
+layx add -o smooth_scroll split_text syntax_highlighter
 
 # Download & bundle Google Fonts locally into assets/font/
 layx add -f "Red Hat Display" "Inter"
@@ -86,7 +89,7 @@ layx add -w hero features pricing
 layx add -t saas-landing
 ```
 
-*Note: Adding components automatically copies the component assets into `layx/components/` and auto-wires `@import` statements into `layx/layx.css`.*
+*Note: New projects ship lean with default components (`button`, `navbar`, `footer`) and default others (`icon`, `theme`). Adding components or other modules automatically copies assets into `layx/` and auto-wires `@import` statements into `layx/layx.css` and imports into `layx/layx.js`.*
 
 ### 3. `layx build`
 Compiles and prepares your landing page for high-performance production deployment:

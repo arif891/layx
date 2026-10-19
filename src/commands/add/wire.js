@@ -12,7 +12,15 @@ async function registerCssImport(cssRelativePath, targetFile = projectPaths.layx
             return false; // Already registered
         }
 
-        if (content.includes('/* Components */')) {
+        const isOther = cssRelativePath.startsWith('others/');
+        const sectionHeader = isOther ? '/* Other */' : '/* Components */';
+
+        if (content.includes(sectionHeader)) {
+            content = content.replace(
+                sectionHeader,
+                `${sectionHeader}\n${importStatement}`
+            );
+        } else if (content.includes('/* Components */')) {
             content = content.replace(
                 '/* Components */',
                 `/* Components */\n${importStatement}`
@@ -39,7 +47,15 @@ async function registerJsImport(jsRelativePath, targetFile = projectPaths.layxJs
             return false; // Already registered
         }
 
-        if (content.includes('/* Components */')) {
+        const isOther = jsRelativePath.includes('others/');
+        const sectionHeader = isOther ? '/* Other */' : '/* Components */';
+
+        if (content.includes(sectionHeader)) {
+            content = content.replace(
+                sectionHeader,
+                `${sectionHeader}\n${importStatement}`
+            );
+        } else if (content.includes('/* Components */')) {
             content = content.replace(
                 '/* Components */',
                 `/* Components */\n${importStatement}`

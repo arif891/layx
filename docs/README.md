@@ -12,11 +12,11 @@ Welcome to the official documentation for **LayX** (`layx-css`) — a modern, CS
 
 | Guide | Description |
 | :--- | :--- |
-| 🚀 **[Getting Started](getting-started.md)** | Installation, scaffolding your first landing page, and project tour. |
-| 🛠️ **[CLI Reference](cli-reference.md)** | Detailed guide to all `layx` commands, flags, and interactive menus. |
-| 🧩 **[Components System](components.md)** | Core components, `manifest.json` schema, auto-wiring, and usage examples. |
-| ⚡ **[Others Modules](others-modules.md)** | Optional UX enhancements (`theme`, `icon`, `smooth_scroll`, `syntax_highlighter`, `pwa`, etc.). |
-| 🏗️ **[Build & Bundling Engine](build-system.md)** | Modern CSS preservation, esbuild JS bundling, HTML rewiring, and image optimization. |
+| 🚀 **[Getting Started](GETTING-STARTED.md)** | Installation, scaffolding your first landing page, and project tour. |
+| 🛠️ **[CLI Reference](CLI-REFERENCE.md)** | Detailed guide to all `layx` commands, flags, and interactive menus. |
+| 🧩 **[Components System](COMPONENTS.md)** | Core components, `manifest.json` schema, auto-wiring, and usage examples. |
+| ⚡ **[Others Modules](OTHERS-MODULES.md)** | Optional UX enhancements (`theme`, `icon`, `smooth_scroll`, `syntax_highlighter`, `pwa`, etc.). |
+| 🏗️ **[Build & Bundling Engine](BUILD-SYSTEM.md)** | Modern CSS preservation, esbuild JS bundling, HTML rewiring, and image optimization. |
 
 ---
 

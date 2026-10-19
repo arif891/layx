@@ -186,7 +186,15 @@ my-landing-page/
 ├── config.mjs               # LayX bundler configuration
 ├── index.html               # Main landing page entry point
 └── package.json             # Project dependencies and build scripts
-```
+## 📚 Documentation
+
+For complete guides and architectural references, check out our markdown docs in the [`/docs`](docs/README.md) folder:
+
+- 🚀 **[Getting Started](docs/getting-started.md)** — Installation, scaffolding, and project structure tour.
+- 🛠️ **[CLI Reference](docs/cli-reference.md)** — Comprehensive guide to all commands, flags, and interactive menus.
+- 🧩 **[Components System](docs/components.md)** — Core components, manifest schema, and auto-wiring.
+- ⚡ **[Others Modules](docs/others-modules.md)** — Interactive modules (`theme`, `icon`, `smooth_scroll`, etc.).
+- 🏗️ **[Build & Bundling Engine](docs/build-system.md)** — Non-destructive CSS minification and two-way build lifecycle.
 
 ---
 

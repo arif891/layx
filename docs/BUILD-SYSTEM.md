@@ -76,21 +76,23 @@ npm run unbuild
 
 ---
 
-## ⚙️ Configuration (`config.mjs`)
+## ⚙️ Configuration (Zero-Config by Default, Opt-In `layx.config.mjs`)
 
-Every LayX project has a `config.mjs` file in the project root allowing you to configure the bundler:
+LayX projects are **100% zero-config by default**. No configuration file is required to build, bundle, or optimize.
+
+If you wish to customize build options (such as enabling sourcemaps for debugging, altering browser targets, or tuning image formats), you can optionally create a `layx.config.mjs` (or `config.mjs`) in your project root:
 
 ```javascript
-// configuration for JavaScript and build processing
-export const config = {
+// layx.config.mjs (optional)
+export default {
   build: {
-    layx: {
-      minify: true,
-      sourcemap: false,
-      format: 'esm',
-      target: 'esnext',
-      charset: 'utf8',
-    }
+    minify: true,
+    sourcemap: true,    // enable sourcemaps for debugging
+    target: 'es2022',   // customize JS target
+  },
+  images: {
+    formats: ['avif', 'webp'],
+    quality: 80
   }
 };
 ```

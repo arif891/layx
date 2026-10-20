@@ -70,7 +70,7 @@ async function createProject(targetName, isInteractive = true) {
         const componentsBase = path.join(frameworkDir, 'components');
         const othersBase = path.join(frameworkDir, 'others');
 
-        // 1. Copy starter template files (assets, pages, index.html, config.mjs, .htaccess, .vscode)
+        // 1. Copy starter template files (assets, pages, index.html, .htaccess, .vscode)
         if (existsSync(templateDir)) {
             await fs.cp(templateDir, targetDir, {
                 recursive: true,

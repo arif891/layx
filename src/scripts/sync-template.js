@@ -12,7 +12,6 @@ async function syncTemplate() {
     const itemsToSync = [
         { src: 'assets', dest: 'assets', isDir: true },
         { src: 'pages', dest: 'pages', isDir: true },
-        { src: 'config.mjs', dest: 'config.mjs', isDir: false },
         { src: 'index.html', dest: 'index.html', isDir: false },
         { src: '.vscode/layx.code-snippets', dest: '.vscode/layx.code-snippets', isDir: false }
     ];

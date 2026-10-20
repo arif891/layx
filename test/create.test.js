@@ -38,7 +38,6 @@ describe('Project Scaffolding (layx create)', () => {
         // Verify directory and files exist
         assert.ok(existsSync(testProjectPath), 'Project directory should exist');
         assert.ok(existsSync(path.join(testProjectPath, 'index.html')), 'index.html should exist');
-        assert.ok(existsSync(path.join(testProjectPath, 'config.mjs')), 'config.mjs should exist');
         assert.ok(existsSync(path.join(testProjectPath, 'layx/layx.css')), 'layx/layx.css should exist');
         assert.ok(existsSync(path.join(testProjectPath, 'layx/layx.js')), 'layx/layx.js should exist');
         assert.ok(existsSync(path.join(testProjectPath, 'assets/css/base.css')), 'assets/css/base.css should exist');

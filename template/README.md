@@ -49,9 +49,11 @@ npx layx snippets
 │       └── pages/home.js    # Page-specific JavaScript
 ├── layx/                    # LayX framework core (styles, components, utilities)
 ├── pages/                   # Additional landing sub-pages
-├── config.mjs               # LayX build and bundler configuration
-└── index.html               # Main landing page entry point
+├── index.html               # Main landing page entry point
+└── package.json             # NPM build and optimization scripts
 ```
+
+> **Zero-Config**: LayX projects work out of the box with zero configuration! To customize esbuild or image settings, you can optionally add `layx.config.mjs`.
 
 ---
 

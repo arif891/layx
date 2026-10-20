@@ -183,8 +183,9 @@ my-landing-page/
 │   ├── main/                # Base reset, layout grid, variables
 │   └── utilities/           # Utility classes (spacing, flex, grid)
 ├── pages/                   # Additional landing sub-pages
-├── config.mjs               # LayX bundler configuration
 ├── index.html               # Main landing page entry point
+├── package.json             # Project dependencies and build scripts
+└── layx.config.mjs          # (Optional) Custom build & optimizer configuration
 ```
 
 ---

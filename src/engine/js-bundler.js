@@ -45,18 +45,10 @@ async function backupPageJs() {
     }
 }
 
-async function runEsbuild() {
-    let buildConfig = {};
+import { loadProjectConfig } from '../core/config.js';
 
-    try {
-        if (projectPaths.config) {
-            const configUrl = pathToFileURL(projectPaths.config).href;
-            const configModule = await import(configUrl);
-            buildConfig = configModule.config?.build?.layx || {};
-        }
-    } catch {
-        // proceed with default esbuild settings
-    }
+async function runEsbuild() {
+    const projectConfig = await loadProjectConfig();
 
     await esbuild.build({
         entryPoints: [projectPaths.baseJs, `${projectPaths.pagesJs}/**/*.js`],
@@ -66,11 +58,9 @@ async function runEsbuild() {
         bundle: true,
         splitting: true,
         treeShaking: true,
-        minify: true,
-        format: 'esm',
         assetNames: '[path]/[name]',
         chunkNames: 'chunks/[name]-[hash]',
-        ...buildConfig
+        ...projectConfig.build
     });
 
     console.log('ESBuild processed');

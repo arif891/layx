@@ -16,7 +16,7 @@ export const projectPaths = {
     layx: path.join(projectRoot, 'layx'),
     assets: path.join(projectRoot, 'assets'),
     pages: path.join(projectRoot, 'pages'),
-    config: path.join(projectRoot, 'config.mjs'),
+    config: path.join(projectRoot, 'layx.config.mjs'),
     indexHtml: path.join(projectRoot, 'index.html'),
     buildState: path.join(projectRoot, 'layx/assets/build_info.json'),
 

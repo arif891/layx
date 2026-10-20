@@ -64,9 +64,9 @@ my-landing-page/
 │   └── utilities/           # CSS utility classes
 ├── pages/                   # Additional landing sub-pages (e.g., other.html)
 ├── .vscode/                 # Code snippet definitions for VS Code
-├── config.mjs               # LayX bundler configuration
 ├── index.html               # Main landing page entry point
-└── package.json             # NPM build and optimization scripts
+├── package.json             # NPM build and optimization scripts
+└── layx.config.mjs          # (Optional) Custom build & optimizer configuration
 ```
 
 ---

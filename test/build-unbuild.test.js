@@ -48,4 +48,28 @@ describe('Build and Unbuild Lifecycle', () => {
         assert.match(html, /<link rel="stylesheet" href="\/layx\/layx\.css">/);
         assert.match(html, /<script src="\/layx\/layx\.js" type="module"><\/script>/);
     });
+
+    test('optimizes CSS by generating only used grid classes and stripping unused ones', async () => {
+        // Add specific layout classes to index.html
+        const indexPath = path.join(testProjectPath, 'index.html');
+        let html = await fs.readFile(indexPath, 'utf8');
+        html = html.replace('<body>', '<body>\n<div class="x-6 x-md-4 num-x-3">Test</div>');
+        await fs.writeFile(indexPath, html, 'utf8');
+
+        // Run build
+        await execFileAsync('node', [cliPath, 'build'], { cwd: testProjectPath });
+
+        // Check bundled CSS in assets/css/base.css
+        const bundledCss = await fs.readFile(path.join(testProjectPath, 'assets/css/base.css'), 'utf8');
+
+        // Verify used classes exist in bundled CSS
+        assert.match(bundledCss, /\.x-6/);
+        assert.match(bundledCss, /\.x-md-4/);
+        assert.match(bundledCss, /\.num-x-3/);
+
+        // Verify unused grid numbers do NOT exist
+        assert.doesNotMatch(bundledCss, /\.x-7\{/);
+        assert.doesNotMatch(bundledCss, /\.x-11\{/);
+        assert.doesNotMatch(bundledCss, /\.x-lg-9\{/);
+    });
 });

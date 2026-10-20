@@ -1,6 +1,6 @@
 {
   "name": "layx-css",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "description": "CSS-first framework and build tool for modern high-performance landing pages",
   "type": "module",
   "author": "arif891",
@@ -39,6 +39,8 @@
     "README.md"
   ],
   "scripts": {
+    "sync:template": "node src/scripts/sync-template.js",
+    "prepublishOnly": "npm run sync:template && npm test",
     "test": "node --test test/**/*.test.js",
     "build": "node src/cli.js build",
     "unbuild": "node src/cli.js unbuild",

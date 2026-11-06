@@ -22,7 +22,7 @@
  *   data-drag-scroll               – axis: "x" (default) | "y" | "both"
  *   data-drag-scroll-multiplier    – drag-to-scroll ratio (default: 1)
  *   data-drag-scroll-momentum      – enables momentum; optional 0–1 strength (default: 0.75)
- *   data-drag-scroll-elastic       – enables rubber-band boundary resistance (default: true)
+ *   data-drag-scroll-elastic       – enables rubber-band boundary resistance (default: false)
  *   data-drag-scroll-item          – selector for items to elastically transform (default: direct children)
  *   data-drag-scroll-easing        – easing function name (default: "expo")
  *   data-drag-scroll-cursor        – idle cursor override (default: "grab")
@@ -435,7 +435,7 @@ class DragScroll {
         const momentum = momentumAttr !== null;
         const strength = Math.min(Math.max(parseFloat(momentumAttr) || 0.75, 0), 1);
         const elasticAttr = el.getAttribute('data-drag-scroll-elastic');
-        const elastic = elasticAttr !== 'false';
+        const elastic = elasticAttr !== null && elasticAttr !== 'false';
         const easingKey = (el.dataset.dragScrollEasing ?? DragScroll.DEFAULT_EASING).trim().toLowerCase();
 
         return {

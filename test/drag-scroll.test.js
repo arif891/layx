@@ -65,7 +65,7 @@ describe('DragScroll Engine', () => {
       globalThis.document = originalDocument;
     });
 
-    test('_parseConfig reads dataset attributes with elastic default true', () => {
+    test('_parseConfig reads dataset attributes with elastic default false', () => {
       const mockEl = {
         dataset: {
           dragScroll: 'x',
@@ -84,21 +84,21 @@ describe('DragScroll Engine', () => {
       assert.strictEqual(config.multiplier, 1.5);
       assert.strictEqual(config.momentum, true);
       assert.strictEqual(config.strength, 0.8);
-      assert.strictEqual(config.elastic, true); // default true
+      assert.strictEqual(config.elastic, false); // default false
       assert.strictEqual(config.easing, DragScroll.EASINGS.cubic);
       assert.strictEqual(config.cursor, 'grab');
       assert.strictEqual(config.cursorActive, 'grabbing');
     });
 
-    test('_parseConfig honors data-drag-scroll-elastic="false"', () => {
+    test('_parseConfig honors data-drag-scroll-elastic="true"', () => {
       const mockEl = {
         dataset: { dragScroll: 'both', dragScrollItem: '.my-item' },
-        getAttribute: (attr) => (attr === 'data-drag-scroll-elastic' ? 'false' : null),
+        getAttribute: (attr) => (attr === 'data-drag-scroll-elastic' ? 'true' : null),
       };
 
       const config = DragScroll._parseConfig(mockEl);
       assert.strictEqual(config.direction, 'both');
-      assert.strictEqual(config.elastic, false);
+      assert.strictEqual(config.elastic, true);
       assert.strictEqual(config.itemSelector, '.my-item');
     });
 
@@ -117,7 +117,7 @@ describe('DragScroll Engine', () => {
       const listeners = {};
       const mockContainer = {
         dataset: { dragScroll: 'x' },
-        getAttribute: () => null,
+        getAttribute: (attr) => (attr === 'data-drag-scroll-elastic' ? 'true' : null),
         scrollLeft: 0,
         scrollTop: 0,
         scrollWidth: 600,

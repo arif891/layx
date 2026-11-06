@@ -1,3 +1,4 @@
 /node_modules
 /setup
 package-lock.json
+.ref-speed-highlight

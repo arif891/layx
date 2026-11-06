@@ -7,8 +7,7 @@
     "syntax_highlighter.css"
   ],
   "js": [
-    "syntax_highlighter.js",
-    "syntax_highlighter_exp.js"
+    "syntax_highlighter.js"
   ],
   "html": [
     "examples/index.html"

@@ -1,21 +1,30 @@
 export default [
   {
     type: 'kwd',
-    match: /\b(echo|set|if|else|for|in|do|goto|call|exit|rem|cls|pause|shift|start|title|color|type|copy|del|move|ren|mkdir|rmdir|cd|dir)\b/gi
+    match: /\b(echo|set|if|else|for|goto|call|exit|pause)\b/gi
   },
   {
     type: 'var',
-    match: /%[a-zA-Z0-9_]+%|%~?[a-zA-Z0-9_]+/g
+    match: /%[a-zA-Z0-9_]+%/g
   },
   {
-    expand: 'str'
+    type: 'str',
+    match: /"(?:\\.|[^"])*"/g
   },
   {
     type: 'cmnt',
-    match: /::.*|rem\b.*/gi
+    match: /::.*/g
+  },
+  {
+    type: 'cmnt',
+    match: /rem .*/gi
   },
   {
     type: 'oper',
-    match: /(@|==|!=|>|<|\||&|\^)/g
+    match: /(=|==|!=|<|>|<=|>=)/g
+  },
+  {
+    type: 'num',
+    match: /\b\d+\b/g
   }
 ];

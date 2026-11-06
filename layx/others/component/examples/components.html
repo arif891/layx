@@ -104,14 +104,16 @@
 </div>
 
 <!-- 7. Content Slot Example -->
-<!-- Renders static HTML inserted between the component tags using <content> -->
+<!-- Renders static HTML inserted between the component tags using standard <slot> -->
 <div component="slotted-card" style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; margin: 10px 0;">
-    <h3 style="margin-top: 0; color: #333;">Card Title</h3>
+    <h3 style="margin-top: 0; color: #333;">
+        <slot name="header">Card Title</slot>
+    </h3>
     <div style="background: #fafafa; padding: 10px; border-radius: 4px;">
-        <!-- The user's content will replace this tag. If empty, the fallback content below is used. -->
-        <content>
+        <!-- The user's content will replace this slot. If empty, the fallback content below is used. -->
+        <slot>
             <em style="color: #999;">No content provided. This is the fallback content!</em>
-        </content>
+        </slot>
     </div>
 </div>
 

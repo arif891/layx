@@ -10,6 +10,33 @@ This folder contains examples demonstrating the usage of the `Component` class d
 
 ## Key Concepts
 
+### Slots & Content Projection
+
+Use standard `<slot>` and named slots (`<slot name="...">`):
+
+```html
+<!-- In components.html -->
+<div component="card">
+    <header><slot name="header">Default Title</slot></header>
+    <main><slot>Default body text</slot></main>
+</div>
+
+<!-- In index.html -->
+<component name="card">
+    <h3 slot="header">My Custom Title</h3>
+    <p>Projected into the default slot!</p>
+</component>
+```
+
+### Built-in Template Helpers
+
+The template engine includes zero-dependency utilities:
+- `renderList(array, item => '...')`: Iterate over arrays cleanly.
+- `when(cond, thenHtml, elseHtml)`: Ternary helper for conditional blocks.
+- `esc(string)`: HTML entity escape for user input.
+- `cls(...classes)`: Dynamic classNames helper (strings, arrays, `{ 'is-active': true }`).
+- `raw(string)`: Emit unescaped raw HTML.
+
 ### Table & List Rendering (Important)
 
 When rendering loops inside strict HTML elements like `<tbody>`, `<ul>`, or `<select>`, you **must** wrap your `${...}` expression in a `<template>` tag.

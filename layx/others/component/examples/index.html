@@ -74,13 +74,13 @@
         </div>
 
         <div class="example-section">
-            <h2>7. Content Slots (<code>&lt;content&gt;</code>)</h2>
-            <p>Placing HTML inside the component tags. The content replaces the <code>&lt;content&gt;</code> tag inside
-                the component definition.</p>
+            <h2>7. Content Slots (<code>&lt;slot&gt;</code>)</h2>
+            <p>Placing HTML inside component tags using standard Web Component <code>&lt;slot&gt;</code> and named slots (<code>slot="header"</code>).</p>
 
-            <p><b>With Custom Content:</b></p>
+            <p><b>With Custom Slot & Named Header:</b></p>
             <component src="./components.html" name="slotted-card">
-                <p style="color: blue;">This is custom HTML injected into the slot!</p>
+                <span slot="header" style="color: #6366f1;">Custom Header via Slot</span>
+                <p style="color: blue;">This is custom HTML injected into the default slot!</p>
                 <button>Click Me</button>
             </component>
 

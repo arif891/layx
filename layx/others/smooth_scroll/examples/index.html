@@ -1,164 +1,453 @@
 <!DOCTYPE html>
-<html lang="en" data-ease="0.015" data-threshold="0.5">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmoothScroll — Modern Minimalist Showcase</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --card-bg: #121215;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.18);
+      --text: #f4f4f5;
+      --text-muted: #71717a;
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.4);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Smooth Scroll Example</title>
-        <style>
-            body {
-                font-family: 'Segoe UI', sans-serif;
-                margin: 0;
-                padding: 0;
-                background: #111;
-                color: #fff;
-            }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-            header {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                background: rgba(0, 0, 0, 0.8);
-                backdrop-filter: blur(10px);
-                padding: 20px;
-                z-index: 100;
-                border-bottom: 1px solid #333;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
 
-            nav button {
-                background: transparent;
-                border: 1px solid #555;
-                color: #fff;
-                padding: 8px 16px;
-                margin-left: 10px;
-                cursor: pointer;
-                border-radius: 4px;
-                transition: all 0.2s;
-            }
+    /* Scroll progress bar */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      box-shadow: 0 0 10px var(--accent-glow);
+      z-index: 1000;
+      transition: width 0.05s linear;
+    }
 
-            nav button:hover {
-                background: #fff;
-                color: #000;
-            }
+    /* Fixed Minimal Navbar */
+    header {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(92%, 840px);
+      background: rgba(18, 18, 21, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 8px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
 
-            section {
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                border-bottom: 1px solid #222;
-            }
+    .brand {
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-            section:nth-child(even) {
-                background: #161616;
-            }
+    .brand-badge {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+    }
 
-            h2 {
-                font-size: 3rem;
-                margin: 0 0 20px 0;
-                background: linear-gradient(45deg, #ff00cc, #3333ff);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-            p {
-                max-width: 600px;
-                line-height: 1.6;
-                color: #aaa;
-                text-align: center;
-            }
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      transition: color 0.15s, background 0.15s;
+    }
 
-            .status-bar {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: #222;
-                padding: 10px 20px;
-                border-radius: 20px;
-                font-family: monospace;
-                border: 1px solid #444;
-            }
+    nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+    }
 
-            /* Example of an element that prevents smooth scroll capture */
-            .native-scroll-area {
-                width: 300px;
-                height: 200px;
-                overflow-y: auto;
-                background: #222;
-                border: 1px solid #555;
-                padding: 10px;
-                margin-top: 20px;
-            }
-        </style>
-    </head>
+    .btn-lock {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
 
-    <body>
+    .btn-lock:hover {
+      border-color: var(--border-hover);
+      background: rgba(255, 255, 255, 0.06);
+    }
 
-        <header>
-            <div style="font-weight: bold;">SmoothScroll.js</div>
-            <nav>
-                <button onclick="scrollToTop()">Top</button>
-                <button onclick="scrollToSection(2)">Section 2</button>
-                <button onclick="scrollToSection(4)">Section 4</button>
-                <button onclick="scrollToBottom()">Bottom</button>
-            </nav>
-        </header>
+    .btn-lock.locked {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: #fff;
+    }
 
-        <section id="s1">
-            <h2>Section One</h2>
-            <p>Scroll down to experience the inertia. This library intercepts wheel and key events to provide smooth
-                scrolling.</p>
-        </section>
+    /* Sections */
+    section {
+      min-height: 100vh;
+      padding: 140px 24px 80px;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
 
-        <section id="s2">
-            <h2>Section Two</h2>
-            <p>This is the second section. The scrolling feel can be customized via <code>data-ease</code> attribute on
-                the html tag.</p>
-        </section>
+    .hero-label {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
 
-        <section id="s3">
-            <h2>Section Three</h2>
-            <p>Example of an inner scrollable area that should behave natively:</p>
-            <div class="native-scroll-area" data-smooth-scroll="self">
-                <p>Hover here and scroll.</p>
-                <p>Line 1</p>
-                <p>Line 2</p>
-                <p>Line 3</p>
-                <p>Line 4</p>
-                <p>Line 5</p>
-                <p>Line 6</p>
-                <p>Line 7</p>
-                <p>Line 8</p>
-                <p>Line 9</p>
-                <p>Line 10</p>
-                <p>Line 11</p>
-                <p>Line 12</p>
-                <p>Line 13</p>
-                <p>Line 14</p>
-                <p>Line 15</p>
-            </div>
-            <p style="margin-top: 10px; font-size: 0.8em;">(Attribute <code>data-smooth-scroll="prevent"</code> allows
-                native scrolling inside this box)</p>
-        </section>
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
 
-        <section id="s4">
-            <h2>Section Four</h2>
-            <p>You can also control the scroll programmatically using the API.</p>
-        </section>
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
 
-        <section id="s5">
-            <h2>Section Five</h2>
-            <p>End of the page.</p>
-        </section>
+    p.lead {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 620px;
+      margin-bottom: 36px;
+      font-weight: 400;
+    }
 
-        <div class="status-bar" id="status">Scrolled: 0px</div>
+    /* Actions */
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
 
-        <script type="module" src="./app.js"></script>
-    </body>
+    .btn {
+      background: #fafafa;
+      color: #09090b;
+      border: none;
+      padding: 10px 18px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
 
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--border-hover);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Grid cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--border-hover);
+    }
+
+    .card-idx {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Sub-scrollable container */
+    .nested-container {
+      background: #000;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      height: 220px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 24px;
+      line-height: 1.8;
+    }
+
+    .nested-container .log-entry {
+      color: #10b981;
+    }
+
+    /* Minimal Floating Telemetry HUD */
+    #hud {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(18, 18, 21, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      z-index: 100;
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 4px 14px;
+      min-width: 190px;
+    }
+
+    .hud-label {
+      color: var(--text-muted);
+    }
+
+    .hud-value {
+      color: var(--text);
+      text-align: right;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #71717a;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .status-indicator.active {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    @media (max-width: 640px) {
+      header {
+        border-radius: 16px;
+        padding: 8px 14px;
+      }
+      nav a {
+        display: none;
+      }
+      #hud {
+        left: 20px;
+        right: 20px;
+        bottom: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="progress-bar"></div>
+
+  <!-- Navbar -->
+  <header>
+    <div class="brand">
+      <span>SmoothScroll</span>
+      <span class="brand-badge">v2.0</span>
+    </div>
+    <nav>
+      <a href="#hero">Overview</a>
+      <a href="#features">Features</a>
+      <a href="#playground">Playground</a>
+      <a href="#nested">Nested</a>
+    </nav>
+    <button id="lock-btn" class="btn-lock">
+      <span class="lock-icon">🔓</span> Lock
+    </button>
+  </header>
+
+  <!-- Hero -->
+  <section id="hero">
+    <span class="hero-label">Zero-Dependency Engine</span>
+    <h1>Fluid momentum.<br>Zero jank.</h1>
+    <p class="lead">
+      A modern, framerate-independent smooth scrolling engine. Re-engineered from the ground up with pure exponential damping, native container coexistence, and zero configuration.
+    </p>
+    <div class="action-row">
+      <button class="btn" onclick="scroller.scrollTo('#features', { offset: -60 })">Explore Features</button>
+      <button class="btn btn-secondary" onclick="scroller.scrollTo('bottom')">Scroll to Bottom</button>
+      <button class="btn btn-secondary" onclick="scroller.scrollTo(1200)">Scroll 1200px</button>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features">
+    <span class="hero-label">Engine Architecture</span>
+    <h2>Built for Landing Pages</h2>
+    <p class="lead">Designed specifically to deliver Apple-grade scroll feel without the bloat of heavy 3rd party frameworks.</p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-idx">01 / DYNAMICS</div>
+        <h3>Exponential Damping</h3>
+        <p>Mathematically compounds across variable refresh rates (60Hz, 120Hz, 144Hz ProMotion) without Euler drift or end-of-scroll speedup.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-idx">02 / COMPATIBILITY</div>
+        <h3>Wheel Normalization</h3>
+        <p>Standardizes line, page, and pixel wheel deltas across Firefox, Windows precision mice, and macOS trackpads.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-idx">03 / COEXISTENCE</div>
+        <h3>Native Scroll Sync</h3>
+        <p>Drag the scrollbar thumb with your mouse anytime. The scroller immediately detects manual jumps and synchronizes seamlessly.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-idx">04 / INTEGRATION</div>
+        <h3>In-Page Anchor Intercept</h3>
+        <p>Click any hash link (e.g. <code>#features</code>). SmoothScroll handles animated smooth-scroll destinations automatically.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Playground -->
+  <section id="playground">
+    <span class="hero-label">Interactive API</span>
+    <h2>Programmatic Control</h2>
+    <p class="lead">Test programmatic destinations, offsets, and instantaneous jumps with clean event callbacks.</p>
+
+    <div class="action-row">
+      <button class="btn btn-secondary" onclick="scroller.scrollTo('#hero')">Top (#hero)</button>
+      <button class="btn btn-secondary" onclick="scroller.scrollTo('#features', { offset: -80 })">Features (-80px offset)</button>
+      <button class="btn btn-secondary" onclick="scroller.scrollTo('#features', { duration: 1.2, easing: 'easeOutExpo', offset: -60 })">Eased 1.2s (easeOutExpo)</button>
+      <button class="btn btn-secondary" onclick="scroller.scrollTo('#nested')">Nested (#nested)</button>
+      <button class="btn btn-secondary" onclick="scroller.scrollTo(0, { immediate: true })">Jump Top (Immediate)</button>
+      <button class="btn btn-secondary" onclick="scroller.scrollTo('bottom')">Jump to Bottom</button>
+    </div>
+  </section>
+
+  <!-- Nested Container -->
+  <section id="nested">
+    <span class="hero-label">Container Coexistence</span>
+    <h2>Sub-Container Freedom</h2>
+    <p class="lead">Scroll inside this inner container. The smooth scroller does not hijack wheel events until the nested boundary is reached.</p>
+
+    <div class="nested-container" id="nested-box">
+      <p class="log-entry">⚡ [Interactive Container] Hover and scroll inside this box:</p>
+      <p>— Line 01: Native scroll container coexistence</p>
+      <p>— Line 02: No artificial event preventDefault</p>
+      <p>— Line 03: Mouse wheel scrolls content smoothly</p>
+      <p>— Line 04: Works inside textareas, code viewers, and sidebars</p>
+      <p>— Line 05: Respects inner boundary limits</p>
+      <p>— Line 06: SmoothScroll yields execution</p>
+      <p>— Line 07: Touchpad micro-delta compatible</p>
+      <p>— Line 08: Zero layout shift</p>
+      <p>— Line 09: Minimal DOM footprint</p>
+      <p>— Line 10: End of nested scroll content</p>
+    </div>
+  </section>
+
+  <!-- Live Telemetry HUD -->
+  <div id="hud">
+    <div class="hud-label">State</div>
+    <div class="hud-value"><span id="hud-status-dot" class="status-indicator"></span><span id="hud-status">IDLE</span></div>
+
+    <div class="hud-label">Scroll</div>
+    <div class="hud-value" id="hud-scroll">0 px</div>
+
+    <div class="hud-label">Progress</div>
+    <div class="hud-value" id="hud-progress">0%</div>
+
+    <div class="hud-label">Velocity</div>
+    <div class="hud-value" id="hud-velocity">0 px/s</div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
 </html>

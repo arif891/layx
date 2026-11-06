@@ -1,7 +1,15 @@
-export default [
+/**
+ * @name Java
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		match: /\/\/.*\n?|\/\*((?!\*\/)[^])*(\*\/)?/g,
+		type: 'cmnt',
 		sub: 'todo'
+	},
+	{
+		type: 'str',
+		match: /"""(\\[^]|(?!""")[^])*(""")?/g
 	},
 	{
 		expand: 'str'
@@ -25,4 +33,4 @@ export default [
 		type: 'class',
 		match: /\b[A-Z][\w_]*\b/g
 	}
-]
+]);

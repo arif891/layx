@@ -1,4 +1,8 @@
-export default [
+/**
+ * @name JSON
+ * @support string, number, bool, ...
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		type: 'var',
 		match: /(("|')((?!\2)[^\r\n\\]|\\[^])*\2|[a-zA-Z]\w*)(?=\s*:)/g
@@ -10,11 +14,11 @@ export default [
 		expand: 'num'
 	},
 	{
-		type: 'func',
+		type: 'num',
 		match: /\bnull\b/g
 	},
 	{
 		type: 'bool',
 		match: /\b(true|false)\b/g
 	}
-]
+]);

@@ -1,4 +1,8 @@
-export default [
+/**
+ * @name CSV
+ * @support punctuation, ...
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		expand: 'strDouble'
 	},
@@ -6,4 +10,4 @@ export default [
 		type: 'oper',
 		match: /,/g
 	}
-]
+]);

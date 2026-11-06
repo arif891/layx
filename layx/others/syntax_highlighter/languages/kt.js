@@ -1,38 +1,28 @@
 export default [
   {
     type: 'kwd',
-    match: /\b(package|import|class|interface|fun|val|var|if|else|for|while|return|when|break|continue|try|catch|finally|throw|object|companion|init|constructor|this|super)\b/g
+    match: /\b(package|import|class|interface|object|fun|val|var|constructor|init|this|super|typeof|as|is|in|out|by|get|set|where|if|else|when|try|catch|finally|for|do|while|throw|return|continue|break|null|true|false)\b/g
   },
   {
     type: 'type',
-    match: /\b(Int|String|Double|Float|Boolean|Long|Short|Byte|Char|Unit|Any)\b/g
+    match: /\b(Byte|Short|Int|Long|Float|Double|Boolean|Char|String|Array|List|Map|Set|Any|Unit|Nothing)\b/g
   },
   {
-    type: 'bool',
-    match: /\b(true|false)\b/g
+    expand: 'str'
   },
   {
-    type: 'num',
-    match: /\b\d+(\.\d+)?\b/g
-  },
-  {
-    type: 'str',
-    match: /"(.*?)"/g
+    expand: 'num'
   },
   {
     type: 'cmnt',
-    match: /\/\/(.*)/g
-  },
-  {
-    type: 'cmnt',
-    match: /\/\*[\s\S]*?\*\//g
+    match: /\/\/.*|\/\*[\s\S]*?\*\//g
   },
   {
     type: 'oper',
-    match: /(\+|-|\*|\/|=|==|!=|<|>|<=|>=|&&|\|\||!|\+=|-=|\*=|\/=)/g
+    match: /(\+|-|\*|\/|=|==|!=|<|>|<=|>=|&&|\|\||!|\+=|-=|\*=|\/=|\?:|\?)/g
   },
   {
     type: 'func',
-    match: /\b([a-zA-Z_][a-zA-Z0-9_]*)\(/g,
+    match: /[a-zA-Z_]\w*(?=\s*\()/g
   }
 ];

@@ -1,11 +1,15 @@
-export default [
+/**
+ * @name URI
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		match: /^#.*/gm,
+		type: 'cmnt',
 		sub: 'todo'
 	},
 	{
 		type: 'class',
-		match: /^\w+(?=:?)/gm
+		match: /^\w+(?=:)/gm
 	},
 	{
 		type: 'num',
@@ -23,4 +27,4 @@ export default [
 		type: 'var',
 		match: /\w+\.\w+(\.\w+)*/g
 	}
-]
+]);

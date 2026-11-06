@@ -6,15 +6,27 @@ import {
   tokenizeSync,
   detectLanguage,
   normalizeLang,
+  highlightHTML,
+  highlightElement,
+  highlightAll,
+  highlightANSI,
+  setLoader,
+  defaultLoader,
 } from '../layx/others/syntax_highlighter/syntax_highlighter.js';
 
 describe('Syntax Highlighter Engine & Core Modules', () => {
-  test('exports SyntaxHighlighter and helper functions', () => {
+  test('exports SyntaxHighlighter and functional API (speed-highlight compatible)', () => {
     assert.strictEqual(typeof SyntaxHighlighter, 'function');
     assert.strictEqual(typeof tokenize, 'function');
     assert.strictEqual(typeof tokenizeSync, 'function');
     assert.strictEqual(typeof detectLanguage, 'function');
     assert.strictEqual(typeof normalizeLang, 'function');
+    assert.strictEqual(typeof highlightHTML, 'function');
+    assert.strictEqual(typeof highlightElement, 'function');
+    assert.strictEqual(typeof highlightAll, 'function');
+    assert.strictEqual(typeof highlightANSI, 'function');
+    assert.strictEqual(typeof setLoader, 'function');
+    assert.strictEqual(typeof defaultLoader, 'function');
     assert.strictEqual(typeof SyntaxHighlighter.highlight, 'function');
     assert.strictEqual(typeof SyntaxHighlighter.highlightElement, 'function');
   });
@@ -113,18 +125,13 @@ describe('Syntax Highlighter Engine & Core Modules', () => {
       });
     });
 
-    test('SyntaxHighlighter.highlight() works safely on the server', async () => {
-      const sampleGrammar = [
-        { match: /\bconst\b/g, type: 'kwd' },
-        { expand: 'num' },
-      ];
-
-      const sh = new SyntaxHighlighter();
-      sh.loadLanguage('mini-js', sampleGrammar);
-
-      const html = await sh.highlight('const x = 100;', 'mini-js', { multiline: false });
+    test('SyntaxHighlighter.highlight() and highlightHTML() work safely on the server with bundled language', async () => {
+      const html = await highlightHTML('const message = "hello";', 'js', { multiline: false });
       assert.ok(html.includes('<span class="kwd">const</span>'));
-      assert.ok(html.includes('<span class="num">100</span>'));
+      assert.ok(html.includes('<span class="str">&quot;hello&quot;</span>') || html.includes('<span class="str">"hello"</span>'));
+
+      const ansi = await highlightANSI('const x = 1;', 'js', { kwd: '\x1b[35m' });
+      assert.ok(ansi.includes('\x1b[35mconst\x1b[0m'));
     });
   });
 

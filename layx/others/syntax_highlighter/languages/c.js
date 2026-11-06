@@ -1,6 +1,10 @@
-export default [
+/**
+ * @name C
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		match: /\/\/.*\n?|\/\*((?!\*\/)[^])*(\*\/)?/g,
+		type: 'cmnt',
 		sub: 'todo'
 	},
 	{
@@ -49,4 +53,4 @@ export default [
 		type: 'class',
 		match: /\b[A-Z][\w_]*\b/g
 	}
-]
+]);

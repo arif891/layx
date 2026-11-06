@@ -1,6 +1,10 @@
-export default [
+/**
+ * @name Lua
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
-		match: /^#!.*|--(\[(=*)\[((?!--\]\2\])[^])*--\]\2\]|.*)/g,
+		match: /^#!.*|--(\[(=*)\[[^]*?\]\2\]|.*)/g,
+		type: 'cmnt',
 		sub: 'todo'
 	},
 	{
@@ -25,4 +29,4 @@ export default [
 		type: 'func',
 		match: /[a-z_]+(?=\s*[({])/g
 	}
-]
+]);

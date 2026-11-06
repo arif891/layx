@@ -1,6 +1,11 @@
-export default [
+/**
+ * @name TOML
+ * @support comment, table, string, bool, variable
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		match: /#.*/g,
+		type: 'cmnt',
 		sub: 'todo'
 	},
 	{
@@ -31,6 +36,6 @@ export default [
 	},
 	{
 		type: 'var',
-		match: /\w+(?= \=)/g
+		match: /[\w-]+(?=\s*=)/g
 	}
-]
+]);

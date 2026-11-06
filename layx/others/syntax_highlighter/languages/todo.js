@@ -1,4 +1,9 @@
-export default [
+/**
+ * @name TODO
+ */
+export default /** @satisfies {import('../index.js').ShjLanguageData} */ ({
+	type: 'cmnt',
+	sub: [
 	{
 		type: 'err',
 		match: /\b(TODO|FIXME|DEBUG|OPTIMIZE|WARNING|XXX|BUG)\b/g
@@ -15,5 +20,4 @@ export default [
 		type: 'oper',
 		match: /\bQUESTION\b/g
 	}
-];
-export let type = 'cmnt';
+]});

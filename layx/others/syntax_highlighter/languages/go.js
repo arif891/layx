@@ -1,7 +1,15 @@
-export default [
+/**
+ * @name Go
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		match: /\/\/.*\n?|\/\*((?!\*\/)[^])*(\*\/)?/g,
+		type: 'cmnt',
 		sub: 'todo'
+	},
+	{
+		type: 'str',
+		match: /`[^`]*`?/g
 	},
 	{
 		expand: 'str'
@@ -23,6 +31,6 @@ export default [
 	},
 	{
 		type: 'oper',
-		match: /[+\-*\/%&|^~=!<>.^-]+/g
+		match: /:=|[+\-*\/%&|^~=!<>.^-]+/g
 	}
-]
+]);

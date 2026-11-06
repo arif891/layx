@@ -127,3 +127,4 @@ function bindCopyButton(btn, codeEl) {
 }
 
 export { sanitize, renderLineNumbers, buildUI, copyToClipboard, bindCopyButton };
+

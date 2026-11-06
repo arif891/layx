@@ -128,3 +128,4 @@ function tokenizeSync(src, lang, onToken, registry = {}) {
 }
 
 export { tokenizer, tokenize, tokenizeSync, expandData };
+

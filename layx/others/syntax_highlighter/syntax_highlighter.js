@@ -3,18 +3,174 @@
  * - Fast registry-free tokenizer based on speed-highlight/core
  * - Auto-detects programming languages & normalizes aliases
  * - Line numbers, header with language label & accessible copy button
- * - CSS layer-scoped theme with automatic light/dark mode adaptation
+ * - Functional and Class-based APIs matching speed-highlight & Layx conventions
  * - SSR & Node.js safe with zero runtime dependencies
  *********************************************************************/
 
-import { tokenize, tokenizeSync } from './core/tokenize.js';
-import { normalizeLang, detectLanguage } from './core/detect.js';
-import { sanitize, buildUI, bindCopyButton } from './core/dom.js';
+import { tokenizer, tokenize as tokenizeCore, tokenizeSync, expandData } from './core/tokenize.js';
+import { normalizeLang, detectLanguage, ALIASES } from './core/detect.js';
+import { sanitize, renderLineNumbers, buildUI, copyToClipboard, bindCopyButton } from './core/dom.js';
 
-class SyntaxHighlighter {
+/**
+ * Default dynamic language loader
+ * @param {string} name
+ */
+export const defaultLoader = (name) => import(`./languages/${normalizeLang(name)}.js`);
+
+let customLoader = defaultLoader;
+const languageCache = Object.create(null);
+
+/**
+ * Configure custom language loader
+ * @param {Function} loaderFn
+ */
+export function setLoader(loaderFn) {
+    customLoader = loaderFn;
+}
+
+/**
+ * Tokenize source code with registered / dynamic languages
+ * @param {string} src
+ * @param {string|Object} lang
+ * @param {Function} onToken
+ */
+export async function tokenize(src, lang, onToken) {
+    const resolved = typeof lang === 'string' ? normalizeLang(lang) : lang;
+    return tokenizeCore(src, resolved, onToken, async (name) => {
+        const norm = normalizeLang(name);
+        if (!languageCache[norm]) {
+            languageCache[norm] = await customLoader(norm);
+        }
+        return languageCache[norm];
+    });
+}
+
+/**
+ * Highlight code string and return HTML
+ * @param {string} src
+ * @param {string|Object} [lang='plain']
+ * @param {Object} [options]
+ * @returns {Promise<string>}
+ */
+export async function highlightHTML(src, lang = 'plain', options = {}) {
+    let targetLang = typeof lang === 'string' ? normalizeLang(lang) : lang;
+
+    if (targetLang === 'auto' || !targetLang) {
+        targetLang = detectLanguage(src);
+    }
+
+    let codeHtml = '';
+    await tokenize(src, targetLang, (text, type) => {
+        const safe = sanitize(text);
+        codeHtml += type ? `<span class="${type}">${safe}</span>` : safe;
+    });
+
+    const isMultiline = options.multiline !== undefined
+        ? Boolean(options.multiline)
+        : src.includes('\n');
+
+    return buildUI(codeHtml, typeof targetLang === 'string' ? targetLang : 'code', isMultiline, options);
+}
+
+/** Alias for highlightHTML */
+export const highlightText = highlightHTML;
+
+/**
+ * Highlight a specific DOM element in-place
+ * @param {HTMLElement} el
+ * @param {string} [lang]
+ * @param {Object} [options]
+ */
+export async function highlightElement(el, lang, options = {}) {
+    if (!el || typeof el.getAttribute !== 'function') return;
+
+    const rawCode = el.textContent || '';
+    const trimmedCode = rawCode.trim();
+
+    let targetLang = lang || el.dataset?.codeLang || el.dataset?.lang || resolveClassLang(el);
+    if ((targetLang === 'auto' || !targetLang) && options.autoDetect !== false) {
+        targetLang = detectLanguage(trimmedCode);
+    }
+    targetLang = normalizeLang(targetLang);
+
+    const isMultiline = options.multiline !== undefined
+        ? Boolean(options.multiline)
+        : (options.block ?? (el.tagName !== 'CODE' && trimmedCode.includes('\n')));
+
+    const mode = isMultiline ? 'multiline' : 'oneline';
+
+    el.classList.add('code-block', targetLang, mode, 'highlighted');
+    if (el.dataset) {
+        el.dataset.codeLang = targetLang;
+        el.dataset.lang = targetLang;
+    }
+
+    const html = await highlightHTML(trimmedCode, targetLang, { ...options, multiline: isMultiline });
+    el.innerHTML = html;
+
+    const btn = el.querySelector('.copy');
+    const codeEl = el.querySelector('.code');
+    if (btn && codeEl) {
+        bindCopyButton(btn, codeEl);
+    }
+}
+
+function resolveClassLang(el) {
+    if (!el.className || typeof el.className !== 'string') return null;
+    const match = el.className.match(/(?:shj-lang-|language-|lang-)([\w-]+)/);
+    return match ? match[1] : null;
+}
+
+/**
+ * Scan and highlight all matching code elements in document
+ * @param {Object|string} [options]
+ */
+export async function highlightAll(options = {}) {
+    if (typeof document === 'undefined') return [];
+
+    const sel = typeof options === 'string'
+        ? options
+        : '[data-code-lang]:not(.highlighted), [data-lang]:not(.highlighted), pre:not(.highlighted) > code:not(.highlighted), pre.code-block:not(.highlighted), [class*="shj-lang-"]:not(.highlighted), [class*="language-"]:not(.highlighted)';
+
+    const opts = typeof options === 'object' ? options : {};
+    const elements = Array.from(document.querySelectorAll(sel));
+
+    return Promise.all(elements.map(el => {
+        const target = el.tagName === 'CODE' && el.parentElement?.tagName === 'PRE' ? el.parentElement : el;
+        return highlightElement(target, undefined, opts);
+    }));
+}
+
+/**
+ * Terminal ANSI syntax highlighter
+ * @param {string} src
+ * @param {string|Object} lang
+ * @param {Object} theme
+ * @returns {Promise<string>}
+ */
+export async function highlightANSI(src, lang, theme = {}) {
+    let res = '';
+    await tokenize(src, lang, (text, token) => {
+        res += token ? `${theme[token] ?? ''}${text}\x1b[0m` : text;
+    });
+    return res;
+}
+
+/**
+ * SyntaxHighlighter Facade Class
+ */
+export class SyntaxHighlighter {
     static _instance = null;
     static detect = detectLanguage;
     static normalize = normalizeLang;
+    static highlight = highlightHTML;
+    static highlightText = highlightHTML;
+    static highlightElement = highlightElement;
+    static highlightAll = highlightAll;
+    static highlightANSI = highlightANSI;
+    static tokenize = tokenize;
+    static setLoader = setLoader;
+    static defaultLoader = defaultLoader;
 
     static getInstance() {
         if (!SyntaxHighlighter._instance) {
@@ -23,41 +179,9 @@ class SyntaxHighlighter {
         return SyntaxHighlighter._instance;
     }
 
-    /**
-     * Highlight code string and return HTML
-     * @param {string} src
-     * @param {string|Object} [lang='plain']
-     * @param {Object} [options]
-     */
-    static async highlight(src, lang, options) {
-        return SyntaxHighlighter.getInstance().highlight(src, lang, options);
-    }
-
-    /**
-     * Highlight a DOM element
-     * @param {HTMLElement} el
-     * @param {Object} [options]
-     */
-    static async highlightElement(el, options) {
-        return SyntaxHighlighter.getInstance().highlightElement(el, options);
-    }
-
-    /**
-     * Scan and highlight all matching code elements
-     * @param {string} [selector]
-     * @param {Object} [options]
-     */
-    static async highlightAll(selector, options) {
-        return SyntaxHighlighter.getInstance().highlightAll(selector, options);
-    }
-
-    /**
-     * Register a custom language definition
-     * @param {string} name
-     * @param {Object} grammar
-     */
     static register(name, grammar) {
-        return SyntaxHighlighter.getInstance().loadLanguage(name, grammar);
+        languageCache[normalizeLang(name)] = grammar;
+        return SyntaxHighlighter;
     }
 
     constructor(options = {}) {
@@ -65,7 +189,6 @@ class SyntaxHighlighter {
             return SyntaxHighlighter._instance;
         }
 
-        this._langs = Object.create(null);
         this._options = {
             lineNumbers: true,
             copyButton: true,
@@ -76,183 +199,65 @@ class SyntaxHighlighter {
 
         SyntaxHighlighter._instance = this;
 
-        // Auto-initialize when running in browser
+        // Auto-run in browser when DOM is ready
         if (typeof window !== 'undefined' && typeof document !== 'undefined') {
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => this.highlightAll(), { once: true });
+                document.addEventListener('DOMContentLoaded', () => highlightAll(this._options), { once: true });
             } else {
-                this.highlightAll();
+                highlightAll(this._options);
             }
         }
     }
 
-    /**
-     * Tokenize source code with the requested language grammar
-     * @param {string} src
-     * @param {string|Object} lang
-     * @param {Function} onToken
-     */
     async tokenize(src, lang, onToken) {
-        const resolvedName = typeof lang === 'string' ? normalizeLang(lang) : lang;
-        return tokenize(src, resolvedName, onToken, async (name) => {
-            const normalized = normalizeLang(name);
-            if (!this._langs[normalized]) {
-                this._langs[normalized] = await import(`./languages/${normalized}.js`);
-            }
-            return this._langs[normalized];
-        });
+        return tokenize(src, lang, onToken);
     }
 
-    /**
-     * Tokenize code and return HTML string with wrapped spans
-     * @param {string} src
-     * @param {string|Object} [lang='plain']
-     * @param {Object} [options]
-     */
-    async highlight(src, lang = 'plain', options = {}) {
-        const opts = { ...this._options, ...options };
-        let targetLang = typeof lang === 'string' ? normalizeLang(lang) : lang;
-
-        // Run auto-detection if language is auto or missing
-        if (targetLang === 'auto' || !targetLang) {
-            targetLang = detectLanguage(src);
-        }
-
-        let codeHtml = '';
-        await this.tokenize(src, targetLang, (text, type) => {
-            const safeText = sanitize(text);
-            codeHtml += type ? `<span class="${type}">${safeText}</span>` : safeText;
-        });
-
-        const isMultiline = opts.multiline !== undefined
-            ? Boolean(opts.multiline)
-            : src.includes('\n');
-
-        return buildUI(codeHtml, typeof targetLang === 'string' ? targetLang : 'code', isMultiline, opts);
+    async highlight(src, lang, options) {
+        return highlightHTML(src, lang, { ...this._options, ...options });
     }
 
-    /**
-     * Highlight a specific DOM element in-place
-     * @param {HTMLElement} el
-     * @param {Object} [options]
-     */
-    async highlightElement(el, options = {}) {
-        if (!el || typeof el.getAttribute !== 'function') return;
-
-        const opts = { ...this._options, ...options };
-        const rawCode = el.textContent || '';
-        const trimmedCode = rawCode.trim();
-
-        // 1. Resolve language from attributes or class
-        let lang = this._resolveLanguage(el);
-        if ((lang === 'auto' || !lang) && opts.autoDetect) {
-            lang = detectLanguage(trimmedCode);
-        }
-
-        const isMultiline = opts.multiline !== undefined
-            ? Boolean(opts.multiline)
-            : trimmedCode.includes('\n');
-
-        const mode = isMultiline ? 'multiline' : 'oneline';
-
-        // 2. Set classes and attributes
-        el.classList.add('code-block', lang, mode, 'highlighted');
-        el.dataset.codeLang = lang;
-
-        // 3. Generate HTML
-        const html = await this.highlight(trimmedCode, lang, { ...opts, multiline: isMultiline });
-        el.innerHTML = html;
-
-        // 4. Hook up copy button
-        const btn = el.querySelector('.copy');
-        const codeEl = el.querySelector('.code');
-        if (btn && codeEl) {
-            bindCopyButton(btn, codeEl);
-        }
+    async highlightText(src, lang, multiline = true, opt = {}) {
+        return highlightHTML(src, lang, { ...this._options, multiline, ...opt });
     }
 
-    /**
-     * Scan and highlight code blocks in the document
-     * @param {string} [selector='[data-code-lang]:not(.highlighted), pre > code:not(.highlighted)']
-     * @param {Object} [options]
-     */
-    async highlightAll(selector, options) {
-        if (typeof document === 'undefined') return [];
-
-        const defaultSel = '[data-code-lang]:not(.highlighted), [data-lang]:not(.highlighted), pre:not(.highlighted) > code:not(.highlighted), pre.code-block:not(.highlighted)';
-        const sel = selector || defaultSel;
-        const elements = Array.from(document.querySelectorAll(sel));
-
-        return Promise.all(elements.map(el => {
-            // If selecting a <code> inside a <pre>, highlight the <pre> container instead for proper block layout
-            const target = el.tagName === 'CODE' && el.parentElement?.tagName === 'PRE' ? el.parentElement : el;
-            return this.highlightElement(target, options);
-        }));
+    async highlightElement(el, lang, mode, opt) {
+        const isMulti = mode !== undefined ? mode === 'multiline' : undefined;
+        return highlightElement(el, lang, { ...this._options, multiline: isMulti, ...opt });
     }
 
-    /**
-     * Manually register or pre-register a language grammar
-     * @param {string} name
-     * @param {Object} grammar
-     */
+    async highlightAll(opt) {
+        return highlightAll({ ...this._options, ...(typeof opt === 'object' ? opt : {}) });
+    }
+
     loadLanguage(name, grammar) {
-        const norm = normalizeLang(name);
-        this._langs[norm] = grammar;
+        languageCache[normalizeLang(name)] = grammar;
         return this;
     }
 
-    /**
-     * Preload multiple languages in parallel
-     * @param {...string} langNames
-     */
-    async preLoadLanguages(...langNames) {
-        await Promise.all(langNames.map(async (name) => {
+    async preLoadLanguages(...names) {
+        await Promise.all(names.map(name => {
             const norm = normalizeLang(name);
-            if (this._langs[norm]) return;
-            try {
-                this._langs[norm] = await import(`./languages/${norm}.js`);
-            } catch (err) {
-                console.error(`[SyntaxHighlighter] Failed to load language: ${name}`, err);
+            if (!languageCache[norm]) {
+                return customLoader(norm).then(mod => { languageCache[norm] = mod; }).catch(() => {});
             }
         }));
         return this;
-    }
-
-    /**
-     * Resolve language identifier from element attributes and classes
-     * @param {HTMLElement} el
-     * @returns {string}
-     */
-    _resolveLanguage(el) {
-        // Explicit dataset attributes
-        const explicit = el.dataset.codeLang || el.dataset.lang;
-        if (explicit && explicit !== 'auto') {
-            return normalizeLang(explicit);
-        }
-
-        // Check element classes: language-*, lang-*, shj-lang-*
-        const classMatch = el.className.match(/\b(?:language|lang|shj-lang)-([a-zA-Z0-9_#-]+)\b/);
-        if (classMatch) {
-            return normalizeLang(classMatch[1]);
-        }
-
-        // Check child <code> if el is a <pre>
-        const childCode = el.querySelector ? el.querySelector('code') : null;
-        if (childCode) {
-            if (childCode.dataset.codeLang || childCode.dataset.lang) {
-                return normalizeLang(childCode.dataset.codeLang || childCode.dataset.lang);
-            }
-            const childMatch = childCode.className.match(/\b(?:language|lang|shj-lang)-([a-zA-Z0-9_#-]+)\b/);
-            if (childMatch) {
-                return normalizeLang(childMatch[1]);
-            }
-        }
-
-        return explicit === 'auto' ? 'auto' : 'auto';
     }
 }
 
-const defaultHighlighter = typeof window !== 'undefined' ? SyntaxHighlighter.getInstance() : null;
+export {
+    tokenizer,
+    tokenizeSync,
+    detectLanguage,
+    normalizeLang,
+    sanitize,
+    renderLineNumbers,
+    buildUI,
+    copyToClipboard,
+    bindCopyButton,
+    expandData,
+    ALIASES,
+};
 
-export { SyntaxHighlighter, tokenize, tokenizeSync, detectLanguage, normalizeLang };
-export default defaultHighlighter;
+export default SyntaxHighlighter;

@@ -1,10 +1,16 @@
+/**
+ * @name Bash
+ */
+
+/** @type {import('../index.js').ShjRule} */
 let variable = {
 	type: 'var',
 	match: /\$\w+|\${[^}]*}|\$\([^)]*\)/g
 };
 
-export default [
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
+		type: 'cmnt',
 		sub: 'todo',
 		match: /#.*/g
 	},
@@ -20,7 +26,7 @@ export default [
 	},
 	{
 		type: 'kwd',
-		match: /\s-[a-zA-Z]+|$<|[&|;]+|\b(unset|readonly|shift|export|if|fi|else|elif|while|do|done|for|until|case|esac|break|continue|exit|return|trap|wait|eval|exec|then|declare|enable|local|select|typeset|time|add|remove|install|update|delete)(?=\s|$)/g
+		match: /\s-[a-zA-Z]+|[&|;]+|\b(unset|readonly|shift|export|if|fi|else|elif|while|do|done|for|until|case|esac|break|continue|exit|return|trap|wait|eval|exec|then|declare|enable|local|select|typeset|time|add|remove|install|update|delete)(?=\s|$)/g
 	},
 	{
 		expand: 'num'
@@ -48,4 +54,4 @@ export default [
 		match: /(?<=\s|^)[\w_]+(?=\s*=)/g
 	},
 	variable
-]
+]);

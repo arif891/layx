@@ -1,97 +1,89 @@
-export default [
-	{
+/**
+ * @name JavaScript
+ * @support basic syntax, regex, jsdoc, json, template literals
+ * @detect ⛔ reported as TypeScript
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
+	{ // js objects
+		match: /(("|')((?!\2)[^\r\n\\]|\\[^])*\2|[a-zA-Z]\w*)(?=\s*:)/g
+	},
+	{ // jsdoc comments
 		match: /\/\*\*((?!\*\/)[^])*(\*\/)?/g,
+		type: 'cmnt',
 		sub: 'jsdoc'
 	},
-	{
+	{ // comments
 		match: /\/\/.*\n?|\/\*((?!\*\/)[^])*(\*\/)?/g,
+		type: 'cmnt',
 		sub: 'todo'
 	},
 	{
 		expand: 'str'
 	},
 	{
-		match: new class {
-			exec(str) {
-				let i = this.lastIndex;
-				for (; i < str.length; i++) {
-					if (str[i] === '`') {
-						let start = i, stack = 0;
-						while (++i < str.length) {
-							if (str[i] === '\\') i++;
-							else if (str[i] === '$' && str[i + 1] === '{') { stack++; i++; }
-							else if (stack > 0 && str[i] === '{') stack++;
-							else if (stack > 0 && str[i] === '}') stack--;
-							else if (stack === 0 && str[i] === '`') { i++; break; }
-						}
-						this.lastIndex = i;
-						return { index: start, 0: str.slice(start, i) };
+		match: /`((?!`)[^]|\\[^])*`?/g,
+		type: 'str',
+		sub: [
+			{
+				match: new class {
+					exec(str) {
+						let i = this.lastIndex,
+							j,
+							f = _ => {
+								while (++i < str.length - 2)
+									if (str[i] == '{') f();
+									else if (str[i] == '}') return;
+							};
+						for (; i < str.length; ++i)
+							if (str[i - 1] != '\\' && str[i] == '$' && str[i + 1] == '{') {
+								j = i++;
+								f(i);
+								this.lastIndex = i + 1;
+								return { index: j, 0: str.slice(j, i + 1) };
+							}
+						return null;
 					}
-				}
-				return null;
+				}(),
+				sub: [
+					{
+						type: 'kwd',
+						match: /^\${|}$/g
+					},
+					{
+						match: /(?!^\$|{)[^]+(?=}$)/g,
+						sub: 'js'
+					}
+				]
 			}
-		}(),
-		sub: 'js_template_literals'
-	},
-	{
-		type: 'var',
-		match: /\b(?!(?:true|false|null|undefined|NaN|Infinity|this|default)\b)[a-zA-Z_$][\w$]*\b(?=\s*:(?!\s*[:=]))/g
+		]
 	},
 	{
 		type: 'kwd',
-		match: /=>|(?<!(?<!\.)\.)(?<!\?\.)\b(this|set|get|as|async|await|break|case|catch|class|const|constructor|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|if|implements|import|in|instanceof|interface|let|var|of|new|package|private|protected|public|return|static|super|switch|throw|throws|try|typeof|void|while|with|yield)\b/g
+		// (?<![^.]\.) is "not after a lone dot", so a property named after a
+		// keyword (obj.default) is not one, while a spread (...this) still is
+		match: /=>|(?<![^.]\.)\b(this|set|get|as|async|await|break|case|catch|class|const|constructor|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|if|implements|import|in|instanceof|interface|let|var|of|new|package|private|protected|public|return|static|super|switch|throw|throws|try|typeof|void|while|with|yield)\b/g
 	},
 	{
-		type: 'bool',
-		match: /\b(true|false|NaN|null|undefined|Infinity)\b/g
-	},
-	{
-		type: 'func',
-		match: /@[\w$_.]+/g
-	},
-	{
-		type: 'func',
-		match: /[#a-zA-Z$_][\w$_]*(?=\s*(\?\.)?\s*\()/g
-	},
-	{
-		type: 'func',
-		match: /(?<![(,]\s*)\s*[#a-zA-Z$_][\w$_]*(?=\s*=\s*(\(?[\w,{}\[\]()=. ]+\)? =>|function\b))/g
-	},
-	{
-		type: 'kwd',
-		match: /\bstatic\b(?=\s*\{)/g
-	},
-	{
-		type: 'var',
-		match: /(?<!(?<!\.)\.)(?<!\?\.)(?<=\.|(?:\?\.\s*))[#a-zA-Z$_][\w$_]*/g
-	},
-	{
-		type: 'type',
-		match: /(?<=:\s*)[A-Z][\w$_]*/g
-	},
-	{
-		type: 'func',
-		match: /(?<=\.)(?:if|catch|while|for|switch|async)\b(?=\s*\()/g
-	},
-	{
-		type: 'var',
-		match: /\b[a-zA-Z$_][\w$_]*(?=\s*:(?!\s*[:=]))/g
-	},
-	{
+		// a division can only follow a value, so a slash anywhere else opens a
+		// regex, the keywords being spelled out as they too end in a word char
+		match: /(?<=[^\w$)\]'"`\s]\s*|\b(case|do|else|in|instanceof|new|of|return|throw|typeof|void|yield|await)\s+|^\s*)\/((?!\/)[^\r\n\\]|\\.)+\/\w*/gm,
 		type: 'oper',
-		match: /:/g
-	},
-	{
-		match: /(?<=(?:^|[=(,:[!&|?{};<>\+*\-\/%^~]|\b(?:case|else|do|return|throw|typeof|void|yield|await|new|in|instanceof))\s*)\/(?:\\.|\[(?:\\.|\[(?:\\.|[^\]])*\]|[^\]])*\]|(?!\/)[^\r\n\\])+\/[dgimsuyv]*/g,
 		sub: 'regex'
 	},
 	{
+		expand: 'num'
+	},
+	{
 		type: 'num',
-		match: /(0[bB][01]+(?:_[01]+)*|0[oO][0-7]+(?:_[0-7]+)*|0[xX][0-9a-fA-F]+(?:_[0-9a-fA-F]+)*|(?:\d+_)*\d+(?:\.(?:\d+_)*\d+)?(?:[eE][+-]?(?:\d+_)*\d+)?)n?/g
+		match: /\b(NaN|null|undefined|[A-Z][A-Z_]*)\b/g
+	},
+	{
+		type: 'bool',
+		match: /\b(true|false)\b/g
 	},
 	{
 		type: 'var',
-		match: /#[\w$_]+/g
+		match: /#[\w$]+/g
 	},
 	{
 		type: 'oper',
@@ -100,5 +92,9 @@ export default [
 	{
 		type: 'class',
 		match: /\b[A-Z][\w_]*\b/g
+	},
+	{
+		type: 'func',
+		match: /[a-zA-Z$_][\w$_]*(?=\s*((\?\.)?\s*\(|=\s*(\(?[\w,{}\[\])]+\)? =>|function\b)))/g
 	}
-]
+]);

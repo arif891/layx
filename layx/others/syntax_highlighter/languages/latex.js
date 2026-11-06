@@ -1,26 +1,22 @@
 export default [
   {
     type: 'kwd',
-    match: /\b(documentclass|usepackage|begin|end)\b/g
+    match: /\\(documentclass|usepackage|begin|end|section|subsection|subsubsection|paragraph|subparagraph|chapter|part|title|author|date|maketitle|tableofcontents|appendix|bibliography|bibliographystyle|cite|ref|label|pageref|include|input|newcommand|renewcommand|def)\b/g
   },
   {
     type: 'func',
-    match: /\b([a-zA-Z]+)\{/g
+    match: /\\[a-zA-Z]+/g
   },
   {
     type: 'cmnt',
     match: /%.*/g
   },
   {
-    type: 'oper',
-    match: /[+\-*\/=<>]/g
-  },
-  {
     type: 'str',
-    match: /\{[^}]*\}/g
+    match: /\$[^$]+\$|\$\$[^$]+\$\$/g
   },
   {
-    type: 'num',
-    match: /\b\d+(\.\d+)?\b/g
+    type: 'oper',
+    match: /[{}\[\]]/g
   }
 ];

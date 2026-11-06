@@ -1,8 +1,14 @@
-import diff from './diff.js'
+/**
+ * @name Git
+ * @support comment, insert, deleted, string, ...
+ */
 
-export default [
+import diff from './diff.js';
+
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		match: /^#.*/gm,
+		type: 'cmnt',
 		sub: 'todo'
 	},
 	{
@@ -17,4 +23,4 @@ export default [
 		type: 'kwd',
 		match: /^commit \w+$/gm
 	}
-]
+]);

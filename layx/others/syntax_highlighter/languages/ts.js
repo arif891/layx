@@ -1,6 +1,11 @@
-import js from './js.js'
+/**
+ * @name TypeScript
+ * @support js syntax, ts keyword, types
+ */
 
-export default [
+import js from './js.js';
+
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		type: 'type',
 		match: /:\s*(any|void|number|boolean|string|object|never|enum)\b/g
@@ -10,4 +15,4 @@ export default [
 		match: /\b(type|namespace|typedef|interface|public|private|protected|implements|declare|abstract|readonly)\b/g
 	},
 	...js
-]
+]);

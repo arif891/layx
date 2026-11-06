@@ -1,18 +1,23 @@
+/**
+ * @name JSDoc
+ */
+
 import todo from './todo.js';
 
-export default [
+export default /** @satisfies {import('../index.js').ShjLanguageData} */ ({
+	type: 'cmnt',
+	sub: [
 	{
 		type: 'kwd',
 		match: /@\w+/g
 	},
 	{
 		type: 'type',
-		match: /{(?:[^}{]|\{(?:[^}{]|\{[^}{]*\})*\})*}/g
+		match: /{[\w\s|<>,.@\[\]]+}/g
 	},
 	{
 		type: 'var',
 		match: /\[[\w\s="']+\]/g
 	},
-	...todo
-];
-export let type = 'cmnt';
+	...todo.sub
+]});

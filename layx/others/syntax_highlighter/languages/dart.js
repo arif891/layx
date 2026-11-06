@@ -12,20 +12,14 @@ export default [
     match: /\b(true|false)\b/g
   },
   {
-    type: 'num',
-    match: /\b\d+(\.\d+)?\b/g
+    expand: 'num'
   },
   {
-    type: 'str',
-    match: /'(.*?)'|"(.*?)"/g
-  },
-  {
-    type: 'cmnt',
-    match: /\/\/(.*)/g
+    expand: 'str'
   },
   {
     type: 'cmnt',
-    match: /\/\*[\s\S]*?\*\//g
+    match: /\/\/.*|\/\*[\s\S]*?\*\//g
   },
   {
     type: 'oper',
@@ -33,6 +27,6 @@ export default [
   },
   {
     type: 'func',
-    match: /\b([a-zA-Z_][a-zA-Z0-9_]*)\(/g,
+    match: /[a-zA-Z_]\w*(?=\s*\()/g
   }
 ];

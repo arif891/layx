@@ -1,38 +1,28 @@
 export default [
   {
     type: 'kwd',
-    match: /\b(import|class|struct|enum|func|let|var|if|else|for|while|return|switch|case|break|default|in|where|guard)\b/g
+    match: /\b(associatedtype|class|deinit|enum|extension|fileprivate|func|import|init|inout|internal|let|open|operator|private|precedencegroup|protocol|public|rethrows|static|struct|subscript|typealias|var|break|case|catch|continue|default|defer|do|else|fallthrough|for|guard|if|in|repeat|return|throw|switch|where|while|as|Any|catch|false|is|nil|rethrows|super|self|Self|throws|true|try|async|await|actor)\b/g
   },
   {
     type: 'type',
-    match: /\b(Int|String|Double|Float|Bool|Array|Dictionary|Set|Optional|Void|Any)\b/g
+    match: /\b(Int|Double|Float|String|Bool|Character|Optional|Array|Dictionary|Set|Void)\b/g
   },
   {
-    type: 'bool',
-    match: /\b(true|false)\b/g
+    expand: 'str'
   },
   {
-    type: 'num',
-    match: /\b\d+(\.\d+)?\b/g
-  },
-  {
-    type: 'str',
-    match: /"(.*?)"/g
+    expand: 'num'
   },
   {
     type: 'cmnt',
-    match: /\/\/(.*)/g
-  },
-  {
-    type: 'cmnt',
-    match: /\/\*[\s\S]*?\*\//g
+    match: /\/\/.*|\/\*[\s\S]*?\*\//g
   },
   {
     type: 'oper',
-    match: /(\+|-|\*|\/|=|==|!=|<|>|<=|>=|&&|\|\||!|\+=|-=|\*=|\/=)/g
+    match: /(\+|-|\*|\/|=|==|!=|<|>|<=|>=|&&|\|\||!|\+=|-=|\*=|\/=|\?\?|\?)/g
   },
   {
     type: 'func',
-    match: /\b([a-zA-Z_][a-zA-Z0-9_]*)\(/g,
+    match: /[a-zA-Z_]\w*(?=\s*\()/g
   }
 ];

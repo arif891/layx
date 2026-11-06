@@ -1,30 +1,32 @@
 export default [
   {
     type: 'kwd',
-    match: /\b(using|namespace|class|public|static|void|string|int|bool|if|else|for|foreach|while|return|new|try|catch|finally|throw)\b/g
+    match: /\b(abstract|as|base|break|case|catch|checked|class|const|continue|default|delegate|do|else|enum|event|explicit|extern|finally|fixed|for|foreach|goto|if|implicit|in|interface|internal|is|lock|namespace|new|operator|out|override|params|private|protected|public|readonly|ref|return|sealed|sizeof|stackalloc|static|struct|switch|this|throw|try|typeof|unchecked|unsafe|using|virtual|void|volatile|while|add|alias|ascending|async|await|by|descending|dynamic|equals|from|get|global|group|into|join|let|nameof|not|notnull|on|orderby|partial|record|remove|select|set|unmanaged|value|var|when|where|with|yield)\b/g
   },
   {
     type: 'type',
-    match: /\b(Console|WriteLine|List|Dictionary|Exception|Task|Thread)\b/g
+    match: /\b(bool|byte|sbyte|char|decimal|double|float|int|uint|nint|nuint|long|ulong|short|ushort|object|string)\b/g
   },
   {
-    type: 'str',
-    match: /"(?:\\.|[^"])*"/g
+    type: 'bool',
+    match: /\b(true|false|null)\b/g
   },
   {
-    type: 'num',
-    match: /\b\d+(\.\d+)?\b/g
+    expand: 'str'
+  },
+  {
+    expand: 'num'
   },
   {
     type: 'cmnt',
-    match: /\/\/.*/g
-  },
-  {
-    type: 'cmnt',
-    match: /\/\*[\s\S]*?\*\//g
+    match: /\/\/.*|\/\*[\s\S]*?\*\//g
   },
   {
     type: 'oper',
-    match: /(\+|-|\*|\/|=|==|!=|<|>|<=|>=|&&|\|\||\?|:)/g
+    match: /(\+|-|\*|\/|=|==|!=|<|>|<=|>=|&&|\|\||!|\+=|-=|\*=|\/=|\?\?|\?)/g
+  },
+  {
+    type: 'func',
+    match: /[a-zA-Z_]\w*(?=\s*\()/g
   }
 ];

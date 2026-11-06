@@ -1,4 +1,7 @@
-export default [
+/**
+ * @name Assembly
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		type: 'cmnt',
 		match: /(;|#).*/gm
@@ -29,10 +32,10 @@ export default [
 	{
 		// instruction (ex: "mov")
 		type: 'kwd',
-		match: /^\t*[a-z][a-z\d]*\b/gm,
+		match: /^[ \t]*[a-z][a-z\d]*\b/gm,
 	},
 	{
 		match: /%|\$/g,
 		type: 'oper'
 	}
-]
+]);

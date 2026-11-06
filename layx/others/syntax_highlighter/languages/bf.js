@@ -1,6 +1,11 @@
-export default [
+/**
+ * @name Brainfuck
+ * @support increment, operator, print, comment
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
-		match: /[^\[\->+.<\]\s].*/g,
+		match: /[^,\[\->+.<\]\s].*/g,
+		type: 'cmnt',
 		sub: 'todo'
 	},
 	{
@@ -15,4 +20,4 @@ export default [
 		type: 'oper',
 		match: /[+-]+/g
 	}
-]
+]);

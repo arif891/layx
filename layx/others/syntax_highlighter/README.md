@@ -1,18 +1,19 @@
 # LayX Syntax Highlighter (`syntax_highlighter`)
 
-A high-performance, client-side syntax highlighter for multi-language code blocks, based on the lightweight architecture of [speed-highlight/core](https://github.com/speed-highlight/core).
+A high-performance, client-side and SSR syntax highlighter for multi-language code blocks, based on the lightweight architecture of [speed-highlight/core](https://github.com/speed-highlight/core).
 
 ---
 
 ## ✨ Features
 
-- **Fast Registry-Free Tokenizer**: Uses generator-based token streaming for minimal memory footprint and fast rendering.
-- **Language Auto-Detection**: Automatically identifies languages (`python`, `js`, `html`, `css`, `sql`, etc.) using heuristic scoring.
-- **Alias Normalization**: Supports common aliases out of the box (`javascript` $\rightarrow$ `js`, `python` $\rightarrow$ `py`, `c++` $\rightarrow$ `cpp`, `shell` $\rightarrow$ `bash`).
-- **Accessible Copy Button**: Copy-to-clipboard with visual feedback and screen-reader `aria-label` announcements.
-- **Line Numbers**: Counter-based gutter lines that adapt dynamically to line wraps.
+- **Fast Registry-Free Tokenizer**: Uses generator-based token streaming (`tokenize`, `tokenizer`) for minimal memory footprint and instant rendering.
+- **Up-to-Date Grammars**: Bundles 35+ clean, modern language definitions with full support for template literals, comments, docstrings, and nested grammars.
+- **Dual API**: Use functional `speed-highlight/core`-style functions (`highlightHTML`, `highlightElement`, `highlightAll`, `highlightANSI`) or the object/class facade (`SyntaxHighlighter`).
+- **Language Auto-Detection**: Automatically identifies languages (`python`, `js`, `html`, `css`, `sql`, `bash`, `json`, etc.) using heuristic scoring.
+- **Alias Normalization**: Normalizes aliases out of the box (`javascript` → `js`, `python` → `py`, `c++` → `cpp`, `shell` → `bash`).
+- **Accessible UI**: Built-in line numbers, language header badge, and copy-to-clipboard button with screen-reader accessible attributes and feedback.
 - **CSS `light-dark()` Theming**: Automatically adapts syntax tokens to the active LayX theme without duplicating stylesheet rules.
-- **SSR & Node.js Safe**: Gracefully handles server-side environments.
+- **SSR & Node.js Safe**: Gracefully handles server-side environments without throwing.
 
 ---
 
@@ -20,7 +21,7 @@ A high-performance, client-side syntax highlighter for multi-language code block
 
 ### 1. HTML Markup
 
-Add `data-code-lang` or standard markdown `class="language-*"` to your code blocks:
+Add `data-code-lang`, `data-lang`, or standard `class="language-*"` / `class="shj-lang-*"`:
 
 ```html
 <!-- Explicit language via data attribute -->
@@ -41,7 +42,7 @@ SELECT id, name, email FROM users WHERE active = 1;
 </pre>
 ```
 
-Include the CSS and script:
+Include CSS and script:
 
 ```html
 <link rel="stylesheet" href="syntax_highlighter.css">
@@ -52,57 +53,48 @@ Include the CSS and script:
 
 ## 💻 Programmatic API
 
-```javascript
-import { SyntaxHighlighter } from './layx/others/syntax_highlighter/syntax_highlighter.js';
+### Functional (speed-highlight compatible)
 
-// 1. Highlight a code string directly
-const html = await SyntaxHighlighter.highlight(`const count = 42;`, 'js');
+```javascript
+import {
+  highlightHTML,
+  highlightElement,
+  highlightAll,
+  highlightANSI,
+  tokenize,
+  detectLanguage,
+  setLoader
+} from './layx/others/syntax_highlighter/syntax_highlighter.js';
+
+// 1. Highlight code string to HTML
+const html = await highlightHTML('const x = 42;', 'js');
 
 // 2. Highlight a specific DOM element
-const codeElement = document.querySelector('#my-snippet');
-await SyntaxHighlighter.highlightElement(codeElement);
+await highlightElement(document.querySelector('#my-code'), 'py');
 
-// 3. Highlight all matching elements
-await SyntaxHighlighter.highlightAll('.code-snippet');
+// 3. Highlight all matching blocks on the page
+await highlightAll();
 
-// 4. Auto-detect code language
-const lang = SyntaxHighlighter.detect(`def add(a, b): return a + b`); // 'py'
+// 4. Highlight for terminal output (ANSI)
+const ansi = await highlightANSI('console.log("hi")', 'js', { kwd: '\x1b[35m' });
 
-// 5. Register custom language grammar
-SyntaxHighlighter.register('my-lang', [
-    { match: /\b(foo|bar|baz)\b/g, type: 'kwd' },
-    { expand: 'str' },
-    { expand: 'num' }
-]);
+// 5. Detect code language
+const lang = detectLanguage('SELECT * FROM users'); // -> "sql"
 ```
 
----
-
-## ⚙️ Options
+### Class / Facade API
 
 ```javascript
-await SyntaxHighlighter.highlightAll(null, {
-    lineNumbers: true,   // Display line numbering gutter (default: true)
-    copyButton: true,    // Include copy to clipboard button (default: true)
-    header: true,        // Show language badge header (default: true)
-    autoDetect: true,    // Auto-detect language if unspecified (default: true)
-    multiline: true      // Force multiline layout (auto-determined if omitted)
-});
+import SyntaxHighlighter from './layx/others/syntax_highlighter/syntax_highlighter.js';
+
+// Static methods
+const html = await SyntaxHighlighter.highlight(`const count = 42;`, 'js');
+await SyntaxHighlighter.highlightAll();
+
+// Custom grammar registration
+SyntaxHighlighter.register('my-dsl', [
+  { match: /\b(rule|when|then)\b/g, type: 'kwd' },
+  { expand: 'str' },
+  { expand: 'num' },
+]);
 ```
-
----
-
-## 🎨 Token Styling Classes
-
-| Class | Highlighted Token |
-| :--- | :--- |
-| `.kwd` | Keywords (`const`, `function`, `if`, `class`, `import`) |
-| `.num` | Numbers (`42`, `3.14`, `0xff`) |
-| `.str` | Strings (`"hello"`, `'world'`) |
-| `.bool` | Booleans and nulls (`true`, `false`, `null`, `undefined`) |
-| `.type` | Types and interfaces (`string`, `number`, `Promise`) |
-| `.func` | Function names and calls |
-| `.cmnt` | Comments (`//`, `/* */`, `#`) |
-| `.oper` | Operators (`+`, `-`, `=`, `=>`) |
-| `.var` | Variables and identifiers |
-| `.class` | Class names |

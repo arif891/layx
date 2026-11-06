@@ -1,7 +1,11 @@
-import md from './md.js'
-import { detectLanguage } from '../helper/language_detector.js'
+/**
+ * @name LeanPub Markdown
+ */
 
-export default [
+import { detectLanguage } from '../detect.js';
+import md from './md.js';
+
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		type: 'insert',
 		match: /(leanpub-start-insert)((?!leanpub-end-insert)[^])*(leanpub-end-insert)?/g,
@@ -31,4 +35,4 @@ export default [
 		]
 	},
 	...md
-]
+]);

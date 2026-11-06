@@ -1,5 +1,2 @@
-import c from './c.js'
-
-export default [
-	...c
-]
+import c from './c.js';
+export default c;

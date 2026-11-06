@@ -12,27 +12,21 @@ export default [
     match: /\$\w+\b/g
   },
   {
-    type: 'str',
-    match: /"(?:\\.|[^"])*"|'(?:\\.|[^'])*'/g
+    expand: 'str'
   },
   {
-    type: 'num',
-    match: /\b\d+(\.\d+)?\b/g
-  },
-  {
-    type: 'cmnt',
-    match: /\/\/.*/g
+    expand: 'num'
   },
   {
     type: 'cmnt',
-    match: /\/\*[\s\S]*?\*\//g
-  },
-  {
-    type: 'cmnt',
-    match: /#.*/g
+    match: /\/\/.*|\/\*[\s\S]*?\*\/|#.*/g
   },
   {
     type: 'oper',
     match: /(\+|-|\*|\/|=|==|!=|<|>|<=|>=|&&|\|\||\?|:|\.|\->)/g
+  },
+  {
+    type: 'func',
+    match: /[a-zA-Z_]\w*(?=\s*\()/g
   }
 ];

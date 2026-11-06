@@ -1,7 +1,16 @@
-export default [
+/**
+ * @name Rust
+ */
+export default /** @satisfies {import('../index.js').ShjGrammar} */ ([
 	{
 		match: /\/\/.*\n?|\/\*((?!\*\/)[^])*(\*\/)?/g,
+		type: 'cmnt',
 		sub: 'todo'
+	},
+	{
+		// lifetime (ex: "'a")
+		type: 'type',
+		match: /'[a-z_]\w*(?!')/g
 	},
 	{
 		expand: 'str'
@@ -25,4 +34,4 @@ export default [
 		type: 'func',
 		match: /[a-zA-Z_][\w_]*(?=\s*!?\s*\()/g
 	}
-]
+]);

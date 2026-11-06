@@ -4,50 +4,112 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
+        <title>Theme Demo – LayX</title>
 
+        <link rel="stylesheet" href="../../main/base/variable.css">
+        <link rel="stylesheet" href="../../main/base/base.css">
+        <link rel="stylesheet" href="../../main/typography/typography.css">
+        <link rel="stylesheet" href="../../main/container/container.css">
         <link rel="stylesheet" href="theme.css">
-
-        <link rel="stylesheet" href="/layx/main/base/variable.css">
-        <link rel="stylesheet" href="/layx/main/base/base.css">
-        <link rel="stylesheet" href="/layx/main/typography/typography.css">
-        <link rel="stylesheet" href="/layx/main/container/container.css">
-        <link rel="stylesheet" href="/layx/components/button/button.css"> 
 
         <style>
             body {
-                transition: background-color .3s;
+                transition: background-color .3s, color .3s;
+                padding: 2.5rem 1.5rem;
+                font-family: var(--font-family, -apple-system, sans-serif);
+                background-color: var(--bg-color, #fff);
+                color: var(--color, #000);
+            }
+
+            .theme-card {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+                max-width: 520px;
+                margin: 0 auto;
+                padding: 1.75rem;
+                border: 1px solid rgba(125, 125, 125, 0.2);
+                border-radius: var(--radius, 8px);
+                background-color: var(--surface-color, #f8fafc);
+            }
+
+            h2 {
+                margin: 0;
+                font-size: 1.4rem;
+                font-weight: 700;
+            }
+
+            p {
+                margin: 0;
+                font-size: 0.95rem;
+                line-height: 1.5;
+                opacity: 0.85;
+            }
+
+            .button-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.6rem;
             }
 
             button {
-                margin: 5px;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                font-weight: 500;
+                cursor: pointer;
+                border: 1px solid rgba(125, 125, 125, 0.25);
+                border-radius: 6px;
+                background-color: var(--bg-color, #fff);
+                color: var(--color, #000);
+                transition: background-color 0.15s, border-color 0.15s;
             }
 
-            button[data-theme-set] {
-                display: inline-flex;
-                gap: .5rem;
+            button:hover {
+                border-color: rgba(125, 125, 125, 0.5);
+            }
+
+            button.active {
+                border-color: var(--link-color, #2da5e6);
+                outline: 2px solid var(--accent-color, #bae7ff);
+                font-weight: 600;
+            }
+
+            .theme-info {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.9rem;
+                padding-top: 0.5rem;
+                border-top: 1px solid rgba(125, 125, 125, 0.15);
             }
         </style>
     </head>
 
-
     <body>
+        <div class="theme-card">
+            <h2>LayX Theme Switcher</h2>
+            <p>Automatic light, dark, and system preference switching powered by native CSS <code>light-dark()</code> and optional View Transitions.</p>
 
-        <container class="__container">
-            <button data-theme-toggle class="theme-toggler">Toggle Theme</button>
+            <div class="button-group">
+                <button data-theme-toggle class="theme-toggler">Toggle Theme</button>
+            </div>
 
-            <div class="wrapper">
+            <div class="button-group">
                 <button data-theme-set="light">Light</button>
                 <button data-theme-set="dark">Dark</button>
                 <button data-theme-set="auto">Auto</button>
             </div>
 
-            <p>Theme Update: <span data-theme-update class="theme-update"></span></p>
-        </container>
+            <div class="theme-info">
+                <span>Current mode:</span>
+                <span data-theme-update data-theme-text class="theme-update"></span>
+            </div>
+        </div>
 
-        <script type="module">
-            import './theme.js';
-        </script>
+        <script src="theme.js" type="module"></script>
     </body>
 
 </html>

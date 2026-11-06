@@ -125,4 +125,30 @@ describe('Component Addition Engine (layx add -c / -o)', () => {
         const trackerJs = path.join(testProjectPath, 'layx/others/mouse_tracker/mouse_tracker.js');
         assert.ok(existsSync(trackerJs), 'mouse_tracker.js should exist in project');
     });
+
+    test('matches font family by spaced name and kebab-case name', async () => {
+        const { searchFont } = await import('../src/commands/add/font.js');
+        const fontInfoPath = path.resolve('src/info/font_info_GF.json');
+        const fontData = JSON.parse(await fs.readFile(fontInfoPath, 'utf8'));
+
+        const resultSpaced = searchFont(fontData, 'Red Hat Display');
+        const resultKebab = searchFont(fontData, 'red-hat-display');
+
+        assert.strictEqual(resultSpaced.found, true);
+        assert.strictEqual(resultSpaced.family, 'Red Hat Display');
+
+        assert.strictEqual(resultKebab.found, true);
+        assert.strictEqual(resultKebab.family, 'Red Hat Display');
+
+        // Test exact match prioritization with literal hyphen in font family
+        const mockFontData = {
+            items: [
+                { family: 'Special-Font' },
+                { family: 'Special Font' }
+            ]
+        };
+        const exactHyphenResult = searchFont(mockFontData, 'Special-Font');
+        assert.strictEqual(exactHyphenResult.found, true);
+        assert.strictEqual(exactHyphenResult.family, 'Special-Font');
+    });
 });

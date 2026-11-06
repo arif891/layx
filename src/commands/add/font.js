@@ -4,7 +4,7 @@ import { ensureDirectoryExists, readFile, writeFile } from '../../utils/fs.js';
 import { downloadFile } from '../../utils/download.js';
 import { projectPaths, packagePaths } from '../../core/paths.js';
 
-export { fontAdd };
+export { fontAdd, searchFont, normalizeFontName };
 
 async function fontAdd(fonts) {
     try {
@@ -22,7 +22,7 @@ async function fontAdd(fonts) {
 }
 
 async function processFontFamily(fontName, fontInfoObj) {
-    const result = searchFont(fontInfoObj, fontName.toLowerCase());
+    const result = searchFont(fontInfoObj, fontName);
 
     if (!result.found) {
         console.warn(result.message);
@@ -73,9 +73,17 @@ async function processFontFamily(fontName, fontInfoObj) {
     }
 }
 
+function normalizeFontName(name = '') {
+    return name.toLowerCase().replace(/[-_\s]+/g, ' ').trim();
+}
+
 function findFontByFamily(fontsData, familyName) {
-    const searchName = familyName.toLowerCase();
-    return fontsData.items?.find(font => font.family.toLowerCase() === searchName);
+    const rawLower = familyName.toLowerCase();
+    const exactMatch = fontsData.items?.find(font => font.family.toLowerCase() === rawLower);
+    if (exactMatch) return exactMatch;
+
+    const searchName = normalizeFontName(familyName);
+    return fontsData.items?.find(font => normalizeFontName(font.family) === searchName);
 }
 
 function searchFont(fontsData, familyName) {

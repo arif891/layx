@@ -251,3 +251,4 @@ await db.deleteDatabase();
 | `store.bulkDelete(keys)` | Batch delete in a single transaction |
 | `store.index(name)` | Accesses a secondary index |
 | `store.entries()` | Async generator yielding `[key, value]` pairs |
+

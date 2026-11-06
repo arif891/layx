@@ -1,235 +1,287 @@
+/*********************************************************************
+ * IDB – Modern, Promise-based IndexedDB Engine for LayX
+ * - Declarative schema & seamless version migrations
+ * - Atomic transaction runner with auto-commit/rollback
+ * - Bound store handles with clean get/set/delete/count/getAll
+ * - Built-in Range helpers and async iterator support
+ * - Plug-and-play IDB.kv default key-value store
+ * - SSR safe with zero runtime dependencies
+ *********************************************************************/
+
+import { Range } from './core/range.js';
+import { runTransaction, promisifyRequest } from './core/transaction.js';
+import { StoreHandle, IndexHandle } from './core/store.js';
+
 class IDB {
-    constructor(dbName, version = 1, upgradeCallback) {
-        this.dbName = dbName;
-        this.version = version;
-        this.upgradeCallback = upgradeCallback;
-        this.db = null;
-        this.openPromise = null;
+    static range = Range;
+
+    /**
+     * Built-in default key-value store for instant plug-and-play persistence
+     */
+    static get kv() {
+        if (!IDB._defaultKv) {
+            const db = new IDB('_layx_kv', {
+                version: 1,
+                stores: {
+                    keyval: {},
+                },
+            });
+            const store = db.store('keyval');
+            IDB._defaultKv = {
+                get: (key) => store.get(key),
+                set: (key, val) => store.set(key, val),
+                delete: (key) => store.delete(key),
+                clear: () => store.clear(),
+                has: (key) => store.has(key),
+                count: () => store.count(),
+                keys: () => store.getAllKeys(),
+                values: () => store.getAll(),
+                entries: async () => {
+                    const keys = await store.getAllKeys();
+                    const values = await store.getAll();
+                    return keys.map((k, i) => [k, values[i]]);
+                },
+            };
+        }
+        return IDB._defaultKv;
     }
 
+    /**
+     * Quick static helper to open a database
+     * @param {string} name
+     * @param {Object} [options]
+     */
+    static async open(name, options) {
+        const db = new IDB(name, options);
+        await db.open();
+        return db;
+    }
+
+    /**
+     * @param {string} [name='app-db']
+     * @param {Object|number} [optionsOrVersion=1]
+     * @param {Function} [legacyUpgradeCallback]
+     */
+    constructor(name = 'app-db', optionsOrVersion = 1, legacyUpgradeCallback) {
+        this.name = name;
+        this.db = null;
+        this._openPromise = null;
+        this._storeCache = new Map();
+
+        if (typeof optionsOrVersion === 'object' && optionsOrVersion !== null) {
+            this.version = optionsOrVersion.version || 1;
+            this.stores = optionsOrVersion.stores || null;
+            this.upgradeCallback = optionsOrVersion.upgrade || null;
+            this.onBlocked = optionsOrVersion.onBlocked || null;
+            this.onVersionChange = optionsOrVersion.onVersionChange || null;
+        } else {
+            this.version = Number(optionsOrVersion) || 1;
+            this.stores = null;
+            this.upgradeCallback = legacyUpgradeCallback || null;
+            this.onBlocked = null;
+            this.onVersionChange = null;
+        }
+    }
+
+    /**
+     * Open the database connection
+     * @returns {Promise<IDBDatabase>}
+     */
     async open() {
         if (this.db) return this.db;
-        if (this.openPromise) return this.openPromise;
+        if (this._openPromise) return this._openPromise;
 
-        this.openPromise = new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.dbName, this.version);
+        if (typeof indexedDB === 'undefined') {
+            return Promise.reject(new Error('[IDB] IndexedDB is not supported in this environment'));
+        }
+
+        this._openPromise = new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.name, this.version);
 
             request.onupgradeneeded = (event) => {
-                this.db = event.target.result;
-                if (this.upgradeCallback) {
-                    this.upgradeCallback(this.db, event.oldVersion, event.newVersion);
+                const db = event.target.result;
+                const tx = event.target.transaction;
+                this.db = db;
+
+                // 1. Declarative schema creation
+                if (this.stores && typeof this.stores === 'object') {
+                    for (const [storeName, config] of Object.entries(this.stores)) {
+                        let store;
+                        if (!db.objectStoreNames.contains(storeName)) {
+                            const params = {};
+                            if (config.keyPath) params.keyPath = config.keyPath;
+                            if (config.autoIncrement !== undefined) params.autoIncrement = config.autoIncrement;
+                            store = db.createObjectStore(storeName, params);
+                        } else {
+                            store = tx.objectStore(storeName);
+                        }
+
+                        // Create indexes if specified
+                        if (Array.isArray(config.indexes)) {
+                            config.indexes.forEach((idx) => {
+                                const idxName = typeof idx === 'string' ? idx : idx.name;
+                                const keyPath = typeof idx === 'string' ? idx : idx.keyPath || idx.name;
+                                const unique = typeof idx === 'object' ? Boolean(idx.unique) : false;
+                                const multiEntry = typeof idx === 'object' ? Boolean(idx.multiEntry) : false;
+
+                                if (!store.indexNames.contains(idxName)) {
+                                    store.createIndex(idxName, keyPath, { unique, multiEntry });
+                                }
+                            });
+                        }
+                    }
+                }
+
+                // 2. Custom upgrade callback
+                if (typeof this.upgradeCallback === 'function') {
+                    this.upgradeCallback(db, event.oldVersion, event.newVersion, tx);
                 }
             };
 
             request.onsuccess = (event) => {
                 this.db = event.target.result;
+                this._openPromise = null;
+
+                // Handle multi-tab version changes to prevent lockups
+                this.db.onversionchange = () => {
+                    if (typeof this.onVersionChange === 'function') {
+                        this.onVersionChange(this);
+                    } else {
+                        this.close();
+                    }
+                };
+
                 resolve(this.db);
-                this.openPromise = null;
             };
 
             request.onerror = (event) => {
-                reject(new Error(`Error opening database: ${event.target.error.message}`));
-                this.openPromise = null;
+                this._openPromise = null;
+                const err = event.target.error || new Error('Failed to open database');
+                reject(err);
+            };
+
+            request.onblocked = (event) => {
+                if (typeof this.onBlocked === 'function') {
+                    this.onBlocked(event);
+                } else {
+                    console.warn(`[IDB] Database "${this.name}" open blocked by open tabs.`);
+                }
             };
         });
 
-        return this.openPromise;
+        return this._openPromise;
     }
 
-    async transaction(storeNames, mode = "readonly") {
+    /**
+     * Get a bound Store handle
+     * @param {string} storeName
+     * @returns {StoreHandle}
+     */
+    store(storeName) {
+        if (!this._storeCache.has(storeName)) {
+            this._storeCache.set(storeName, new StoreHandle(storeName, { db: this }));
+        }
+        return this._storeCache.get(storeName);
+    }
+
+    /**
+     * Run an atomic multi-store transaction with automatic commit / rollback
+     * @param {string|string[]} storeNames
+     * @param {'readonly'|'readwrite'} [mode='readwrite']
+     * @param {Function} callback
+     * @returns {Promise<any>}
+     */
+    async tx(storeNames, mode = 'readwrite', callback) {
         const db = await this.open();
-        return db.transaction(storeNames, mode);
+        return runTransaction(db, storeNames, mode, callback, (rawStore, tx) => {
+            return new StoreHandle(rawStore.name, { rawStore, tx });
+        });
     }
 
-    async store(storeName, mode = "readonly") {
-        const tx = await this.transaction(storeName, mode);
-        return tx.objectStore(storeName);
+    // ── Direct Store Shortcuts ────────────────────────────────────────────────
+
+    async get(storeName, key) {
+        return this.store(storeName).get(key);
     }
 
-    async add(storeName, value, key) {
-        try {
-            const store = await this.store(storeName, "readwrite");
-            return await this.request(store.add(value, key));
-        } catch (error) {
-            throw new Error(`Add operation failed: ${error.message}`);
-        }
-    }
-
-    async get(storeName, keyOrIndex, key) {
-        this.validateStoreName(storeName);
-        this.validateKey(keyOrIndex);
-        try {
-            const store = await this.store(storeName);
-            const request = key !== undefined ? store.index(keyOrIndex).get(key) : store.get(keyOrIndex);
-            return await this.request(request);
-        } catch (error) {
-            throw new Error(`Get operation failed: ${error.message}`);
-        }
-    }
-
-    async getAll(storeName, query) {
-        try {
-            const store = await this.store(storeName);
-            const results = [];
-            return new Promise((resolve, reject) => {
-                const request = query ? store.openCursor(query) : store.openCursor();
-
-                request.onsuccess = (event) => {
-                    const cursor = event.target.result;
-                    if (cursor) {
-                        results.push(cursor.value);
-                        cursor.continue();
-                    } else {
-                        resolve(results);
-                    }
-                };
-
-                request.onerror = (event) => reject(new Error(`GetAll operation failed: ${event.target.error.message}`));
-            });
-        } catch (error) {
-            throw new Error(`GetAll operation failed: ${error.message}`);
-        }
-    }
-
-    async forEach(storeName, query, callback) {
-        try {
-            const store = await this.store(storeName);
-            return new Promise((resolve, reject) => {
-                const request = query ? store.openCursor(query) : store.openCursor();
-
-                request.onsuccess = async (event) => {
-                    const cursor = event.target.result;
-                    if (cursor) {
-                        await callback(cursor.value, cursor);
-                        cursor.continue();
-                    } else {
-                        resolve();
-                    }
-                };
-
-                request.onerror = (event) => reject(new Error(`ForEach operation failed: ${event.target.error.message}`));
-            });
-        } catch (error) {
-            throw new Error(`ForEach operation failed: ${error.message}`);
-        }
+    async set(storeName, keyOrValue, value) {
+        return this.store(storeName).set(keyOrValue, value);
     }
 
     async put(storeName, value, key) {
-        this.validateStoreName(storeName);
-        if (!value) {
-            throw new Error('No value provided for put operation');
-        }
-        try {
-            const store = await this.store(storeName, "readwrite");
-            return await this.request(store.put(value, key));
-        } catch (error) {
-            throw new Error(`Put operation failed: ${error.message}`);
-        }
+        return this.store(storeName).put(value, key);
+    }
+
+    async add(storeName, value, key) {
+        return this.store(storeName).add(value, key);
     }
 
     async delete(storeName, key) {
-        try {
-            const store = await this.store(storeName, "readwrite");
-            return await this.request(store.delete(key));
-        } catch (error) {
-            throw new Error(`Delete operation failed: ${error.message}`);
-        }
+        return this.store(storeName).delete(key);
     }
 
     async clear(storeName) {
-        try {
-            const store = await this.store(storeName, "readwrite");
-            return await this.request(store.clear());
-        } catch (error) {
-            throw new Error(`Clear operation failed: ${error.message}`);
-        }
+        return this.store(storeName).clear();
     }
 
     async count(storeName, query) {
-        try {
-            const store = await this.store(storeName);
-            return await this.request(store.count(query));
-        } catch (error) {
-            throw new Error(`Count operation failed: ${error.message}`);
-        }
+        return this.store(storeName).count(query);
     }
 
-    async getByIndex(storeName, indexName, value) {
-        try {
-            const store = await this.store(storeName);
-            const index = store.index(indexName);
-            return await this.request(index.get(value));
-        } catch (error) {
-            throw new Error(`GetByIndex operation failed: ${error.message}`);
-        }
+    async getAll(storeName, options) {
+        return this.store(storeName).getAll(options);
     }
 
-    async getAllByIndex(storeName, indexName, value) {
-        try {
-            const store = await this.store(storeName);
-            const index = store.index(indexName);
-            return await this.request(index.getAll(value));
-        } catch (error) {
-            throw new Error(`GetAllByIndex operation failed: ${error.message}`);
-        }
+    async bulkPut(storeName, items, keys) {
+        return this.store(storeName).bulkPut(items, keys);
     }
 
-    async bulkAdd(storeName, items) {
-        try {
-            const store = await this.store(storeName, "readwrite");
-            const promises = items.map(item => this.request(store.add(item)));
-            return await Promise.all(promises);
-        } catch (error) {
-            throw new Error(`BulkAdd operation failed: ${error.message}`);
-        }
+    async bulkAdd(storeName, items, keys) {
+        return this.store(storeName).bulkAdd(items, keys);
     }
 
-    async bulkPut(storeName, items) {
-        try {
-            const store = await this.store(storeName, "readwrite");
-            const promises = items.map(item => this.request(store.put(item)));
-            return await Promise.all(promises);
-        } catch (error) {
-            throw new Error(`BulkPut operation failed: ${error.message}`);
-        }
+    async bulkDelete(storeName, keys) {
+        return this.store(storeName).bulkDelete(keys);
     }
 
-    validateKey(key) {
-        if (!key && key !== 0) {
-            throw new Error('Invalid key provided');
-        }
+    async forEach(storeName, query, callback) {
+        const cb = typeof query === 'function' ? query : callback;
+        const q = typeof query === 'function' ? undefined : query;
+        return this.store(storeName).iterate(q, cb);
     }
 
-    validateStoreName(storeName) {
-        if (!storeName || typeof storeName !== 'string') {
-            throw new Error('Invalid store name provided');
-        }
-    }
+    // ── Management ────────────────────────────────────────────────────────────
 
+    /**
+     * Close the database connection
+     */
     close() {
         if (this.db) {
             this.db.close();
             this.db = null;
-            this.openPromise = null;
         }
+        this._openPromise = null;
+        this._storeCache.clear();
     }
 
+    /**
+     * Delete the entire database
+     * @returns {Promise<void>}
+     */
     async deleteDatabase() {
         this.close();
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.deleteDatabase(this.dbName);
-            request.onsuccess = resolve;
-            request.onerror = (event) => reject(new Error(`DeleteDatabase operation failed: ${event.target.error.message}`));
-        });
-    }
+        if (typeof indexedDB === 'undefined') {
+            return Promise.reject(new Error('[IDB] IndexedDB is not supported in this environment'));
+        }
 
-    // Utility function for handling indexedDB requests
-    request(request) {
         return new Promise((resolve, reject) => {
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = (event) => reject(new Error(event.target.error.message));
+            const request = indexedDB.deleteDatabase(this.name);
+            request.onsuccess = () => resolve();
+            request.onerror = (e) => reject(e.target.error || new Error('Failed to delete database'));
+            request.onblocked = () => console.warn(`[IDB] Database "${this.name}" deletion blocked.`);
         });
     }
 }
 
-export { IDB };
+export { IDB, Range, StoreHandle, IndexHandle };
+export default IDB;

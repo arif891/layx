@@ -72,4 +72,33 @@ describe('Build and Unbuild Lifecycle', () => {
         assert.doesNotMatch(bundledCss, /\.x-11\{/);
         assert.doesNotMatch(bundledCss, /\.x-lg-9\{/);
     });
+
+    test('build purges unused symbols from icons.svg and unbuild restores them', async () => {
+        // Reset back to unbuilt state first
+        await execFileAsync('node', [cliPath, 'unbuild'], { cwd: testProjectPath });
+
+        // Add sun-fill icon usage to index.html
+        const indexPath = path.join(testProjectPath, 'index.html');
+        let html = await fs.readFile(indexPath, 'utf8');
+        html = html.replace('<body>', '<body>\n<svg class="icon"><use href="/assets/image/svg/icons.svg#sun-fill" /></svg>');
+        await fs.writeFile(indexPath, html, 'utf8');
+
+        // Run build
+        const { stdout: buildOut } = await execFileAsync('node', [cliPath, 'build'], { cwd: testProjectPath });
+        assert.match(buildOut, /Purged \d+ unused symbol/);
+
+        // Read built icons.svg
+        const svgPath = path.join(testProjectPath, 'assets/image/svg/icons.svg');
+        const builtSvg = await fs.readFile(svgPath, 'utf8');
+        assert.match(builtSvg, /id="sun-fill"/, 'Used sun-fill symbol must be retained');
+        assert.doesNotMatch(builtSvg, /id="id"/, 'Unused id placeholder symbols must be purged');
+
+        // Run unbuild
+        await execFileAsync('node', [cliPath, 'unbuild'], { cwd: testProjectPath });
+
+        // Read restored icons.svg
+        const restoredSvg = await fs.readFile(svgPath, 'utf8');
+        assert.match(restoredSvg, /id="sun-fill"/, 'Restored SVG should have sun-fill');
+        assert.match(restoredSvg, /id="id"/, 'Restored SVG should have original id placeholders');
+    });
 });

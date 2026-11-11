@@ -1,7 +1,6 @@
 import path from 'node:path';
 import sharp from 'sharp';
 import { getFilesWithExtension, readFile, writeFile, moveFile } from '../utils/fs.js';
-import { minify } from '../utils/helpers.js';
 import { projectPaths } from '../core/paths.js';
 import { setBuildState } from '../utils/build-state.js';
 
@@ -18,9 +17,6 @@ async function optimizeImages(optimizer = 'avif') {
         const found = await getFilesWithExtension(imagesDir, ext, true, ['original_images_dir']);
         images = [...images, ...found];
     }
-
-    // Await SVG optimization
-    await optimizeSvgFiles(imagesDir);
 
     if (images.length === 0) {
         console.log('No raster images found to optimize.');
@@ -60,34 +56,6 @@ async function optimizeSingleImage(image, optimizer) {
     } catch (error) {
         console.error(`Error optimizing image ${image}: ${error.message}`);
     }
-}
-
-async function optimizeSvgFiles(imagesDir) {
-    console.log('Optimizing SVG images...');
-    const svgFiles = await getFilesWithExtension(imagesDir, 'svg', true);
-
-    if (svgFiles.length === 0) return;
-
-    await Promise.all(
-        svgFiles.map(async (image) => {
-            try {
-                const content = await readFile(image);
-                const relPath = path.relative(projectPaths.root, image).replace(/\\/g, '/');
-                const backupPath = path.join(projectPaths.layx, relPath);
-
-                // Backup original SVG into layx/
-                await writeFile(backupPath, content);
-
-                // Minify SVG and overwrite
-                const optimized = minify(content, 'xml');
-                await writeFile(image, optimized);
-
-                console.log(`Optimized SVG: ${path.basename(image)}`);
-            } catch (err) {
-                console.error(`Failed to optimize SVG ${image}: ${err.message}`);
-            }
-        })
-    );
 }
 
 async function restoreOptimizedImages() {

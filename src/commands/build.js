@@ -3,6 +3,7 @@ import { bundleCss } from '../engine/css-bundler.js';
 import { bundleJs } from '../engine/js-bundler.js';
 import { processHtmlFiles } from '../engine/html-transformer.js';
 import { optimizeImages } from '../engine/image-optimizer.js';
+import { purgeUnusedSvgSymbols } from '../engine/svg-purger.js';
 import { setBuildState, getBuildState } from '../utils/build-state.js';
 import { unbuild } from './unbuild.js';
 import { projectPaths } from '../core/paths.js';
@@ -32,6 +33,9 @@ async function build(options = {}) {
         // Bundle CSS and JS
         await bundleCss(optimize);
         await bundleJs();
+
+        // Purge unused SVG symbols from icons.svg
+        await purgeUnusedSvgSymbols(options);
 
         // Transform HTML entry points to comment out dev layx references
         if (!isRebuild) {

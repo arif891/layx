@@ -94,6 +94,22 @@ document.addEventListener('component-error', (e) => {
         assert.strictEqual(output.trim(), '');
     });
 
+    test('unwraps component-ready guards with nested parentheses and conditions', () => {
+        const input = `
+if (window.__componentsReady || document.documentElement.hasAttribute('data-components-ready') || !document.querySelector('script[src*="component.js"]')) {
+    init();
+} else {
+    document.addEventListener('components-ready', init, { once: true });
+}
+`;
+        const output = unwrapComponentCode(input);
+        assert.ok(!output.includes('__componentsReady'));
+        assert.ok(!output.includes('data-components-ready'));
+        assert.ok(!output.includes('component.js'));
+        assert.ok(!output.includes('addEventListener'));
+        assert.strictEqual(output.trim(), 'init();');
+    });
+
     test('removes component.js script tags from HTML and unwraps inline scripts', () => {
         const html = `
 <!DOCTYPE html>

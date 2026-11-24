@@ -63,10 +63,97 @@ function unwrapComponentCode(code) {
     // 5. Remove `component-loaded` and `component-error` listeners
     result = removeLifecycleListeners(result);
 
-    // 6. Unwrap `components-ready` and `component-ready` event listeners
+    // 6. Unwrap component-ready conditional guards
+    result = unwrapComponentGuards(result);
+
+    // 7. Unwrap `components-ready` and `component-ready` event listeners
     result = unwrapReadyListeners(result);
 
     return result;
+}
+
+/**
+ * Unwraps `if (window.__componentsReady || ...) { init(); } else { addEventListener(...) }` guards.
+ */
+function unwrapComponentGuards(code) {
+    if (!code || typeof code !== 'string') return code;
+
+    const pattern = /\bif\s*\(/g;
+    let match;
+
+    while ((match = pattern.exec(code)) !== null) {
+        const ifStartIndex = match.index;
+        const openParenIndex = ifStartIndex + match[0].length - 1;
+        const closeParenIndex = findMatchingParen(code, openParenIndex);
+        if (closeParenIndex === -1) break;
+
+        const condition = code.slice(openParenIndex + 1, closeParenIndex);
+        const isComponentGuard =
+            condition.includes('__componentsReady') ||
+            condition.includes('data-components-ready') ||
+            condition.includes('component.js');
+
+        if (!isComponentGuard) {
+            continue;
+        }
+
+        // Find the "then" branch
+        let afterParen = closeParenIndex + 1;
+        while (afterParen < code.length && /\s/.test(code[afterParen])) afterParen++;
+
+        let thenBody = '';
+        let thenEndIndex = -1;
+
+        if (code[afterParen] === '{') {
+            const closeBrace = findMatchingBrace(code, afterParen);
+            if (closeBrace === -1) break;
+            thenBody = code.slice(afterParen + 1, closeBrace).trim();
+            thenEndIndex = closeBrace + 1;
+        } else {
+            let endStmt = afterParen;
+            while (endStmt < code.length && code[endStmt] !== ';' && code[endStmt] !== '\n') endStmt++;
+            thenBody = code.slice(afterParen, endStmt).trim();
+            if (code[endStmt] === ';') endStmt++;
+            thenEndIndex = endStmt;
+        }
+
+        // Check if there is an "else" branch
+        let afterThen = thenEndIndex;
+        while (afterThen < code.length && /\s/.test(code[afterThen])) afterThen++;
+
+        let fullEndIndex = thenEndIndex;
+        if (code.slice(afterThen, afterThen + 4) === 'else' && !/[\w$]/.test(code[afterThen + 4] || '')) {
+            let afterElse = afterThen + 4;
+            while (afterElse < code.length && /\s/.test(code[afterElse])) afterElse++;
+
+            if (code[afterElse] === '{') {
+                const elseCloseBrace = findMatchingBrace(code, afterElse);
+                if (elseCloseBrace !== -1) {
+                    fullEndIndex = elseCloseBrace + 1;
+                }
+            } else {
+                let elseEndStmt = afterElse;
+                while (elseEndStmt < code.length && code[elseEndStmt] !== ';' && code[elseEndStmt] !== '\n') elseEndStmt++;
+                if (code[elseEndStmt] === ';') elseEndStmt++;
+                fullEndIndex = elseEndStmt;
+            }
+        }
+
+        // Consume trailing newline
+        while (fullEndIndex < code.length && (code[fullEndIndex] === ' ' || code[fullEndIndex] === '\t')) fullEndIndex++;
+        if (code[fullEndIndex] === '\r') fullEndIndex++;
+        if (code[fullEndIndex] === '\n') fullEndIndex++;
+
+        // Determine line indentation
+        const lineStart = code.lastIndexOf('\n', ifStartIndex - 1) + 1;
+        const indent = code.slice(lineStart, ifStartIndex).match(/^[ \t]*/)[0] || '';
+
+        const replacement = thenBody ? `${indent}${thenBody}\n` : '';
+        code = code.slice(0, lineStart) + replacement + code.slice(fullEndIndex);
+        pattern.lastIndex = lineStart + replacement.length;
+    }
+
+    return code;
 }
 
 /**

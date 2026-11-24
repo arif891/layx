@@ -9,7 +9,99 @@ import { removePagesFromLinks } from './html-transformer.js';
 import { unwrapComponentCode } from './component-unwrapper.js';
 import { updateUrlsInContent } from './image-optimizer.js';
 
-export { bundleJs };
+export { bundleJs, getPageEntryPoints };
+
+const INTERNAL_DIR_NAMES = new Set([
+    'modules',
+    'components',
+    'utils',
+    'helpers',
+    'services',
+    'lib',
+    'core',
+    'shared',
+    'common',
+    'vendor',
+    'ai',
+    'store',
+    'stores',
+    'hooks',
+    'context'
+]);
+
+async function getPageEntryPoints(pagesJsDir, rootDir) {
+    let allFiles = [];
+    try {
+        allFiles = await getFilesWithExtension(pagesJsDir, 'js', true);
+    } catch {
+        return [];
+    }
+
+    // Collect all script src paths referenced in project HTML files
+    const htmlLinkedScripts = new Set();
+    try {
+        const htmlFiles = await getFilesWithExtension(rootDir, 'html', true);
+        for (const htmlFile of htmlFiles) {
+            const relHtml = path.relative(rootDir, htmlFile).replace(/\\/g, '/');
+            if (relHtml.startsWith('dist/') || relHtml.startsWith('node_modules/')) continue;
+            const content = await readFile(htmlFile);
+            const scriptMatches = content.matchAll(/<script\b[^>]*\bsrc=['"]([^'"]+)['"]/gi);
+            for (const match of scriptMatches) {
+                const src = match[1].replace(/^\//, '').replace(/\\/g, '/');
+                htmlLinkedScripts.add(src);
+                if (src.startsWith('assets/js/pages/')) {
+                    htmlLinkedScripts.add(src.replace(/^assets\/js\/pages\//, ''));
+                }
+            }
+        }
+    } catch {}
+
+    const entryPoints = [];
+
+    for (const file of allFiles) {
+        const relFromPages = path.relative(pagesJsDir, file).replace(/\\/g, '/');
+        const relFromRoot = path.relative(rootDir, file).replace(/\\/g, '/');
+        const segments = relFromPages.split('/');
+
+        // 1. If explicitly referenced in HTML, it is an entry point!
+        if (htmlLinkedScripts.has(relFromRoot) || htmlLinkedScripts.has(relFromPages)) {
+            entryPoints.push(file);
+            continue;
+        }
+
+        // 2. Ignore private/internal directories (modules, components, etc.)
+        const hasInternalDir = segments.some((seg, idx) =>
+            idx < segments.length - 1 && (INTERNAL_DIR_NAMES.has(seg.toLowerCase()) || seg.startsWith('_'))
+        );
+        if (hasInternalDir) {
+            continue;
+        }
+
+        // 3. Ignore files starting with underscore
+        if (path.basename(file).startsWith('_')) {
+            continue;
+        }
+
+        // 4. Top-level files directly under pages/ (e.g. pages/home.js, pages/other.js)
+        if (segments.length === 1) {
+            entryPoints.push(file);
+            continue;
+        }
+
+        // 5. Entry point files under pages/<page>/ (e.g. pages/app/index.js, pages/app/main.js, pages/app/app.js)
+        const baseNameWithoutExt = path.basename(file, '.js');
+        const parentDirName = segments[segments.length - 2];
+        if (
+            baseNameWithoutExt === 'index' ||
+            baseNameWithoutExt === 'main' ||
+            baseNameWithoutExt === parentDirName
+        ) {
+            entryPoints.push(file);
+        }
+    }
+
+    return entryPoints;
+}
 
 async function bundleJs(outDir, projectConfig = null, optimizer = null) {
     try {
@@ -28,18 +120,17 @@ async function bundleJs(outDir, projectConfig = null, optimizer = null) {
             entryPoints['base'] = 'virtual:layx-base';
         }
 
-        // Page JS files: each page gets bundled to outDir/assets/js/pages/*.js
-        let pageFiles = [];
-        try {
-            pageFiles = await getFilesWithExtension(projectPaths.pagesJs, 'js', true);
-        } catch {
-            pageFiles = [];
-        }
+        // Page JS files: only actual page entry points get bundled to outDir/assets/js/pages/*.js
+        const pageFiles = await getPageEntryPoints(projectPaths.pagesJs, projectPaths.root);
 
         for (const file of pageFiles) {
             const relPath = path.relative(projectPaths.pagesJs, file).replace(/\\/g, '/');
             const entryKey = `pages/${relPath.replace(/\.js$/, '')}`;
             entryPoints[entryKey] = file;
+        }
+
+        if (projectConfig.build?.entryPoints && typeof projectConfig.build.entryPoints === 'object') {
+            Object.assign(entryPoints, projectConfig.build.entryPoints);
         }
 
         if (Object.keys(entryPoints).length === 0) {

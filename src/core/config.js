@@ -32,8 +32,9 @@ async function loadProjectConfig(customRoot = projectRoot) {
         }
     }
 
-    const userBuild = userConfig.build || {};
-    const buildLayx = userBuild.layx || userBuild;
+    const userBuild = { ...(userConfig.build || {}) };
+    const buildLayx = userConfig.build?.layx || userBuild;
+    delete userBuild.layx;
     const outDir = userBuild.outDir || userConfig.outDir || userBuild.dist || userConfig.dist || 'dist';
 
     const userCopy = userBuild.copy || buildLayx.copy || userConfig.copy || [];

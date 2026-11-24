@@ -202,6 +202,7 @@ async function bundleJs(outDir, projectConfig = null, optimizer = null) {
         };
 
         const userBuildOptions = { ...projectConfig.build };
+        delete userBuildOptions.layx;
         delete userBuildOptions.outDir;
         delete userBuildOptions.dist;
         delete userBuildOptions.copy;

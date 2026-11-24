@@ -65,6 +65,84 @@ describe('Production Build Engine', () => {
         assert.ok(!existsSync(path.join(testProjectPath, 'layx/assets/js/user_base.js')), 'No backup user_base.js in layx/');
     });
 
+    test('moves pages/other.html to root /other.html in dist and updates links by removing /pages/', async () => {
+        // Add various links with /pages/ to index.html
+        const indexPath = path.join(testProjectPath, 'index.html');
+        let html = await fs.readFile(indexPath, 'utf8');
+        const testLinks = `
+            <a href="/pages/other.html" id="link-abs">Other Abs</a>
+            <a href="./pages/other.html" id="link-rel">Other Rel</a>
+            <a href="pages/other.html" id="link-bare">Other Bare</a>
+            <a href="/pages/other.html#section" id="link-hash">Other Hash</a>
+        `;
+        html = html.replace('<body>', `<body>\n${testLinks}`);
+        await fs.writeFile(indexPath, html, 'utf8');
+
+        // Run build
+        await execFileAsync('node', [cliPath, 'build'], { cwd: testProjectPath });
+
+        const distDir = path.join(testProjectPath, 'dist');
+
+        // 1. Verify other.html is at root of dist/
+        const otherHtmlPath = path.join(distDir, 'other.html');
+        assert.ok(existsSync(otherHtmlPath), 'dist/other.html must exist at root of dist');
+
+        // 2. Verify dist/pages does NOT exist
+        assert.ok(!existsSync(path.join(distDir, 'pages')), 'dist/pages directory should NOT exist');
+
+        // 3. Verify links are updated in dist/index.html
+        const distIndexHtml = await fs.readFile(path.join(distDir, 'index.html'), 'utf8');
+        assert.ok(distIndexHtml.includes('href="/other.html"'), 'Absolute link /pages/other.html must become /other.html');
+        assert.ok(distIndexHtml.includes('href="./other.html"'), 'Relative link ./pages/other.html must become ./other.html');
+        assert.ok(distIndexHtml.includes('href="other.html"'), 'Bare link pages/other.html must become other.html');
+        assert.ok(distIndexHtml.includes('href="/other.html#section"'), 'Hash link must be updated to /other.html#section');
+
+        // Make sure no leftover /pages/ links remain
+        assert.ok(!distIndexHtml.includes('href="/pages/other.html"'));
+        assert.ok(!distIndexHtml.includes('href="./pages/other.html"'));
+        assert.ok(!distIndexHtml.includes('href="pages/other.html"'));
+    });
+
+    test('build fails when a file or folder in pages/ collides with an existing root file or folder', async () => {
+        // Create a collision: pages/index.html (conflicts with root index.html)
+        const collidingPagePath = path.join(testProjectPath, 'pages/index.html');
+        await fs.writeFile(collidingPagePath, '<html><body>Conflict</body></html>', 'utf8');
+
+        await assert.rejects(
+            async () => {
+                await execFileAsync('node', [cliPath, 'build'], { cwd: testProjectPath });
+            },
+            (err) => {
+                assert.match(err.message, /Collision detected/);
+                assert.match(err.message, /pages\/index\.html/);
+                return true;
+            },
+            'Build must fail when pages/index.html conflicts with root index.html'
+        );
+
+        // Clean up the collision
+        await fs.rm(collidingPagePath);
+
+        // Test collision with root folder: pages/assets
+        const collidingDir = path.join(testProjectPath, 'pages/assets');
+        await fs.mkdir(collidingDir, { recursive: true });
+
+        await assert.rejects(
+            async () => {
+                await execFileAsync('node', [cliPath, 'build'], { cwd: testProjectPath });
+            },
+            (err) => {
+                assert.match(err.message, /Collision detected/);
+                assert.match(err.message, /pages\/assets/);
+                return true;
+            },
+            'Build must fail when pages/assets conflicts with root assets folder'
+        );
+
+        // Clean up the collision folder
+        await fs.rm(collidingDir, { recursive: true });
+    });
+
     test('optimizes CSS by generating only used grid classes in dist/assets/css/base.css', async () => {
         // Add specific layout classes to development index.html
         const indexPath = path.join(testProjectPath, 'index.html');

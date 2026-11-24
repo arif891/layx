@@ -4,6 +4,7 @@ import { minify, getCssContentBlock, extractClasses, extractImportUrls } from '.
 import { breakPoints, optimizableFiles } from '../core/constants.js';
 import { projectPaths } from '../core/paths.js';
 import { updateUrlsInContent } from './image-optimizer.js';
+import { removePagesFromLinks } from './html-transformer.js';
 
 export { bundleCss, processPageCss };
 
@@ -18,6 +19,7 @@ async function bundleCss(outDir, optimize = true, optimizer = null) {
         const finalBaseContent = await processCssContent(baseContent, projectPaths.baseCss, optimize);
 
         let bundledBaseCss = minify(finalContent + finalBaseContent, 'css');
+        bundledBaseCss = removePagesFromLinks(bundledBaseCss);
         if (optimizer) {
             bundledBaseCss = updateUrlsInContent(bundledBaseCss, 'css', optimizer);
         }
@@ -48,6 +50,7 @@ async function processPageCss(outDir, optimize = true, optimizer = null) {
 
         let finalContent = await processCssContent(content, file, optimize, true);
         finalContent = minify(finalContent, 'css');
+        finalContent = removePagesFromLinks(finalContent);
         if (optimizer) {
             finalContent = updateUrlsInContent(finalContent, 'css', optimizer);
         }
@@ -72,6 +75,7 @@ async function processPageCss(outDir, optimize = true, optimizer = null) {
         const outPath = path.join(outDir, 'assets/css', relPath);
         let content = await readFile(file);
         content = minify(content, 'css');
+        content = removePagesFromLinks(content);
         if (optimizer) {
             content = updateUrlsInContent(content, 'css', optimizer);
         }

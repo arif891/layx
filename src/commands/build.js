@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import pc from 'picocolors';
 import { bundleCss } from '../engine/css-bundler.js';
 import { bundleJs } from '../engine/js-bundler.js';
-import { processHtmlFiles } from '../engine/html-transformer.js';
+import { processHtmlFiles, checkPagesCollision, copyPagesNonHtmlFiles } from '../engine/html-transformer.js';
 import { optimizeImagesForBuild } from '../engine/image-optimizer.js';
 import { purgeUnusedSvgSymbols } from '../engine/svg-purger.js';
 import { loadProjectConfig } from '../core/config.js';
@@ -29,6 +29,9 @@ async function build(options = {}) {
         throw new Error(`Output directory cannot be project root, parent directory, or inside layx/assets (${outDir})`);
     }
 
+    // Collision check: verify no files or folders in pages/ conflict with root files or folders
+    await checkPagesCollision(projectPaths.root, projectPaths.pages);
+
     const optimize = options.optimize !== false;
     const optimizer = optimize ? (options.optimizer || projectConfig.images?.formats?.[0] || 'avif') : null;
 
@@ -41,7 +44,10 @@ async function build(options = {}) {
         await copyOtherAssets(projectPaths.assets, path.join(outDir, 'assets'));
         await copyRootStaticFiles(projectPaths.root, outDir);
 
-        // 2. Images: optimize raster images and purge SVG symbols directly into outDir
+        // 2. Copy non-HTML files from pages/ directly to outDir root
+        await copyPagesNonHtmlFiles(projectPaths.pages, outDir);
+
+        // 3. Images: optimize raster images and purge SVG symbols directly into outDir
         if (existsSync(projectPaths.image)) {
             if (optimize) {
                 await optimizeImagesForBuild(outDir, optimizer);
@@ -56,13 +62,13 @@ async function build(options = {}) {
             });
         }
 
-        // 3. Bundle CSS into outDir/assets/css
+        // 4. Bundle CSS into outDir/assets/css
         await bundleCss(outDir, optimize, optimizer);
 
-        // 4. Bundle JS into outDir/assets/js
+        // 5. Bundle JS into outDir/assets/js
         await bundleJs(outDir, projectConfig);
 
-        // 5. Transform HTML entry points (remove layx CSS/JS completely) and write directly to outDir
+        // 6. Transform HTML entry points (flatten pages/ to root, remove layx entries, update links)
         await processHtmlFiles(projectPaths.root, outDir, { optimizer });
 
         console.log(pc.green(`Build process completed successfully! Output generated in: ${outDir}`));

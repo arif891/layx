@@ -2,9 +2,10 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
 import * as esbuild from 'esbuild';
-import { getFilesWithExtension } from '../utils/fs.js';
+import { getFilesWithExtension, readFile, writeFile } from '../utils/fs.js';
 import { projectPaths } from '../core/paths.js';
 import { loadProjectConfig } from '../core/config.js';
+import { removePagesFromLinks } from './html-transformer.js';
 
 export { bundleJs };
 
@@ -92,6 +93,22 @@ async function bundleJs(outDir, projectConfig = null) {
         esbuildConfig.outdir = outJsDir;
 
         await esbuild.build(esbuildConfig);
+
+        // Update /pages/ links in bundled JS output
+        let jsOutputFiles = [];
+        try {
+            jsOutputFiles = await getFilesWithExtension(outJsDir, 'js', true);
+        } catch {
+            jsOutputFiles = [];
+        }
+        for (const file of jsOutputFiles) {
+            const content = await readFile(file);
+            const updated = removePagesFromLinks(content);
+            if (updated !== content) {
+                await writeFile(file, updated);
+            }
+        }
+
         console.log('ESBuild processed JS ->', outJsDir);
     } catch (error) {
         console.error('Error processing JS files:', error);

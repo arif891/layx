@@ -5,7 +5,7 @@ import pc from 'picocolors';
 import { bundleCss } from '../engine/css-bundler.js';
 import { bundleJs } from '../engine/js-bundler.js';
 import { processHtmlFiles, checkPagesCollision, copyPagesNonHtmlFiles } from '../engine/html-transformer.js';
-import { optimizeImagesForBuild } from '../engine/image-optimizer.js';
+import { optimizeImagesForBuild, updateUrlsInContent } from '../engine/image-optimizer.js';
 import { purgeUnusedSvgSymbols } from '../engine/svg-purger.js';
 import { unwrapComponentCode } from '../engine/component-unwrapper.js';
 import { isPathExcluded } from '../utils/fs.js';
@@ -90,10 +90,10 @@ async function build(options = {}) {
         await bundleCss(outDir, optimize, optimizer);
 
         // 7. Bundle JS into outDir/assets/js
-        await bundleJs(outDir, projectConfig);
+        await bundleJs(outDir, projectConfig, optimizer);
 
         // 8. Unwrap any copied non-bundled JS files in outDir
-        await unwrapOutDirJs(outDir);
+        await unwrapOutDirJs(outDir, optimizer);
 
         // 9. Transform HTML entry points (flatten pages/ to root, remove layx entries, bake components, update links)
         await processHtmlFiles(projectPaths.root, outDir, { optimizer, projectConfig, exclude: userExclude });
@@ -248,7 +248,7 @@ async function executeCustomCopy(srcRoot, destDir, copyConfig) {
     }
 }
 
-async function unwrapOutDirJs(outDir) {
+async function unwrapOutDirJs(outDir, optimizer = null) {
     if (!existsSync(outDir)) return;
 
     async function* getJsFiles(dir) {
@@ -271,7 +271,10 @@ async function unwrapOutDirJs(outDir) {
     for await (const file of getJsFiles(outDir)) {
         try {
             const content = await fs.readFile(file, 'utf8');
-            const unwrapped = unwrapComponentCode(content);
+            let unwrapped = unwrapComponentCode(content);
+            if (optimizer) {
+                unwrapped = updateUrlsInContent(unwrapped, 'js', optimizer);
+            }
             if (unwrapped !== content) {
                 await fs.writeFile(file, unwrapped, 'utf8');
             }

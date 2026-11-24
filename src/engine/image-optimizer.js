@@ -8,6 +8,8 @@ import { projectPaths } from '../core/paths.js';
 export {
     optimizeImages,
     optimizeImagesForBuild,
+    restoreOptimizedImages,
+    updateUrls,
     updateUrlsInContent,
     extractUrls
 };
@@ -110,12 +112,65 @@ async function optimizeImages(optimizer = 'avif') {
             }
 
             console.log(`Optimized: ${path.basename(image)} -> ${path.basename(optimizedImage)}`);
+
+            // Move original image to original_images_dir backup folder
+            const backupDir = path.join(path.dirname(image), 'original_images_dir');
+            const backupPath = path.join(backupDir, path.basename(image));
+            await fs.mkdir(backupDir, { recursive: true });
+            await fs.rename(image, backupPath);
         } catch (error) {
             console.error(`Error optimizing image ${image}: ${error.message}`);
         }
     }
 
-    console.log(`Optimized images with ${optimizer}`);
+    await updateUrls(optimizer);
+    console.log(`Optimized images with ${optimizer} and updated links in project files.`);
+}
+
+/**
+ * Restores original raster images from original_images_dir back to their parent folders.
+ */
+async function restoreOptimizedImages() {
+    const imagesDir = projectPaths.image;
+    if (!existsSync(imagesDir)) return;
+
+    const rasterExtensions = ['jpg', 'jpeg', 'png'];
+    for (const ext of rasterExtensions) {
+        const files = await getFilesWithExtension(imagesDir, ext, true);
+        for (const file of files) {
+            if (file.includes('original_images_dir')) {
+                const destPath = file.replace(/[/\\]original_images_dir[/\\]/, path.sep);
+                await fs.rename(file, destPath);
+                console.log(`Restored: ${path.basename(file)} -> ${path.relative(imagesDir, destPath)}`);
+            }
+        }
+    }
+}
+
+async function updateUrls(optimizer) {
+    await updateFiles(projectPaths.root, 'html', optimizer);
+    await updateFiles(projectPaths.pages, 'html', optimizer);
+    await updateFiles(projectPaths.css, 'css', optimizer);
+    await updateFiles(projectPaths.js, 'js', optimizer);
+}
+
+async function updateFiles(directory, type, optimizer) {
+    if (!existsSync(directory)) return;
+    const exclude = ['dist', 'node_modules', '.git', 'original_images_dir', 'template', 'scratch'];
+    const files = await getFilesWithExtension(directory, type, true, exclude);
+
+    for (const file of files) {
+        try {
+            const content = await readFile(file);
+            const updatedContent = updateUrlsInContent(content, type, optimizer);
+            if (updatedContent !== content) {
+                await writeFile(file, updatedContent);
+                console.log(`Updated image links in: ${path.relative(projectPaths.root, file)}`);
+            }
+        } catch (error) {
+            console.error(`Failed to update image links in ${file}: ${error.message}`);
+        }
+    }
 }
 
 function updateUrlsInContent(content, type, optimizer) {
@@ -131,22 +186,28 @@ function updateUrlsInContent(content, type, optimizer) {
 }
 
 function extractUrls(content, type = 'html') {
-    const srcRegex = /<(?:img|source)\b[^>]*\s+src=["'](\/assets\/image\/[^"']+\.(?:png|jpg|jpeg))["']/gi;
-    const urlRegex = /url\(["']?(\/assets\/image\/[^"')]+\.(?:png|jpg|jpeg))["']?\)/gi;
+    // 1. Quoted paths in HTML attributes, JS strings, CSS, or component props:
+    //    e.g. "/assets/image/foo.png", 'assets/image/foo.jpg', `./assets/image/foo.png`
+    const quotedRegex = /(['"`])((?:\.\/|\.\.\/|\/)?assets\/image\/[^"'`\s?#]+\.(?:png|jpg|jpeg))\1/gi;
+
+    // 2. CSS url(...) syntax (quoted or unquoted):
+    //    e.g. url(/assets/image/foo.png), url('/assets/image/foo.png')
+    const urlRegex = /url\(["']?((?:\.\/|\.\.\/|\/)?assets\/image\/[^"')\s?#]+\.(?:png|jpg|jpeg))["']?\)/gi;
+
+    // 3. Fallback for unquoted src/href attributes:
+    const unquotedAttrRegex = /\b(?:src|href)=((?:\.\/|\.\.\/|\/)?assets\/image\/[^\s>]+?\.(?:png|jpg|jpeg))/gi;
+
     const values = new Set();
     let match;
 
-    if (type === 'html') {
-        while ((match = srcRegex.exec(content)) !== null) {
-            values.add(match[1]);
-        }
-        while ((match = urlRegex.exec(content)) !== null) {
-            values.add(match[1]);
-        }
-    } else if (type === 'css') {
-        while ((match = urlRegex.exec(content)) !== null) {
-            values.add(match[1]);
-        }
+    while ((match = quotedRegex.exec(content)) !== null) {
+        values.add(match[2]);
+    }
+    while ((match = urlRegex.exec(content)) !== null) {
+        values.add(match[1]);
+    }
+    while ((match = unquotedAttrRegex.exec(content)) !== null) {
+        values.add(match[1]);
     }
 
     return Array.from(values);

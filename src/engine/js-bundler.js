@@ -7,10 +7,11 @@ import { projectPaths } from '../core/paths.js';
 import { loadProjectConfig } from '../core/config.js';
 import { removePagesFromLinks } from './html-transformer.js';
 import { unwrapComponentCode } from './component-unwrapper.js';
+import { updateUrlsInContent } from './image-optimizer.js';
 
 export { bundleJs };
 
-async function bundleJs(outDir, projectConfig = null) {
+async function bundleJs(outDir, projectConfig = null, optimizer = null) {
     try {
         if (!projectConfig) {
             projectConfig = await loadProjectConfig();
@@ -131,6 +132,9 @@ async function bundleJs(outDir, projectConfig = null) {
             const content = await readFile(file);
             let updated = removePagesFromLinks(content);
             updated = unwrapComponentCode(updated);
+            if (optimizer) {
+                updated = updateUrlsInContent(updated, 'js', optimizer);
+            }
             if (updated !== content) {
                 await writeFile(file, updated);
             }

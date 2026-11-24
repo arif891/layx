@@ -48,6 +48,10 @@ describe('Image Optimization Engine', () => {
         const avifPath = path.join(testProjectPath, 'assets/image/test-raster.avif');
         assert.ok(existsSync(avifPath), 'Optimized AVIF file should exist');
 
+        // Verify original image was moved to original_images_dir
+        const backupPngPath = path.join(testProjectPath, 'assets/image/original_images_dir/test-raster.png');
+        assert.ok(existsSync(backupPngPath), 'Original raster image should be moved to original_images_dir');
+
         // Verify SVG was NOT minified, purged, or modified in any way
         const currentSvgContent = await fs.readFile(svgPath, 'utf8');
         assert.equal(currentSvgContent, initialSvgContent, 'SVG content must remain byte-for-byte identical');

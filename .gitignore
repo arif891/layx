@@ -1,3 +1,6 @@
 /node_modules
 /setup
 package-lock.json
+/scratch
+/dist
+*.tgz

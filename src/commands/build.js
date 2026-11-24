@@ -56,8 +56,7 @@ async function build(options = {}) {
 
     try {
         // Clean and prepare output directory
-        await fs.rm(outDir, { recursive: true, force: true });
-        await fs.mkdir(outDir, { recursive: true });
+        await cleanOutputDirectory(outDir);
 
         // 1. Copy assets subdirectories (font, brand, media, static, etc.)
         await copyOtherAssets(projectPaths.assets, path.join(outDir, 'assets'), userExclude);
@@ -279,5 +278,25 @@ async function unwrapOutDirJs(outDir, optimizer = null) {
                 await fs.writeFile(file, unwrapped, 'utf8');
             }
         } catch {}
+    }
+}
+
+async function cleanOutputDirectory(dir) {
+    if (!existsSync(dir)) {
+        await fs.mkdir(dir, { recursive: true });
+        return;
+    }
+    try {
+        await fs.rm(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
+        await fs.mkdir(dir, { recursive: true });
+    } catch (err) {
+        if (err.code === 'EBUSY' || err.code === 'EPERM') {
+            const entries = await fs.readdir(dir);
+            await Promise.all(entries.map(entry =>
+                fs.rm(path.join(dir, entry), { recursive: true, force: true, maxRetries: 3, retryDelay: 100 })
+            ));
+        } else {
+            throw err;
+        }
     }
 }

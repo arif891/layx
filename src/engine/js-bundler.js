@@ -54,7 +54,7 @@ async function getPageEntryPoints(pagesJsDir, rootDir) {
                 }
             }
         }
-    } catch {}
+    } catch { }
 
     const entryPoints = [];
 
@@ -140,7 +140,7 @@ async function bundleJs(outDir, projectConfig = null, optimizer = null) {
                     entryPoints[entryKey] = file;
                 }
             }
-        } catch {}
+        } catch { }
 
         if (projectConfig.build?.entryPoints && typeof projectConfig.build.entryPoints === 'object') {
             Object.assign(entryPoints, projectConfig.build.entryPoints);
@@ -330,6 +330,21 @@ async function bundleJs(outDir, projectConfig = null, optimizer = null) {
                     content = updateUrlsInContent(content, 'js', optimizer);
                 }
                 await writeFile(outfile, content);
+            } else if (bundleOutDir && existsSync(bundleOutDir)) {
+                try {
+                    const generatedFiles = await getFilesWithExtension(bundleOutDir, 'js', true);
+                    for (const genFile of generatedFiles) {
+                        let content = await readFile(genFile);
+                        let updated = removePagesFromLinks(content);
+                        updated = unwrapComponentCode(updated);
+                        if (optimizer) {
+                            updated = updateUrlsInContent(updated, 'js', optimizer);
+                        }
+                        if (updated !== content) {
+                            await writeFile(genFile, updated);
+                        }
+                    }
+                } catch { }
             }
         }
 

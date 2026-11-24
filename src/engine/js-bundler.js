@@ -129,6 +129,19 @@ async function bundleJs(outDir, projectConfig = null, optimizer = null) {
             entryPoints[entryKey] = file;
         }
 
+        // Web Worker files: discover any worker.js or *.worker.js across assets/js/
+        try {
+            const allJsFiles = await getFilesWithExtension(projectPaths.js, 'js', true);
+            for (const file of allJsFiles) {
+                const base = path.basename(file);
+                if (base === 'worker.js' || base.endsWith('.worker.js')) {
+                    const relPath = path.relative(projectPaths.js, file).replace(/\\/g, '/');
+                    const entryKey = relPath.replace(/\.js$/, '');
+                    entryPoints[entryKey] = file;
+                }
+            }
+        } catch {}
+
         if (projectConfig.build?.entryPoints && typeof projectConfig.build.entryPoints === 'object') {
             Object.assign(entryPoints, projectConfig.build.entryPoints);
         }

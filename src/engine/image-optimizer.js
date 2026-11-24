@@ -47,27 +47,23 @@ async function optimizeImagesForBuild(outDir, optimizer = 'avif') {
                 await sharp(image).webp().toFile(destFile);
             }
 
-            // Also copy original image to destination so direct references / JS references don't 404
-            const originalDest = path.join(destDir, path.basename(image));
-            if (originalDest !== destFile) {
-                await fs.copyFile(image, originalDest);
-            }
-
             console.log(`Optimized image: ${path.basename(image)} -> ${baseName}.${optimizer}`);
         } catch (error) {
             console.error(`Error optimizing image ${image}: ${error.message}`);
         }
     }
 
-    // Copy any static non-raster, non-svg images (e.g. .gif, .ico, already .webp, .avif)
+    // Copy any static non-raster, non-svg images (e.g. .gif, .ico, existing .webp, .avif)
     const otherExtensions = ['gif', 'ico', 'webp', 'avif'];
     for (const ext of otherExtensions) {
-        const found = await getFilesWithExtension(imagesDir, ext, true);
+        const found = await getFilesWithExtension(imagesDir, ext, true, ['original_images_dir']);
         for (const file of found) {
             const relPath = path.relative(imagesDir, file);
             const destPath = path.join(outImagesDir, relPath);
-            await fs.mkdir(path.dirname(destPath), { recursive: true });
-            await fs.copyFile(file, destPath);
+            if (!existsSync(destPath)) {
+                await fs.mkdir(path.dirname(destPath), { recursive: true });
+                await fs.copyFile(file, destPath);
+            }
         }
     }
 }

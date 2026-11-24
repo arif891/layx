@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { extractUrls } from './image-optimizer.js';
 import { bakeComponentsInHtml } from './component-baker.js';
+import { isPathExcluded } from '../utils/fs.js';
 
 export {
     processHtmlFiles,
@@ -20,7 +21,7 @@ const DEFAULT_EXCLUDES = ['node_modules', '.git', '.vscode', 'template', 'scratc
  * Checks if any files or folders inside pages/ collide with existing files or folders at project root.
  * Fails the build if a collision is detected.
  */
-async function checkPagesCollision(rootDir, pagesDir) {
+async function checkPagesCollision(rootDir, pagesDir, exclude = []) {
     if (!existsSync(pagesDir)) return;
 
     async function* getEntries(dir, base = '') {
@@ -28,6 +29,9 @@ async function checkPagesCollision(rootDir, pagesDir) {
         for (const item of items) {
             if (item.name === '.gitkeep') continue;
             const rel = base ? path.join(base, item.name) : item.name;
+            const normRel = rel.replace(/\\/g, '/');
+            if (isPathExcluded(normRel, exclude) || isPathExcluded(`pages/${normRel}`, exclude)) continue;
+
             yield { name: item.name, rel, isDir: item.isDirectory() };
             if (item.isDirectory()) {
                 yield* getEntries(path.join(dir, item.name), rel);
@@ -49,7 +53,7 @@ async function checkPagesCollision(rootDir, pagesDir) {
 /**
  * Copies non-HTML files and folders from pages/ directly to the root of outDir.
  */
-async function copyPagesNonHtmlFiles(pagesDir, outDir) {
+async function copyPagesNonHtmlFiles(pagesDir, outDir, exclude = []) {
     if (!existsSync(pagesDir)) return;
 
     async function* getNonHtmlFiles(dir) {
@@ -63,6 +67,9 @@ async function copyPagesNonHtmlFiles(pagesDir, outDir) {
         for (const item of items) {
             if (item.name === '.gitkeep') continue;
             const fullPath = path.join(dir, item.name);
+            const relToPages = path.relative(pagesDir, fullPath).replace(/\\/g, '/');
+            if (isPathExcluded(relToPages, exclude) || isPathExcluded(`pages/${relToPages}`, exclude)) continue;
+
             if (item.isDirectory()) {
                 yield* getNonHtmlFiles(fullPath);
             } else if (item.isFile() && path.extname(item.name) !== '.html') {
@@ -150,9 +157,12 @@ async function processHtmlFiles(startPath = './', outDir = null, options = {}) {
         }
 
         for (const entry of entries) {
-            if (exclude.includes(entry.name)) continue;
+            if (exclude.includes(entry.name) || entry.name === 'components') continue;
 
             const fullPath = path.join(dir, entry.name);
+            const relPath = path.relative(startPath, fullPath).replace(/\\/g, '/');
+            if (isPathExcluded(relPath, options.exclude) || isPathExcluded(entry.name, options.exclude)) continue;
+
             if (entry.isDirectory()) {
                 yield* findHtmlFiles(fullPath);
             } else if (entry.isFile() && path.extname(entry.name) === '.html') {

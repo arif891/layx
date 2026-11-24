@@ -148,6 +148,16 @@ describe('Component Baker', () => {
         assert.ok(output.includes('This is a static alert component.'));
     });
 
+    test('bakes standalone component file referenced by src without explicit name', async () => {
+        const buttonPath = path.resolve('layx/components/button/button.html');
+        const html = `
+<component src="${buttonPath.replace(/\\/g, '/')}"></component>
+`;
+        const output = await bakeComponentsInHtml(html, '', {}, process.cwd());
+        assert.ok(!output.includes('<component'));
+        assert.ok(output.includes('<button'));
+    });
+
     test('strips component.js script tags from baked HTML', async () => {
         const html = `
 <template component="box"><div>Box</div></template>

@@ -8,6 +8,6 @@
     "optimize": "layx optimize"
   },
   "devDependencies": {
-    "layx-css": "^0.1.3"
+    "layx-css": "^0.1.4"
   }
 }

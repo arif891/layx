@@ -79,9 +79,12 @@ Compiles, bundles, and prepares your landing page project for high-performance p
 layx build
 # or with custom output directory
 layx build --outDir custom-output
+# or with custom copy targets and exclusions
+layx build --exclude "drafts,*.log" --copy "docs,README.md"
 ```
 
 **Optimization steps:**
+- **Configurable Copy & Exclude**: Supports custom copy targets via `--copy <patterns>` (or config `copy`) and custom exclusions via `--exclude <patterns>` (or config `exclude`).
 - **Static Component Baking**: Pre-renders `<component>` tags into standard HTML, merges classes & styles, evaluates props and slots, and strips prototype component definitions.
 - **JS Event Unwrapping & Bundling**: Removes `component.js` imports and instantiations (`new Component`), unwraps `components-ready` listeners to top-level code, and bundles JS with `esbuild` for code-splitting and tree-shaking into `dist/assets/js/`.
 - **Pages Flattening**: Moves files from `pages/` (e.g. `pages/other.html`) to the root of `dist/` (e.g. `dist/other.html`) and updates all links (`/pages/other.html` -> `/other.html`).

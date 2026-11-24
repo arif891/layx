@@ -126,7 +126,56 @@ LayX supports an intuitive `pages/` directory during development for multi-page 
 Custom root files and directories are copied directly to `dist/` without any manual build configuration:
 - **`public/` directory**: Any files and subdirectories inside `public/` are copied directly to the root of `dist/`.
 - **Root static files**: Files like `favicon.ico`, `robots.txt`, `sitemap.xml`, `_headers`, `_redirects`, `site.webmanifest` are copied to `dist/`.
-- **Exclusions**: `layx/` (framework source), `node_modules`, `pages/`, `.git`, `.vscode`, `package.json`, and config files are never copied to `dist/`.
+- **Default exclusions**: `layx/` (framework source), `node_modules`, `pages/`, `.git`, `.vscode`, `package.json`, and config files are excluded from `dist/`.
+
+---
+
+## 🗂️ Configurable Copy & Exclude
+
+You can customize exactly which files or directories to **copy** or **exclude** via `layx.config.mjs` or CLI flags:
+
+### 1. In `layx.config.mjs`:
+```javascript
+export default {
+  build: {
+    outDir: 'dist',
+    
+    // Additional files or directories to copy to output
+    copy: [
+      'docs',                                      // Copies docs/ folder to dist/docs/
+      'README.md',                                 // Copies README.md to dist/README.md
+      { from: 'custom-data/data.json', to: 'static/data.json' } // Custom source -> destination mapping
+    ],
+
+    // Files, folders, or patterns to exclude from build
+    exclude: [
+      'drafts',                                    // Excludes drafts/ folder
+      '*.secret',                                  // Excludes files matching wildcard pattern
+      'pages/draft-post.html',                     // Excludes specific sub-page
+      'notes.txt'                                  // Excludes specific file
+    ]
+  }
+};
+```
+
+### 2. Via CLI Flags:
+You can also specify or append rules directly from the command line:
+```bash
+# Exclude folders and patterns (comma-separated)
+layx build --exclude "drafts,*.log,*.tmp"
+
+# Copy additional folders
+layx build --copy "docs,README.md"
+
+# Combine both
+layx build --exclude "drafts,*.secret" --copy "docs"
+```
+
+### Pattern Matching Rules:
+- **Exact match**: `'drafts'` or `'notes.txt'` matches the file or directory.
+- **Directory prefix**: `'drafts'` or `'drafts/'` matches all contents inside `drafts/`.
+- **Basename match**: `'secret.key'` matches `secret.key` anywhere in the project tree.
+- **Wildcards (`*`, `?`)**: `'*.log'` matches `app.log`, `server.log`; `'temp-*'` matches `temp-1.json`.
 
 ---
 
@@ -144,6 +193,8 @@ export default {
     minify: true,
     sourcemap: true,    // enable sourcemaps for debugging
     target: 'es2022',   // customize JS target
+    copy: ['docs'],     // additional files or folders to copy
+    exclude: ['drafts', '*.log'], // files or patterns to exclude
   },
   images: {
     formats: ['avif', 'webp'],

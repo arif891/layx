@@ -542,10 +542,12 @@ async function bakeComponentsInHtml(htmlContent, currentFilePath = '', dataConte
 
     // Helper to register components from an HtmlNode tree
     function registerFromAst(tree) {
+        let count = 0;
         const compNodes = tree.querySelectorAll(node => node.hasAttribute('component'));
         for (const node of compNodes) {
             const compName = node.getAttribute('component')?.trim();
             if (!compName) continue;
+            count++;
 
             let rootNode;
             if (node.tagName === 'template') {
@@ -576,28 +578,76 @@ async function bakeComponentsInHtml(htmlContent, currentFilePath = '', dataConte
 
             registry[compName] = rootNode;
         }
+        return count;
     }
 
     // 1. Register inline components present in the file itself
     registerFromAst(ast);
 
     // 2. Helper to load and register components from external file
-    async function loadSrcFile(src) {
+    async function loadSrcFile(src, explicitName = null) {
         if (!src) return;
         let absPath;
         if (src.startsWith('/')) {
             absPath = path.join(projectRoot, src.slice(1));
+            if (!existsSync(absPath)) {
+                if (src.startsWith('/pages/')) {
+                    const withoutPages = path.join(projectRoot, src.slice('/pages/'.length));
+                    if (existsSync(withoutPages)) absPath = withoutPages;
+                } else {
+                    const withPages = path.join(projectRoot, 'pages', src.slice(1));
+                    if (existsSync(withPages)) absPath = withPages;
+                }
+            }
         } else {
             absPath = path.resolve(baseDir, src);
+            if (!existsSync(absPath)) {
+                const rootRel = path.join(projectRoot, src);
+                if (existsSync(rootRel)) absPath = rootRel;
+            }
         }
 
         if (loadedFiles.has(absPath)) return;
         loadedFiles.add(absPath);
 
         if (existsSync(absPath)) {
-            const content = await fs.readFile(absPath, 'utf8');
+            let content = await fs.readFile(absPath, 'utf8');
+            content = content
+                .replace(/<noscript\b[^>]*>[\s\S]*?<\/body>[\s\S]*?<\/noscript>/gi, '')
+                .replace(/<noscript>\s*<\/body>\s*<\/html>\s*<\/noscript>/gi, '')
+                .replace(/<!--\s*<\/body>\s*<\/html>\s*-->/gi, '')
+                .trim();
+
             const fileAst = parseHtml(content);
-            registerFromAst(fileAst);
+            const registeredCount = registerFromAst(fileAst);
+
+            // Standalone component file without explicit [component] attribute
+            if (registeredCount === 0) {
+                const baseName = path.basename(absPath, '.html');
+                const compName = explicitName || baseName;
+
+                const elementChildren = fileAst.children.filter(c => c.type === 'element');
+                let rootNode;
+                if (elementChildren.length === 1) {
+                    rootNode = elementChildren[0].cloneNode(true);
+                } else {
+                    const temp = new HtmlNode('element', 'div');
+                    for (const c of fileAst.children) {
+                        temp.appendChild(c.cloneNode(true));
+                    }
+                    rootNode = temp;
+                }
+
+                if (content.includes('${') || rootNode.hasAttribute('dynamic')) {
+                    rootNode._raw = preprocessTemplate(rootNode.innerHTML);
+                    rootNode.setAttribute('dynamic', '');
+                }
+
+                registry[compName] = rootNode;
+                if (explicitName && explicitName !== baseName) {
+                    registry[baseName] = rootNode;
+                }
+            }
         } else {
             console.warn(`[ComponentBaker] Referenced component file not found: ${src} (${absPath})`);
         }
@@ -605,11 +655,16 @@ async function bakeComponentsInHtml(htmlContent, currentFilePath = '', dataConte
 
     // 3. Walk and instantiate all <component> elements
     async function walkComponent(el, seen = new Set(), parentCtx = { ...DEFAULT_HELPERS, ...dataContext }) {
-        const name = el.getAttribute('name');
+        let name = el.getAttribute('name');
         const src = el.getAttribute('src');
 
+        if (!name && src) {
+            const clean = src.split('?')[0].split('#')[0];
+            name = path.basename(clean, '.html');
+        }
+
         if (src) {
-            await loadSrcFile(src);
+            await loadSrcFile(src, name);
         }
 
         if (!name) return;

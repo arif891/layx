@@ -323,4 +323,79 @@ ${originalBaseJs}
         await fs.writeFile(baseJsPath, originalBaseJs, 'utf8');
         await fs.rm(componentsFilePath, { force: true });
     });
+
+    test('supports configurable copy and exclude via config and CLI flags', async () => {
+        // 1. Create files that should be excluded
+        const draftsDir = path.join(testProjectPath, 'drafts');
+        await fs.mkdir(draftsDir, { recursive: true });
+        await fs.writeFile(path.join(draftsDir, 'draft1.html'), '<p>Draft</p>', 'utf8');
+
+        const secretFile = path.join(testProjectPath, 'app.secret');
+        await fs.writeFile(secretFile, 'SUPER_SECRET', 'utf8');
+
+        const logFile = path.join(testProjectPath, 'test.log');
+        await fs.writeFile(logFile, 'LOG_ENTRY', 'utf8');
+
+        // Create an excluded page in pages/
+        const draftPage = path.join(testProjectPath, 'pages/draft-post.html');
+        await fs.writeFile(draftPage, '<p>Draft Page</p>', 'utf8');
+
+        // 2. Create files that should be copied via custom copy
+        const docsDir = path.join(testProjectPath, 'docs');
+        await fs.mkdir(docsDir, { recursive: true });
+        await fs.writeFile(path.join(docsDir, 'guide.md'), '# Guide', 'utf8');
+
+        const customSrcDir = path.join(testProjectPath, 'custom-data');
+        await fs.mkdir(customSrcDir, { recursive: true });
+        await fs.writeFile(path.join(customSrcDir, 'data.json'), '{"key":"value"}', 'utf8');
+
+        // 3. Create layx.config.mjs with copy and exclude
+        const configPath = path.join(testProjectPath, 'layx.config.mjs');
+        const configContent = `
+export default {
+    build: {
+        copy: [
+            'docs',
+            { from: 'custom-data/data.json', to: 'static/data.json' }
+        ],
+        exclude: [
+            'drafts',
+            '*.secret',
+            'pages/draft-post.html'
+        ]
+    }
+};
+`;
+        await fs.writeFile(configPath, configContent, 'utf8');
+
+        // 4. Run build with CLI override for additional exclude
+        await execFileAsync('node', [
+            cliPath,
+            'build',
+            '--exclude', '*.log'
+        ], { cwd: testProjectPath });
+
+        const distDir = path.join(testProjectPath, 'dist');
+
+        // Verify excluded items do NOT exist in dist
+        assert.ok(!existsSync(path.join(distDir, 'drafts')), 'drafts/ must be excluded from dist');
+        assert.ok(!existsSync(path.join(distDir, 'app.secret')), '*.secret must be excluded from dist');
+        assert.ok(!existsSync(path.join(distDir, 'test.log')), '*.log (from CLI) must be excluded from dist');
+        assert.ok(!existsSync(path.join(distDir, 'draft-post.html')), 'pages/draft-post.html must be excluded from dist');
+
+        // Verify configured copy targets DO exist in dist
+        const copiedDocPath = path.join(distDir, 'docs/guide.md');
+        assert.ok(existsSync(copiedDocPath), 'docs/guide.md must be copied via copy config');
+        const copiedDataPath = path.join(distDir, 'static/data.json');
+        assert.ok(existsSync(copiedDataPath), 'static/data.json must be copied via object mapping');
+
+        // Clean up
+        await fs.rm(draftsDir, { recursive: true, force: true });
+        await fs.rm(secretFile, { force: true });
+        await fs.rm(logFile, { force: true });
+        await fs.rm(draftPage, { force: true });
+        await fs.rm(docsDir, { recursive: true, force: true });
+        await fs.rm(customSrcDir, { recursive: true, force: true });
+        await fs.rm(configPath, { force: true });
+    });
 });

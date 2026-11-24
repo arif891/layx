@@ -1,7 +1,18 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 
-export { getFilesContent, ensureDirectoryExists, getFilesWithExtension, readFile, writeFile, copyFile, moveFile, deleteFile };
+export {
+    getFilesContent,
+    ensureDirectoryExists,
+    getFilesWithExtension,
+    readFile,
+    writeFile,
+    copyFile,
+    moveFile,
+    deleteFile,
+    matchesPattern,
+    isPathExcluded
+};
 
 async function getFilesWithExtension(directory, extension, subDir = false, exclude = ['layx', 'setup', 'node_modules', '.git']) {
     let entries;
@@ -95,4 +106,49 @@ async function deleteFile(filePath) {
     } catch (err) {
         if (err.code !== 'ENOENT') throw err;
     }
+}
+
+/**
+ * Checks if a relative path or filename matches a pattern.
+ */
+function matchesPattern(targetPath, pattern) {
+    if (!targetPath || !pattern) return false;
+
+    const normTarget = targetPath.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+    const normPattern = pattern.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+
+    // Exact match
+    if (normTarget === normPattern) return true;
+
+    // Basename match (e.g. pattern "notes.txt" matches "sub/notes.txt")
+    const base = path.basename(normTarget);
+    if (base === normPattern) return true;
+
+    // Directory match (e.g. pattern "drafts" matches "drafts/page.html")
+    if (normTarget.startsWith(normPattern + '/')) return true;
+
+    // Wildcard matching (*, ?)
+    if (normPattern.includes('*') || normPattern.includes('?')) {
+        const regexStr = '^' + normPattern
+            .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+            .replace(/\*/g, '.*')
+            .replace(/\?/g, '.') + '$';
+        const regex = new RegExp(regexStr, 'i');
+        if (regex.test(normTarget) || regex.test(base)) return true;
+    }
+
+    return false;
+}
+
+/**
+ * Checks if a path matches any pattern in an exclude list.
+ */
+function isPathExcluded(targetPath, excludeList) {
+    if (!Array.isArray(excludeList) || excludeList.length === 0) return false;
+    return excludeList.some(pattern => {
+        if (typeof pattern === 'string') {
+            return matchesPattern(targetPath, pattern);
+        }
+        return false;
+    });
 }

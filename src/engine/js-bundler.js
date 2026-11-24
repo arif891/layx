@@ -99,6 +99,8 @@ async function bundleJs(outDir, projectConfig = null) {
         const userBuildOptions = { ...projectConfig.build };
         delete userBuildOptions.outDir;
         delete userBuildOptions.dist;
+        delete userBuildOptions.copy;
+        delete userBuildOptions.exclude;
 
         const esbuildConfig = {
             entryPoints,

@@ -110,12 +110,15 @@ ${pc.yellow(pc.bold('OPTIONS:'))}
   -v, --version          Show version number
   -h, --help             Show help documentation
   --outDir, -o <dir>     Output directory for build (default: dist)
+  --copy, -c <patterns>  Additional files or folders to copy (comma-separated)
+  --exclude, -e <items>  Files or folders to exclude from build (comma-separated)
 
 ${pc.yellow(pc.bold('EXAMPLES:'))}
   layx create my-landing-page
   layx add -c navbar -f "Red Hat Display"
   layx build
   layx build --outDir output
+  layx build --exclude "drafts,*.log" --copy "docs,README.md"
   layx snippets
 `);
 }
@@ -135,7 +138,20 @@ if (!command) {
             if (outIdx !== -1 && args[outIdx + 1]) {
                 outDir = args[outIdx + 1];
             }
-            await build({ outDir });
+
+            let copy;
+            const copyIdx = args.findIndex(a => a === '--copy' || a === '-c');
+            if (copyIdx !== -1 && args[copyIdx + 1]) {
+                copy = args[copyIdx + 1];
+            }
+
+            let exclude;
+            const excIdx = args.findIndex(a => a === '--exclude' || a === '-e');
+            if (excIdx !== -1 && args[excIdx + 1]) {
+                exclude = args[excIdx + 1];
+            }
+
+            await build({ outDir, copy, exclude });
             break;
         }
         case 'create':

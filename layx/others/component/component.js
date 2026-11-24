@@ -144,11 +144,16 @@ class Component {
     /* Depth-first walk with cycle detection + context inheritance */
     async _walk(el, seen = new Set(), parentCtx = this._ctx) {
         if (!el || !el.getAttribute) return;
-        const name = el.getAttribute('name');
+        let name = el.getAttribute('name');
         const src = el.getAttribute('src');
 
+        if (!name && src) {
+            const clean = src.split('?')[0].split('#')[0];
+            name = clean.split('/').pop().replace(/\.html$/i, '');
+        }
+
         try {
-            if (src) await this._load(src);
+            if (src) await this._load(src, name);
             if (!name) return;
 
             if (seen.has(name)) {
@@ -182,12 +187,12 @@ class Component {
     }
 
     /* Fetch + register once per src URL */
-    async _load(src) {
+    async _load(src, explicitName = null) {
         if (this._fetching.has(src)) return this._fetching.get(src);
 
         const job = fetch(src)
             .then(r => (r.ok ? r.text() : Promise.reject(new Error(`${r.status} @ ${src}`))))
-            .then(html => this._registerHTML(html))
+            .then(html => this._registerHTML(html, explicitName))
             .catch(err => {
                 this._fetching.delete(src);
                 throw err;
@@ -231,12 +236,23 @@ class Component {
     }
 
     /* Parse HTML string into component templates */
-    _registerHTML(html) {
+    _registerHTML(html, explicitName = null) {
         if (typeof DOMParser === 'undefined') return;
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        doc.querySelectorAll('[component]').forEach(node => {
-            this._registerNode(node);
-        });
+        const cleanHtml = html
+            .replace(/<noscript\b[^>]*>[\s\S]*?<\/body>[\s\S]*?<\/noscript>/gi, '')
+            .replace(/<noscript>\s*<\/body>\s*<\/html>\s*<\/noscript>/gi, '')
+            .replace(/<!--\s*<\/body>\s*<\/html>\s*-->/gi, '')
+            .trim();
+        const doc = new DOMParser().parseFromString(cleanHtml, 'text/html');
+        const compNodes = doc.querySelectorAll('[component]');
+        if (compNodes.length > 0) {
+            compNodes.forEach(node => {
+                this._registerNode(node);
+            });
+        } else if (explicitName && doc.body) {
+            const element = doc.body.firstElementChild || doc.body;
+            this._registerNode(element, explicitName);
+        }
     }
 
     /* Produce real DOM from template */

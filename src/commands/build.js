@@ -8,6 +8,7 @@ import { processHtmlFiles, checkPagesCollision, copyPagesNonHtmlFiles } from '..
 import { optimizeImagesForBuild } from '../engine/image-optimizer.js';
 import { purgeUnusedSvgSymbols } from '../engine/svg-purger.js';
 import { unwrapComponentCode } from '../engine/component-unwrapper.js';
+import { isPathExcluded } from '../utils/fs.js';
 import { loadProjectConfig } from '../core/config.js';
 import { projectPaths } from '../core/paths.js';
 
@@ -30,8 +31,25 @@ async function build(options = {}) {
         throw new Error(`Output directory cannot be project root, parent directory, or inside layx/assets (${outDir})`);
     }
 
-    // Collision check: verify no files or folders in pages/ conflict with root files or folders
-    await checkPagesCollision(projectPaths.root, projectPaths.pages);
+    const normalizeList = (val) => {
+        if (!val) return [];
+        if (Array.isArray(val)) return val;
+        if (typeof val === 'string') return val.split(',').map(s => s.trim()).filter(Boolean);
+        return [val];
+    };
+
+    const userCopy = [
+        ...normalizeList(projectConfig.build?.copy),
+        ...normalizeList(options.copy)
+    ];
+
+    const userExclude = [
+        ...normalizeList(projectConfig.build?.exclude),
+        ...normalizeList(options.exclude)
+    ];
+
+    // Collision check: verify no non-excluded files or folders in pages/ conflict with root files or folders
+    await checkPagesCollision(projectPaths.root, projectPaths.pages, userExclude);
 
     const optimize = options.optimize !== false;
     const optimizer = optimize ? (options.optimizer || projectConfig.images?.formats?.[0] || 'avif') : null;
@@ -42,20 +60,23 @@ async function build(options = {}) {
         await fs.mkdir(outDir, { recursive: true });
 
         // 1. Copy assets subdirectories (font, brand, media, static, etc.)
-        await copyOtherAssets(projectPaths.assets, path.join(outDir, 'assets'));
+        await copyOtherAssets(projectPaths.assets, path.join(outDir, 'assets'), userExclude);
 
         // 2. Copy all files and folders from root (except layx and dev/build exclusions)
-        await copyRootFilesAndFolders(projectPaths.root, outDir);
+        await copyRootFilesAndFolders(projectPaths.root, outDir, { copy: userCopy, exclude: userExclude });
 
-        // 3. Copy non-HTML files from pages/ directly to outDir root
-        await copyPagesNonHtmlFiles(projectPaths.pages, outDir);
+        // 3. Copy custom configured targets (files, folders, or { from, to } mappings)
+        await executeCustomCopy(projectPaths.root, outDir, userCopy);
 
-        // 4. Images: optimize raster images and purge SVG symbols directly into outDir
-        if (existsSync(projectPaths.image)) {
+        // 4. Copy non-HTML files from pages/ directly to outDir root
+        await copyPagesNonHtmlFiles(projectPaths.pages, outDir, userExclude);
+
+        // 5. Images: optimize raster images and purge SVG symbols directly into outDir
+        if (existsSync(projectPaths.image) && !isPathExcluded('assets/image', userExclude) && !isPathExcluded('image', userExclude)) {
             if (optimize) {
                 await optimizeImagesForBuild(outDir, optimizer);
             } else {
-                await copyDirectory(projectPaths.image, path.join(outDir, 'assets/image'));
+                await copyDirectory(projectPaths.image, path.join(outDir, 'assets/image'), userExclude);
             }
 
             await purgeUnusedSvgSymbols({
@@ -65,17 +86,17 @@ async function build(options = {}) {
             });
         }
 
-        // 5. Bundle CSS into outDir/assets/css
+        // 6. Bundle CSS into outDir/assets/css
         await bundleCss(outDir, optimize, optimizer);
 
-        // 6. Bundle JS into outDir/assets/js
+        // 7. Bundle JS into outDir/assets/js
         await bundleJs(outDir, projectConfig);
 
-        // 7. Unwrap any copied non-bundled JS files in outDir
+        // 8. Unwrap any copied non-bundled JS files in outDir
         await unwrapOutDirJs(outDir);
 
-        // 8. Transform HTML entry points (flatten pages/ to root, remove layx entries, bake components, update links)
-        await processHtmlFiles(projectPaths.root, outDir, { optimizer, projectConfig });
+        // 9. Transform HTML entry points (flatten pages/ to root, remove layx entries, bake components, update links)
+        await processHtmlFiles(projectPaths.root, outDir, { optimizer, projectConfig, exclude: userExclude });
 
         console.log(pc.green(`Build process completed successfully! Output generated in: ${outDir}`));
     } catch (error) {
@@ -84,7 +105,7 @@ async function build(options = {}) {
     }
 }
 
-async function copyOtherAssets(srcAssetsDir, destAssetsDir) {
+async function copyOtherAssets(srcAssetsDir, destAssetsDir, exclude = []) {
     if (!existsSync(srcAssetsDir)) return;
     const entries = await fs.readdir(srcAssetsDir, { withFileTypes: true });
 
@@ -93,12 +114,13 @@ async function copyOtherAssets(srcAssetsDir, destAssetsDir) {
             continue;
         }
         if (entry.name === '.gitkeep') continue;
+        if (isPathExcluded(entry.name, exclude) || isPathExcluded(`assets/${entry.name}`, exclude)) continue;
 
         const srcPath = path.join(srcAssetsDir, entry.name);
         const destPath = path.join(destAssetsDir, entry.name);
 
         if (entry.isDirectory()) {
-            await copyDirectory(srcPath, destPath);
+            await copyDirectory(srcPath, destPath, exclude);
         } else if (entry.isFile()) {
             await fs.mkdir(destAssetsDir, { recursive: true });
             await fs.copyFile(srcPath, destPath);
@@ -106,26 +128,32 @@ async function copyOtherAssets(srcAssetsDir, destAssetsDir) {
     }
 }
 
-async function copyDirectory(src, dest) {
+async function copyDirectory(src, dest, exclude = []) {
     if (!existsSync(src)) return;
     await fs.mkdir(dest, { recursive: true });
     const entries = await fs.readdir(src, { withFileTypes: true });
 
     for (const entry of entries) {
         if (entry.name === '.gitkeep') continue;
+        if (isPathExcluded(entry.name, exclude)) continue;
+
         const srcPath = path.join(src, entry.name);
         const destPath = path.join(dest, entry.name);
 
         if (entry.isDirectory()) {
-            await copyDirectory(srcPath, destPath);
+            await copyDirectory(srcPath, destPath, exclude);
         } else if (entry.isFile()) {
             await fs.copyFile(srcPath, destPath);
         }
     }
 }
 
-async function copyRootFilesAndFolders(srcRoot, destDir) {
+async function copyRootFilesAndFolders(srcRoot, destDir, { copy = [], exclude = [] } = {}) {
     if (!existsSync(srcRoot)) return;
+
+    const explicitCopies = new Set(
+        copy.map(item => (typeof item === 'string' ? item : item?.from)).filter(Boolean)
+    );
 
     const excludeDirs = new Set([
         'layx',          // Framework core - explicitly excluded
@@ -155,28 +183,67 @@ async function copyRootFilesAndFolders(srcRoot, destDir) {
     const entries = await fs.readdir(srcRoot, { withFileTypes: true });
 
     for (const entry of entries) {
+        const relPath = entry.name;
+        if (isPathExcluded(relPath, exclude)) continue;
+
         if (entry.isDirectory()) {
-            if (excludeDirs.has(entry.name)) continue;
+            if (excludeDirs.has(entry.name) && !explicitCopies.has(entry.name)) continue;
             if (path.resolve(srcRoot, entry.name) === path.resolve(destDir)) continue;
 
             const srcPath = path.join(srcRoot, entry.name);
             if (entry.name === 'public') {
                 // Contents of public/ are copied directly to root of destDir
-                await copyDirectory(srcPath, destDir);
+                await copyDirectory(srcPath, destDir, exclude);
             } else {
                 // Any other folder in root (e.g. static/, downloads/, data/, etc.) is copied into destDir
-                await copyDirectory(srcPath, path.join(destDir, entry.name));
+                await copyDirectory(srcPath, path.join(destDir, entry.name), exclude);
             }
         } else if (entry.isFile()) {
             // HTML files are transformed and copied by processHtmlFiles
             if (path.extname(entry.name) === '.html') continue;
-            if (excludeFiles.has(entry.name)) continue;
+            if (excludeFiles.has(entry.name) && !explicitCopies.has(entry.name)) continue;
             if (entry.name.endsWith('.tgz')) continue;
 
             // Copy all other root files (favicon, robots, sitemap, _headers, _redirects, webmanifest, etc.)
             const srcFile = path.join(srcRoot, entry.name);
             const destFile = path.join(destDir, entry.name);
             await fs.copyFile(srcFile, destFile);
+        }
+    }
+}
+
+async function executeCustomCopy(srcRoot, destDir, copyConfig) {
+    if (!Array.isArray(copyConfig) || copyConfig.length === 0) return;
+
+    for (const item of copyConfig) {
+        if (!item) continue;
+        let fromRel;
+        let toRel;
+
+        if (typeof item === 'string') {
+            fromRel = item;
+            toRel = item;
+        } else if (typeof item === 'object' && item.from) {
+            fromRel = item.from;
+            toRel = item.to || item.from;
+        } else {
+            continue;
+        }
+
+        const fromPath = path.resolve(srcRoot, fromRel);
+        const toPath = path.resolve(destDir, toRel);
+
+        if (!existsSync(fromPath)) {
+            console.warn(pc.yellow(`[LayX Build] Configured copy target not found: ${fromRel} (${fromPath})`));
+            continue;
+        }
+
+        const stat = await fs.stat(fromPath);
+        if (stat.isDirectory()) {
+            await copyDirectory(fromPath, toPath);
+        } else if (stat.isFile()) {
+            await fs.mkdir(path.dirname(toPath), { recursive: true });
+            await fs.copyFile(fromPath, toPath);
         }
     }
 }

@@ -97,6 +97,7 @@ Compiles and prepares your landing page for high-performance production deployme
 - **Static Component Baking**: Pre-renders `<component>` tags into semantic HTML, strips prototype imports, and unwraps `components-ready` event listeners before bundling.
 - **Pages Flattening**: Moves `pages/*.html` directly to the output root (e.g. `pages/other.html` -> `dist/other.html`) and updates links automatically.
 - **Root Asset Copying**: Copies all custom root files (`favicon.ico`, `robots.txt`, `_headers`) and directories (`public/`, `downloads/`) to `dist/`, while strictly excluding the `layx/` framework folder.
+- **Configurable Copy & Exclude**: Customize additional copy targets (`copy: ['docs']`) or exclude patterns (`exclude: ['drafts', '*.log']`) in `layx.config.mjs` or via `--copy` and `--exclude` flags.
 - **CSS Optimization**: Strips unused responsive grid layout classes and minifies CSS without altering modern CSS syntax (`@layer`, `@starting-style`).
 - **JS Bundling**: Uses `esbuild` for code-splitting, tree-shaking, and ES module bundling into `dist/assets/js/`.
 - **HTML Cleanup**: Removes development framework references (`/layx/layx.css`, `/layx/layx.js`) completely from HTML.
@@ -107,6 +108,8 @@ Compiles and prepares your landing page for high-performance production deployme
 layx build
 # or with custom output directory
 layx build --outDir dist
+# or with custom exclusions & copy targets
+layx build --exclude "drafts,*.log" --copy "docs"
 ```
 
 ### 4. `layx optimize`

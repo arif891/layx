@@ -208,4 +208,35 @@ describe('Production Build Engine', () => {
         assert.ok(existsSync(path.join(customPath, 'assets/css/base.css')), 'CSS should exist in custom directory');
         assert.ok(existsSync(path.join(customPath, 'assets/js/base.js')), 'JS should exist in custom directory');
     });
+
+    test('copies all root files and custom directories to dist while excluding layx dir', async () => {
+        // Create custom root files and folder
+        const rootHeaders = path.join(testProjectPath, '_headers');
+        const rootCustomTxt = path.join(testProjectPath, 'custom.txt');
+        const rootDownloadDir = path.join(testProjectPath, 'downloads');
+        const rootDoc = path.join(rootDownloadDir, 'guide.pdf');
+
+        await fs.writeFile(rootHeaders, '/*\n  X-Frame-Options: DENY', 'utf8');
+        await fs.writeFile(rootCustomTxt, 'Custom static content', 'utf8');
+        await fs.mkdir(rootDownloadDir, { recursive: true });
+        await fs.writeFile(rootDoc, 'PDF-content', 'utf8');
+
+        // Run build
+        await execFileAsync('node', [cliPath, 'build'], { cwd: testProjectPath });
+
+        const distDir = path.join(testProjectPath, 'dist');
+
+        // Verify custom files and folder were copied to dist
+        assert.ok(existsSync(path.join(distDir, '_headers')), 'dist/_headers must exist');
+        assert.ok(existsSync(path.join(distDir, 'custom.txt')), 'dist/custom.txt must exist');
+        assert.ok(existsSync(path.join(distDir, 'downloads/guide.pdf')), 'dist/downloads/guide.pdf must exist');
+
+        // Verify layx directory is NOT in dist
+        assert.ok(!existsSync(path.join(distDir, 'layx')), 'layx directory must NOT be copied to dist');
+
+        // Clean up root test files
+        await fs.rm(rootHeaders, { force: true });
+        await fs.rm(rootCustomTxt, { force: true });
+        await fs.rm(rootDownloadDir, { recursive: true, force: true });
+    });
 });

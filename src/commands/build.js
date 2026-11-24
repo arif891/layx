@@ -40,14 +40,16 @@ async function build(options = {}) {
         await fs.rm(outDir, { recursive: true, force: true });
         await fs.mkdir(outDir, { recursive: true });
 
-        // 1. Copy non-code assets (font, brand, media, public, static, etc.)
+        // 1. Copy assets subdirectories (font, brand, media, static, etc.)
         await copyOtherAssets(projectPaths.assets, path.join(outDir, 'assets'));
-        await copyRootStaticFiles(projectPaths.root, outDir);
 
-        // 2. Copy non-HTML files from pages/ directly to outDir root
+        // 2. Copy all files and folders from root (except layx and dev/build exclusions)
+        await copyRootFilesAndFolders(projectPaths.root, outDir);
+
+        // 3. Copy non-HTML files from pages/ directly to outDir root
         await copyPagesNonHtmlFiles(projectPaths.pages, outDir);
 
-        // 3. Images: optimize raster images and purge SVG symbols directly into outDir
+        // 4. Images: optimize raster images and purge SVG symbols directly into outDir
         if (existsSync(projectPaths.image)) {
             if (optimize) {
                 await optimizeImagesForBuild(outDir, optimizer);
@@ -62,13 +64,13 @@ async function build(options = {}) {
             });
         }
 
-        // 4. Bundle CSS into outDir/assets/css
+        // 5. Bundle CSS into outDir/assets/css
         await bundleCss(outDir, optimize, optimizer);
 
-        // 5. Bundle JS into outDir/assets/js
+        // 6. Bundle JS into outDir/assets/js
         await bundleJs(outDir, projectConfig);
 
-        // 6. Transform HTML entry points (flatten pages/ to root, remove layx entries, update links)
+        // 7. Transform HTML entry points (flatten pages/ to root, remove layx entries, update links)
         await processHtmlFiles(projectPaths.root, outDir, { optimizer });
 
         console.log(pc.green(`Build process completed successfully! Output generated in: ${outDir}`));
@@ -118,17 +120,59 @@ async function copyDirectory(src, dest) {
     }
 }
 
-async function copyRootStaticFiles(srcRoot, destDir) {
-    const staticFiles = ['favicon.ico', 'robots.txt', 'sitemap.xml', 'manifest.json', 'CNAME'];
-    for (const file of staticFiles) {
-        const filePath = path.join(srcRoot, file);
-        if (existsSync(filePath)) {
-            await fs.copyFile(filePath, path.join(destDir, file));
-        }
-    }
+async function copyRootFilesAndFolders(srcRoot, destDir) {
+    if (!existsSync(srcRoot)) return;
 
-    const publicDir = path.join(srcRoot, 'public');
-    if (existsSync(publicDir) && publicDir !== destDir) {
-        await copyDirectory(publicDir, destDir);
+    const excludeDirs = new Set([
+        'layx',          // Framework core - explicitly excluded
+        'node_modules',  // Node dependencies
+        '.git',
+        '.github',
+        '.vscode',
+        '.agent',
+        'scratch',
+        'template',
+        'assets',        // Handled by asset bundlers & copyOtherAssets
+        'pages',         // Handled by pages flattening
+        path.basename(destDir) // Output directory itself
+    ]);
+
+    const excludeFiles = new Set([
+        'package.json',
+        'package-lock.json',
+        'layx.config.mjs',
+        'layx.config.js',
+        'config.mjs',
+        '.gitignore',
+        '.npmignore',
+        '.gitkeep'
+    ]);
+
+    const entries = await fs.readdir(srcRoot, { withFileTypes: true });
+
+    for (const entry of entries) {
+        if (entry.isDirectory()) {
+            if (excludeDirs.has(entry.name)) continue;
+            if (path.resolve(srcRoot, entry.name) === path.resolve(destDir)) continue;
+
+            const srcPath = path.join(srcRoot, entry.name);
+            if (entry.name === 'public') {
+                // Contents of public/ are copied directly to root of destDir
+                await copyDirectory(srcPath, destDir);
+            } else {
+                // Any other folder in root (e.g. static/, downloads/, data/, etc.) is copied into destDir
+                await copyDirectory(srcPath, path.join(destDir, entry.name));
+            }
+        } else if (entry.isFile()) {
+            // HTML files are transformed and copied by processHtmlFiles
+            if (path.extname(entry.name) === '.html') continue;
+            if (excludeFiles.has(entry.name)) continue;
+            if (entry.name.endsWith('.tgz')) continue;
+
+            // Copy all other root files (favicon, robots, sitemap, _headers, _redirects, webmanifest, etc.)
+            const srcFile = path.join(srcRoot, entry.name);
+            const destFile = path.join(destDir, entry.name);
+            await fs.copyFile(srcFile, destFile);
+        }
     }
 }

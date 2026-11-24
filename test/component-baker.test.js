@@ -169,4 +169,41 @@ describe('Component Baker', () => {
         assert.ok(!output.includes('<script'));
         assert.ok(output.includes('<div>Box</div>'));
     });
+
+    test('evaluates dynamic expressions on component root element attributes', async () => {
+        const html = `
+<button component="action-btn" dynamic prop="name, active, value" class="btn"
+    data-name="\${name}" data-active="\${active ? 'true' : 'false'}" data-value="\${value || ''}">
+    <span>\${name}</span>
+</button>
+
+<component name="action-btn" prop="'Submit', true, 'send'"></component>
+<component name="action-btn" prop="'Cancel', false, ''"></component>
+`;
+        const output = await bakeComponentsInHtml(html);
+        assert.ok(!output.includes('${'));
+        assert.ok(output.includes('data-name="Submit"'));
+        assert.ok(output.includes('data-active="true"'));
+        assert.ok(output.includes('data-value="send"'));
+        assert.ok(output.includes('data-name="Cancel"'));
+        assert.ok(output.includes('data-active="false"'));
+        assert.ok(output.includes('data-value=""'));
+    });
+
+    test('unwraps template tags in standalone component files', async () => {
+        const html = `
+<template component="wrapped-card" dynamic prop="title">
+    <div class="card">
+        <h4>\${title}</h4>
+    </div>
+</template>
+
+<component name="wrapped-card" prop="'Hello'"></component>
+`;
+        const output = await bakeComponentsInHtml(html);
+        assert.ok(!output.includes('<template'));
+        assert.ok(!output.includes('</template>'));
+        assert.ok(output.includes('<div class="card">'));
+        assert.ok(output.includes('<h4>Hello</h4>'));
+    });
 });

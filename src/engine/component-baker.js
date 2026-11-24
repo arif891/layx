@@ -16,6 +16,13 @@ const VOID_ELEMENTS = new Set([
     'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'
 ]);
 
+const BOOLEAN_ATTRIBUTES = new Set([
+    'async', 'autofocus', 'autoplay', 'checked', 'controls', 'default', 'defer',
+    'disabled', 'formnovalidate', 'hidden', 'inert', 'ismap', 'itemscope', 'loop',
+    'multiple', 'muted', 'nomodule', 'novalidate', 'open', 'playsinline', 'readonly',
+    'required', 'reversed', 'selected'
+]);
+
 /**
  * Lightweight HTML DOM Node for static component baking without external dependencies.
  */
@@ -300,7 +307,12 @@ function serializeNode(node) {
 
         let attrStr = '';
         for (const [k, v] of Object.entries(node.attrs)) {
-            if (v === '' && !['value', 'placeholder', 'alt', 'title'].includes(k)) {
+            if (BOOLEAN_ATTRIBUTES.has(k)) {
+                if (v === false || v === 'false' || v === null || v === undefined) {
+                    continue;
+                }
+                attrStr += ` ${k}`;
+            } else if (v === '' && !['value', 'placeholder', 'alt', 'title', 'class', 'id', 'name', 'src', 'href', 'style'].includes(k) && !k.startsWith('data-') && !k.startsWith('aria-')) {
                 attrStr += ` ${k}`;
             } else {
                 attrStr += ` ${k}="${String(v).replace(/"/g, '&quot;')}"`;
@@ -533,6 +545,11 @@ function resolveSlots(instanceNode, placeholderNode) {
 async function bakeComponentsInHtml(htmlContent, currentFilePath = '', dataContext = {}, projectRoot = process.cwd()) {
     if (!htmlContent || typeof htmlContent !== 'string') return htmlContent;
 
+    htmlContent = htmlContent
+        .replace(/<noscript\b[^>]*>[\s\S]*?<\/body>[\s\S]*?<\/noscript>/gi, '')
+        .replace(/<noscript>\s*<\/body>\s*<\/html>\s*<\/noscript>/gi, '')
+        .replace(/<!--\s*<\/body>\s*<\/html>\s*-->/gi, '');
+
     const baseDir = currentFilePath ? path.dirname(path.resolve(currentFilePath)) : projectRoot;
     const ast = parseHtml(htmlContent);
 
@@ -628,7 +645,27 @@ async function bakeComponentsInHtml(htmlContent, currentFilePath = '', dataConte
 
                 const elementChildren = fileAst.children.filter(c => c.type === 'element');
                 let rootNode;
-                if (elementChildren.length === 1) {
+                const candidate = elementChildren.length === 1 ? elementChildren[0] : null;
+
+                if (candidate && candidate.tagName === 'template') {
+                    const innerElements = candidate.children.filter(c => c.type === 'element');
+                    if (innerElements.length === 1) {
+                        rootNode = innerElements[0].cloneNode(true);
+                    } else if (innerElements.length > 1) {
+                        const temp = new HtmlNode('element', 'div');
+                        for (const c of candidate.children) {
+                            temp.appendChild(c.cloneNode(true));
+                        }
+                        rootNode = temp;
+                    } else {
+                        rootNode = candidate.cloneNode(true);
+                    }
+                    for (const [k, v] of Object.entries(candidate.attrs)) {
+                        if (k !== 'component' && !rootNode.hasAttribute(k)) {
+                            rootNode.setAttribute(k, v);
+                        }
+                    }
+                } else if (elementChildren.length === 1) {
                     rootNode = elementChildren[0].cloneNode(true);
                 } else {
                     const temp = new HtmlNode('element', 'div');
@@ -713,6 +750,18 @@ async function bakeComponentsInHtml(htmlContent, currentFilePath = '', dataConte
             instance.removeAttribute('dynamic');
             instance.removeAttribute('prop');
         }
+
+        // Evaluate dynamic expressions in root element attributes
+        for (const [attrName, attrVal] of Object.entries(instance.attrs)) {
+            if (typeof attrVal === 'string' && attrVal.includes('${')) {
+                const evaluated = renderTemplate(preprocessTemplate(attrVal), ctx);
+                instance.attrs[attrName] = evaluated;
+            }
+            if (BOOLEAN_ATTRIBUTES.has(attrName) && (instance.attrs[attrName] === 'false' || instance.attrs[attrName] === false)) {
+                instance.removeAttribute(attrName);
+            }
+        }
+        instance.removeAttribute('prop');
 
         resolveSlots(instance, el);
 

@@ -45,6 +45,12 @@ async function optimizeImagesForBuild(outDir, optimizer = 'avif') {
                 await sharp(image).webp().toFile(destFile);
             }
 
+            // Also copy original image to destination so direct references / JS references don't 404
+            const originalDest = path.join(destDir, path.basename(image));
+            if (originalDest !== destFile) {
+                await fs.copyFile(image, originalDest);
+            }
+
             console.log(`Optimized image: ${path.basename(image)} -> ${baseName}.${optimizer}`);
         } catch (error) {
             console.error(`Error optimizing image ${image}: ${error.message}`);
@@ -132,6 +138,9 @@ function extractUrls(content, type = 'html') {
 
     if (type === 'html') {
         while ((match = srcRegex.exec(content)) !== null) {
+            values.add(match[1]);
+        }
+        while ((match = urlRegex.exec(content)) !== null) {
             values.add(match[1]);
         }
     } else if (type === 'css') {

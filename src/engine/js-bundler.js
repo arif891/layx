@@ -199,7 +199,7 @@ async function bundleJs(outDir, projectConfig = null, optimizer = null) {
             outdir: outJsDir,
             allowOverwrite: true,
             bundle: true,
-            splitting: true,
+            splitting: projectConfig.build?.splitting ?? false,
             treeShaking: true,
             plugins: [virtualPlugin, componentUnwrapPlugin],
             assetNames: '[path]/[name]',

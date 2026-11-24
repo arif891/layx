@@ -1,10 +1,8 @@
 import path from 'node:path';
-import fs from 'node:fs/promises';
-import { existsSync } from 'node:fs';
-import pc from 'picocolors';
 import { getFilesWithExtension, readFile, writeFile } from '../utils/fs.js';
 import { minify } from '../utils/helpers.js';
 import { projectPaths } from '../core/paths.js';
+import pc from 'picocolors';
 
 export { purgeUnusedSvgSymbols, isSymbolUsed, parseSvgSymbols, stripComments };
 
@@ -52,9 +50,6 @@ function stripComments(content) {
 
 /**
  * Checks whether an SVG symbol ID is referenced in the codebase.
- * Checks for:
- * 1. Fragment identifier: #symbolId followed by a non-identifier delimiter (href="#sun-fill", url(#sun-fill), icons.svg#sun-fill)
- * 2. Exact match in quotes (JS variables, attribute strings, e.g. 'sun-fill', "sun-fill", `sun-fill`)
  * @param {string} symbolId
  * @param {string} content
  * @returns {boolean}
@@ -76,14 +71,14 @@ function isSymbolUsed(symbolId, content) {
 
 /**
  * Scans all HTML and JS files in the project and purges unused `<symbol>` definitions from SVG sprites.
- * Keeps a backup in layx/ so `layx unbuild` can restore the original SVG sprites.
+ * When outDir / outImage is provided, directly outputs to the target directory without touching source files.
  * @param {object} [options]
  * @returns {Promise<void>}
  */
 async function purgeUnusedSvgSymbols(options = {}) {
     const root = options.root || projectPaths.root;
     const imagesDir = options.image || projectPaths.image;
-    const layxDir = options.layx || projectPaths.layx;
+    const outImageDir = options.outImage || (options.outDir ? path.join(options.outDir, 'assets/image') : null);
 
     let svgFiles = [];
     try {
@@ -94,66 +89,56 @@ async function purgeUnusedSvgSymbols(options = {}) {
 
     if (svgFiles.length === 0) return;
 
-    // Scan all user HTML and JS files (exclude framework internals and node_modules)
-    const excludeDirs = ['layx', 'node_modules', '.git', 'scratch', 'original_images_dir'];
+    // Scan all user HTML and JS files in root
+    const excludeDirs = ['layx', 'node_modules', '.git', 'scratch', 'original_images_dir', 'dist'];
+    if (options.outDir) {
+        excludeDirs.push(path.basename(options.outDir));
+    }
+
     const htmlFiles = await getFilesWithExtension(root, 'html', true, excludeDirs);
     const jsFiles = await getFilesWithExtension(root, 'js', true, excludeDirs);
 
-    let combinedCode = '';
-    for (const file of [...htmlFiles, ...jsFiles]) {
-        try {
-            const fileContent = await readFile(file);
-            combinedCode += '\n' + stripComments(fileContent);
-        } catch {
-            // ignore unreadable files
-        }
-    }
+    const [htmlContents, jsContents] = await Promise.all([
+        Promise.all(htmlFiles.map(f => readFile(f).catch(() => ''))),
+        Promise.all(jsFiles.map(f => readFile(f).catch(() => '')))
+    ]);
 
-    const symbolRegex = /<symbol\b([^>]*?)(?:>([\s\S]*?)<\/symbol>|\/>)/gi;
+    const combinedContent = stripComments([...htmlContents, ...jsContents].join('\n'));
 
     for (const svgFile of svgFiles) {
-        try {
-            const content = await readFile(svgFile);
-            const hasSymbols = content.includes('<symbol');
+        const svgContent = await readFile(svgFile);
+        const symbols = parseSvgSymbols(svgContent);
 
-            // Ensure original backup exists in layx/ before any modification
-            const relPath = path.relative(root, svgFile).replace(/\\/g, '/');
-            const backupPath = path.join(layxDir, relPath);
-            if (!existsSync(backupPath)) {
-                await writeFile(backupPath, content);
+        if (symbols.length === 0) {
+            if (outImageDir) {
+                const relPath = path.relative(imagesDir, svgFile);
+                const destPath = path.join(outImageDir, relPath);
+                await writeFile(destPath, minify(svgContent, 'html'));
             }
-
-            let updatedSvg = content;
-            let removedCount = 0;
-            let keptCount = 0;
-
-            if (hasSymbols) {
-                const symbols = parseSvgSymbols(content);
-                if (symbols.length > 0) {
-                    updatedSvg = content.replace(symbolRegex, (fullMatch, attrs) => {
-                        const idMatch = attrs.match(/\bid=["']([^"']+)["']/i);
-                        const id = idMatch ? idMatch[1] : null;
-                        if (id && isSymbolUsed(id, combinedCode)) {
-                            keptCount++;
-                            return fullMatch;
-                        }
-                        removedCount++;
-                        return '';
-                    });
-                }
-            }
-
-            const minified = minify(updatedSvg, 'xml');
-            await writeFile(svgFile, minified);
-
-            if (hasSymbols && removedCount > 0) {
-                console.log(pc.green(`Purged ${removedCount} unused symbol(s) from ${path.basename(svgFile)} (${keptCount} kept)`));
-            } else {
-                console.log(pc.green(`Optimized SVG: ${path.basename(svgFile)}`));
-            }
-        } catch (err) {
-            console.error(pc.red(`Failed to optimize SVG ${svgFile}: ${err.message}`));
+            continue;
         }
+
+        let purgedContent = svgContent;
+        let purgedCount = 0;
+
+        for (const symbol of symbols) {
+            const isUsed = isSymbolUsed(symbol.id, combinedContent);
+            if (!isUsed || symbol.isEmpty) {
+                purgedContent = purgedContent.replace(symbol.raw, '');
+                purgedCount++;
+            }
+        }
+
+        const optimizedSvg = minify(purgedContent, 'html');
+
+        if (outImageDir) {
+            const relPath = path.relative(imagesDir, svgFile);
+            const destPath = path.join(outImageDir, relPath);
+            await writeFile(destPath, optimizedSvg);
+        } else {
+            await writeFile(svgFile, optimizedSvg);
+        }
+
+        console.log(pc.green(`Purged ${purgedCount} unused symbol(s) from ${path.basename(svgFile)} (${symbols.length - purgedCount} kept)`));
     }
 }
-

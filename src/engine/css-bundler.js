@@ -1,51 +1,81 @@
 import path from 'node:path';
 import { readFile, writeFile, getFilesWithExtension, getFilesContent } from '../utils/fs.js';
 import { minify, getCssContentBlock, extractClasses, extractImportUrls } from '../utils/helpers.js';
-import { breakPoints, layout, optimizableFiles } from '../core/constants.js';
+import { breakPoints, optimizableFiles } from '../core/constants.js';
 import { projectPaths } from '../core/paths.js';
+import { updateUrlsInContent } from './image-optimizer.js';
 
 export { bundleCss, processPageCss };
 
-async function bundleCss(optimize = true) {
+async function bundleCss(outDir, optimize = true, optimizer = null) {
     try {
         const [sourceContent, baseContent] = await Promise.all([
-            readFile(projectPaths.layxCss),
+            readFile(projectPaths.layxCss).catch(() => ''),
             readFile(projectPaths.baseCss).catch(() => '')
         ]);
 
         const finalContent = await processCssContent(sourceContent, projectPaths.layxCss, optimize);
         const finalBaseContent = await processCssContent(baseContent, projectPaths.baseCss, optimize);
 
-        await Promise.all([
-            writeFile(projectPaths.layxBaseCssOut, finalContent),
-            writeFile(projectPaths.userBaseCss, baseContent),
-            writeFile(projectPaths.baseCss, minify(finalContent + finalBaseContent, 'css'))
-        ]);
+        let bundledBaseCss = minify(finalContent + finalBaseContent, 'css');
+        if (optimizer) {
+            bundledBaseCss = updateUrlsInContent(bundledBaseCss, 'css', optimizer);
+        }
 
-        console.log('Processed LayX base CSS');
-        await processPageCss(optimize);
+        const outBaseCss = path.join(outDir, 'assets/css/base.css');
+        await writeFile(outBaseCss, bundledBaseCss);
+
+        console.log('Processed LayX base CSS ->', outBaseCss);
+        await processPageCss(outDir, optimize, optimizer);
     } catch (error) {
         console.error('Error processing CSS files:', error);
         throw error;
     }
 }
 
-async function processPageCss(optimize = true) {
-    const pageFiles = await getFilesWithExtension(projectPaths.pagesCss, 'css', true);
+async function processPageCss(outDir, optimize = true, optimizer = null) {
+    let pageFiles = [];
+    try {
+        pageFiles = await getFilesWithExtension(projectPaths.pagesCss, 'css', true);
+    } catch {
+        pageFiles = [];
+    }
 
     for (const file of pageFiles) {
-        const relPath = path.relative(projectPaths.root, file).replace(/\\/g, '/');
-        const outPath = path.join(projectPaths.layx, relPath);
+        const relPath = path.relative(projectPaths.pagesCss, file).replace(/\\/g, '/');
+        const outPath = path.join(outDir, 'assets/css/pages', relPath);
         const content = await readFile(file);
 
-        // Backup original page CSS
+        let finalContent = await processCssContent(content, file, optimize, true);
+        finalContent = minify(finalContent, 'css');
+        if (optimizer) {
+            finalContent = updateUrlsInContent(finalContent, 'css', optimizer);
+        }
+
+        await writeFile(outPath, finalContent);
+        console.log(`Processed ${path.basename(file)} ->`, outPath);
+    }
+
+    // Process any other custom CSS in assets/css/ (excluding base.css and pages/)
+    let allCssFiles = [];
+    try {
+        allCssFiles = await getFilesWithExtension(projectPaths.css, 'css', true);
+    } catch {
+        allCssFiles = [];
+    }
+
+    for (const file of allCssFiles) {
+        if (path.resolve(file) === path.resolve(projectPaths.baseCss)) continue;
+        if (path.resolve(file).startsWith(path.resolve(projectPaths.pagesCss))) continue;
+
+        const relPath = path.relative(projectPaths.css, file).replace(/\\/g, '/');
+        const outPath = path.join(outDir, 'assets/css', relPath);
+        let content = await readFile(file);
+        content = minify(content, 'css');
+        if (optimizer) {
+            content = updateUrlsInContent(content, 'css', optimizer);
+        }
         await writeFile(outPath, content);
-
-        // Minify and optimize page CSS
-        const finalContent = await processCssContent(content, file, optimize, true);
-        await writeFile(file, minify(finalContent, 'css'));
-
-        console.log(`Processed ${path.basename(file)}`);
     }
 }
 

@@ -56,12 +56,4 @@ describe('Image Optimization Engine', () => {
         const backupSvgPath = path.join(testProjectPath, 'layx/assets/image/svg/icons.svg');
         assert.ok(!existsSync(backupSvgPath), 'SVG backup in layx/ should NOT be created by optimize');
     });
-
-    test('unbuild restores raster images cleanly', async () => {
-        const { stdout } = await execFileAsync('node', [cliPath, 'unbuild'], { cwd: testProjectPath });
-        assert.match(stdout, /Unbuild process completed successfully/);
-
-        const testPngPath = path.join(testProjectPath, 'assets/image/test-raster.png');
-        assert.ok(existsSync(testPngPath), 'Restored PNG should exist in assets/image');
-    });
 });

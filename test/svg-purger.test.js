@@ -77,7 +77,8 @@ describe('SVG Symbol Purger Engine', () => {
     describe('purgeUnusedSvgSymbols file operation', () => {
         const testDir = path.resolve('scratch/test-svg-purger');
         const imgDir = path.join(testDir, 'assets/image/svg');
-        const layxImgDir = path.join(testDir, 'layx/assets/image/svg');
+        const outDir = path.join(testDir, 'dist');
+        const outImgDir = path.join(outDir, 'assets/image/svg');
 
         before(async () => {
             if (existsSync(testDir)) {
@@ -92,7 +93,7 @@ describe('SVG Symbol Purger Engine', () => {
             }
         });
 
-        test('purges unused symbols from SVG and backs up original', async () => {
+        test('purges unused symbols from SVG directly to output directory without modifying source', async () => {
             const initialSvg = `<svg xmlns="http://www.w3.org/2000/svg">
                 <symbol id="sun-fill"><path d="1" /></symbol>
                 <symbol id="moon"><path d="2" /></symbol>
@@ -109,23 +110,24 @@ describe('SVG Symbol Purger Engine', () => {
             await purgeUnusedSvgSymbols({
                 root: testDir,
                 image: path.join(testDir, 'assets/image'),
-                layx: path.join(testDir, 'layx')
+                outDir
             });
 
-            // 1. Verify backup was created with original content
-            const backupFilePath = path.join(layxImgDir, 'icons.svg');
-            assert.ok(existsSync(backupFilePath), 'Backup in layx/ should exist');
-            const backupContent = await fs.readFile(backupFilePath, 'utf8');
-            assert.ok(backupContent.includes('id="sun-fill"'));
-            assert.ok(backupContent.includes('id="moon"'));
-            assert.ok(backupContent.includes('id="id"'));
+            // 1. Verify NO backup directory in layx/ was created
+            const backupFilePath = path.join(testDir, 'layx/assets/image/svg/icons.svg');
+            assert.ok(!existsSync(backupFilePath), 'Backup in layx/ should NOT exist');
 
-            // 2. Verify optimized SVG only contains used symbol
-            const purgedContent = await fs.readFile(svgFilePath, 'utf8');
+            // 2. Verify source SVG remains untouched
+            const sourceSvg = await fs.readFile(svgFilePath, 'utf8');
+            assert.equal(sourceSvg, initialSvg, 'Source SVG must remain untouched');
+
+            // 3. Verify output SVG in dist/ only contains used symbol
+            const outSvgPath = path.join(outImgDir, 'icons.svg');
+            assert.ok(existsSync(outSvgPath), 'Output SVG in dist should exist');
+            const purgedContent = await fs.readFile(outSvgPath, 'utf8');
             assert.ok(purgedContent.includes('id="sun-fill"'), 'Used symbol should be preserved');
             assert.ok(!purgedContent.includes('id="moon"'), 'Unused moon symbol should be purged');
             assert.ok(!purgedContent.includes('id="id"'), 'Empty id placeholder should be purged');
         });
     });
 });
-

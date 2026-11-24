@@ -1,61 +1,128 @@
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import pc from 'picocolors';
 import { bundleCss } from '../engine/css-bundler.js';
 import { bundleJs } from '../engine/js-bundler.js';
 import { processHtmlFiles } from '../engine/html-transformer.js';
-import { optimizeImages } from '../engine/image-optimizer.js';
+import { optimizeImagesForBuild } from '../engine/image-optimizer.js';
 import { purgeUnusedSvgSymbols } from '../engine/svg-purger.js';
-import { setBuildState, getBuildState } from '../utils/build-state.js';
-import { unbuild } from './unbuild.js';
+import { loadProjectConfig } from '../core/config.js';
 import { projectPaths } from '../core/paths.js';
 
 export { build };
 
 async function build(options = {}) {
-    const isRebuild = options.isRebuild === true;
-    const optimize = options.optimize !== false;
-
     console.log(pc.cyan('Starting build process...'));
 
+    const projectConfig = await loadProjectConfig();
+    const outDirName = options.outDir || projectConfig.build.outDir || 'dist';
+    const outDir = path.resolve(projectPaths.root, outDirName);
+
+    // Defensive check: prevent wiping project root or source dirs
+    if (
+        outDir === projectPaths.root ||
+        outDir === path.dirname(projectPaths.root) ||
+        outDir.startsWith(projectPaths.layx) ||
+        outDir.startsWith(projectPaths.assets)
+    ) {
+        throw new Error(`Output directory cannot be project root, parent directory, or inside layx/assets (${outDir})`);
+    }
+
+    const optimize = options.optimize !== false;
+    const optimizer = optimize ? (options.optimizer || projectConfig.images?.formats?.[0] || 'avif') : null;
+
     try {
-        if (!isRebuild) {
-            const state = await getBuildState();
-            if (state?.build) {
-                console.log(pc.yellow('Existing build detected. Initiating rebuild...'));
-                await unbuild({ isRebuild: true });
-                return build({ isRebuild: true, optimize });
-            }
+        // Clean and prepare output directory
+        await fs.rm(outDir, { recursive: true, force: true });
+        await fs.mkdir(outDir, { recursive: true });
 
+        // 1. Copy non-code assets (font, brand, media, public, static, etc.)
+        await copyOtherAssets(projectPaths.assets, path.join(outDir, 'assets'));
+        await copyRootStaticFiles(projectPaths.root, outDir);
+
+        // 2. Images: optimize raster images and purge SVG symbols directly into outDir
+        if (existsSync(projectPaths.image)) {
             if (optimize) {
-                await optimizeImages();
+                await optimizeImagesForBuild(outDir, optimizer);
+            } else {
+                await copyDirectory(projectPaths.image, path.join(outDir, 'assets/image'));
             }
+
+            await purgeUnusedSvgSymbols({
+                root: projectPaths.root,
+                image: projectPaths.image,
+                outDir
+            });
         }
 
-        // Bundle CSS and JS
-        await bundleCss(optimize);
-        await bundleJs();
+        // 3. Bundle CSS into outDir/assets/css
+        await bundleCss(outDir, optimize, optimizer);
 
-        // Purge unused SVG symbols from icons.svg
-        await purgeUnusedSvgSymbols(options);
+        // 4. Bundle JS into outDir/assets/js
+        await bundleJs(outDir, projectConfig);
 
-        // Transform HTML entry points to comment out dev layx references
-        if (!isRebuild) {
-            await processHtmlFiles(projectPaths.root, 'comment');
-        }
+        // 5. Transform HTML entry points (remove layx CSS/JS completely) and write directly to outDir
+        await processHtmlFiles(projectPaths.root, outDir, { optimizer });
 
-        await setBuildState({ build: true, lastBuilt: new Date().toISOString() });
-        console.log(pc.green('Build process completed successfully.'));
+        console.log(pc.green(`Build process completed successfully! Output generated in: ${outDir}`));
     } catch (error) {
         console.error(pc.red(`Build process failed: ${error.message}`));
-        await handleBuildFailure();
         throw error;
     }
 }
 
-async function handleBuildFailure() {
-    try {
-        await setBuildState({ build: false });
-        console.log(pc.yellow('Build state reset due to failure.'));
-    } catch (error) {
-        console.error('Failed to reset build state:', error.message);
+async function copyOtherAssets(srcAssetsDir, destAssetsDir) {
+    if (!existsSync(srcAssetsDir)) return;
+    const entries = await fs.readdir(srcAssetsDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+        if (entry.name === 'css' || entry.name === 'js' || entry.name === 'image') {
+            continue;
+        }
+        if (entry.name === '.gitkeep') continue;
+
+        const srcPath = path.join(srcAssetsDir, entry.name);
+        const destPath = path.join(destAssetsDir, entry.name);
+
+        if (entry.isDirectory()) {
+            await copyDirectory(srcPath, destPath);
+        } else if (entry.isFile()) {
+            await fs.mkdir(destAssetsDir, { recursive: true });
+            await fs.copyFile(srcPath, destPath);
+        }
+    }
+}
+
+async function copyDirectory(src, dest) {
+    if (!existsSync(src)) return;
+    await fs.mkdir(dest, { recursive: true });
+    const entries = await fs.readdir(src, { withFileTypes: true });
+
+    for (const entry of entries) {
+        if (entry.name === '.gitkeep') continue;
+        const srcPath = path.join(src, entry.name);
+        const destPath = path.join(dest, entry.name);
+
+        if (entry.isDirectory()) {
+            await copyDirectory(srcPath, destPath);
+        } else if (entry.isFile()) {
+            await fs.copyFile(srcPath, destPath);
+        }
+    }
+}
+
+async function copyRootStaticFiles(srcRoot, destDir) {
+    const staticFiles = ['favicon.ico', 'robots.txt', 'sitemap.xml', 'manifest.json', 'CNAME'];
+    for (const file of staticFiles) {
+        const filePath = path.join(srcRoot, file);
+        if (existsSync(filePath)) {
+            await fs.copyFile(filePath, path.join(destDir, file));
+        }
+    }
+
+    const publicDir = path.join(srcRoot, 'public');
+    if (existsSync(publicDir) && publicDir !== destDir) {
+        await copyDirectory(publicDir, destDir);
     }
 }

@@ -103,11 +103,4 @@ When your landing page is ready to deploy:
 ```bash
 npm run build
 ```
-This produces optimized production bundles, minifies CSS while preserving modern features, converts images to AVIF/WebP, and transforms `index.html` to load production assets.
-
-### Step 5: Restore for Further Development
-Need to make changes after a build?
-```bash
-npm run unbuild
-```
-Your HTML and assets will be instantly restored to their development source files!
+This produces an optimized production build in `/dist` without modifying any of your development source files! It bundles CSS and JS, purges unused layout classes and SVG symbols, optimizes images, and strips development framework tags from HTML.

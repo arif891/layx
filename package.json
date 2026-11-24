@@ -43,7 +43,6 @@
     "prepublishOnly": "npm run sync:template && npm test",
     "test": "node --test test/**/*.test.js",
     "build": "node src/cli.js build",
-    "unbuild": "node src/cli.js unbuild",
     "optimize": "node src/cli.js optimize",
     "snippets": "node src/cli.js snippets"
   },

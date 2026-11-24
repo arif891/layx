@@ -1,67 +1,100 @@
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { existsSync } from 'node:fs';
 import * as esbuild from 'esbuild';
-import { readFile, writeFile, getFilesWithExtension } from '../utils/fs.js';
+import { getFilesWithExtension } from '../utils/fs.js';
 import { projectPaths } from '../core/paths.js';
+import { loadProjectConfig } from '../core/config.js';
 
 export { bundleJs };
 
-async function bundleJs() {
+async function bundleJs(outDir, projectConfig = null) {
     try {
-        const [sourceContent, baseContent] = await Promise.all([
-            readFile(projectPaths.layxJs),
-            readFile(projectPaths.baseJs).catch(() => '')
-        ]);
+        if (!projectConfig) {
+            projectConfig = await loadProjectConfig();
+        }
 
-        // Backup original base JS and layx JS output
-        await Promise.all([
-            writeFile(projectPaths.layxBaseJsOut, sourceContent),
-            writeFile(projectPaths.userBaseJs, baseContent),
-            writeFile(projectPaths.baseJs, `import '../../layx/layx.js';\n` + baseContent)
-        ]);
+        const outJsDir = path.join(outDir, 'assets/js');
+        const hasLayxJs = existsSync(projectPaths.layxJs);
+        const hasBaseJs = existsSync(projectPaths.baseJs);
 
-        console.log('Processed LayX base JS');
+        const entryPoints = {};
 
-        // Backup page JS files
-        await backupPageJs();
+        // Base bundle: bundles layx.js + user base.js without modifying source files
+        if (hasLayxJs || hasBaseJs) {
+            entryPoints['base'] = 'virtual:layx-base';
+        }
 
-        // Bundle with esbuild
-        await runEsbuild();
+        // Page JS files: each page gets bundled to outDir/assets/js/pages/*.js
+        let pageFiles = [];
+        try {
+            pageFiles = await getFilesWithExtension(projectPaths.pagesJs, 'js', true);
+        } catch {
+            pageFiles = [];
+        }
+
+        for (const file of pageFiles) {
+            const relPath = path.relative(projectPaths.pagesJs, file).replace(/\\/g, '/');
+            const entryKey = `pages/${relPath.replace(/\.js$/, '')}`;
+            entryPoints[entryKey] = file;
+        }
+
+        if (Object.keys(entryPoints).length === 0) {
+            console.log('No JS files found to bundle.');
+            return;
+        }
+
+        const virtualPlugin = {
+            name: 'layx-virtual-entry',
+            setup(build) {
+                build.onResolve({ filter: /^virtual:layx-base$/ }, args => ({
+                    path: args.path,
+                    namespace: 'layx-virtual'
+                }));
+
+                build.onLoad({ filter: /.*/, namespace: 'layx-virtual' }, () => {
+                    let contents = '';
+                    if (hasLayxJs) {
+                        const rel = './' + path.relative(projectPaths.root, projectPaths.layxJs).replace(/\\/g, '/');
+                        contents += `import ${JSON.stringify(rel)};\n`;
+                    }
+                    if (hasBaseJs) {
+                        const rel = './' + path.relative(projectPaths.root, projectPaths.baseJs).replace(/\\/g, '/');
+                        contents += `import ${JSON.stringify(rel)};\n`;
+                    }
+                    return {
+                        contents,
+                        resolveDir: projectPaths.root,
+                        loader: 'js'
+                    };
+                });
+            }
+        };
+
+        const userBuildOptions = { ...projectConfig.build };
+        delete userBuildOptions.outDir;
+        delete userBuildOptions.dist;
+
+        const esbuildConfig = {
+            entryPoints,
+            outdir: outJsDir,
+            allowOverwrite: true,
+            bundle: true,
+            splitting: true,
+            treeShaking: true,
+            plugins: [virtualPlugin],
+            assetNames: '[path]/[name]',
+            chunkNames: 'chunks/[name]-[hash]',
+            ...userBuildOptions
+        };
+
+        // Guarantee output directory is outJsDir
+        esbuildConfig.outdir = outJsDir;
+
+        await esbuild.build(esbuildConfig);
+        console.log('ESBuild processed JS ->', outJsDir);
     } catch (error) {
         console.error('Error processing JS files:', error);
         throw error;
     }
-}
-
-async function backupPageJs() {
-    const pageFiles = await getFilesWithExtension(projectPaths.pagesJs, 'js', true);
-
-    for (const file of pageFiles) {
-        const relPath = path.relative(projectPaths.root, file).replace(/\\/g, '/');
-        const outPath = path.join(projectPaths.layx, relPath);
-        const content = await readFile(file);
-        await writeFile(outPath, content);
-        console.log(`Processed ${path.basename(file)}`);
-    }
-}
-
-import { loadProjectConfig } from '../core/config.js';
-
-async function runEsbuild() {
-    const projectConfig = await loadProjectConfig();
-
-    await esbuild.build({
-        entryPoints: [projectPaths.baseJs, `${projectPaths.pagesJs}/**/*.js`],
-        outbase: projectPaths.js,
-        outdir: projectPaths.js,
-        allowOverwrite: true,
-        bundle: true,
-        splitting: true,
-        treeShaking: true,
-        assetNames: '[path]/[name]',
-        chunkNames: 'chunks/[name]-[hash]',
-        ...projectConfig.build
-    });
-
-    console.log('ESBuild processed');
 }

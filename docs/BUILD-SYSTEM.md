@@ -1,6 +1,6 @@
 # LayX Build & Bundling Engine
 
-The LayX build engine is engineered specifically for modern, high-performance landing pages. It provides automated production optimization without the overhead or configuration complexity of generic full-stack bundlers.
+The LayX build engine is engineered specifically for modern, high-performance landing pages. It provides automated production optimization directly to `/dist` (or a configurable output directory) without modifying development source files.
 
 ---
 
@@ -12,67 +12,46 @@ The LayX build engine is engineered specifically for modern, high-performance la
 2. **ESBuild JavaScript Bundling**:
    - Bundles all modules imported by `layx/layx.js` and `assets/js/base.js` into optimized production chunks with tree-shaking.
 3. **HTML Transformation**:
-   - Automatically comments out multiple development `<link>` and `<script>` tags in `index.html` and `pages/*.html`.
-   - Injects single production bundles (`/assets/css/base.css` and `/assets/js/base.js`).
+   - Automatically removes development framework entries (`/layx/layx.css` and `/layx/layx.js`) completely in output HTML.
+   - Preserves references to bundled production assets (`/assets/css/base.css` and `/assets/js/base.js`).
 4. **Sharp Image Optimization**:
-   - Automatically converts PNG and JPEG assets in `assets/image/` to AVIF (and WebP) using high-speed native bindings.
-   - Losslessly minifies SVG vector files.
-5. **Two-Way Lifecycle (`build` & `unbuild`)**:
-   - Build for deployment, then restore back to development source files at any time.
+   - Automatically converts PNG and JPEG assets in `assets/image/` to AVIF (and WebP) directly into the output directory.
+   - Purges unused SVG `<symbol>` tags from icon sprites.
+5. **Clean Output Separation**:
+   - Compiles everything directly into `/dist` (or your configured `outDir`).
+   - Your development source files in `assets/` and `index.html` are never modified.
+   - Framework source in `layx/` is bundled and not copied into `dist/`.
 
 ---
 
-## 🔄 Two-Way Lifecycle
+## 🚀 Running a Production Build
 
-```mermaid
-graph LR
-    Dev[Development Source Files] -->|layx build| Prod[Production Bundled Assets]
-    Prod -->|layx unbuild| Dev
-```
-
-### 1. `layx build`
-Run this before deploying to production:
 ```bash
 layx build
-# or
+# or with custom output directory
+layx build --outDir my-dist
+# or via npm
 npm run build
 ```
 
 **What happens during `layx build`:**
-1. **CSS Bundling**:
-   - Reads `layx/layx.css` and resolves all `@import` rules.
-   - Extracts HTML classes used across `index.html` and `pages/*.html` to strip unused grid column classes.
-   - Combines framework CSS and `assets/css/base.css` into a minified bundle at `assets/css/base.css`.
-   - Moves original base CSS to `layx/assets/css/user_base.css` for safe restoration.
-2. **JavaScript Bundling**:
-   - Runs `esbuild` on `assets/js/base.js` and `layx/layx.js`.
-   - Bundles, tree-shakes, and minifies the code into `assets/js/base.js`.
-3. **HTML Rewiring**:
-   - In `index.html` and `pages/*.html`, wraps development `<link href="/layx/layx.css">` and `<script src="/layx/layx.js">` in special HTML comments:
-     ```html
-     <!--layx:style-->
-     <!--<link rel="stylesheet" href="/layx/layx.css">-->
-     <!--/layx:style-->
-     ```
-4. **Image & SVG Optimization**:
-   - Converts raster images to modern `.avif` / `.webp` formats.
-   - Optimizes `.svg` files while backing up originals to `layx/assets/image/`.
-
----
-
-### 2. `layx unbuild`
-Need to make edits or continue local development after running a build?
-```bash
-layx unbuild
-# or
-npm run unbuild
-```
-
-**What happens during `layx unbuild`:**
-1. Restores all HTML tags from `<!--layx:style-->` and `<!--layx:script-->` comments.
-2. Restores original development `assets/css/base.css` and `assets/js/base.js` from `layx/assets/`.
-3. Restores original uncompressed SVGs and image backups.
-4. Leaves your project completely clean and ready for development.
+1. **Clean Destination**: Cleans existing files in `/dist` to prevent stale artifacts.
+2. **Asset Copying**: Copies static assets (`assets/font/`, `assets/brand/`, `assets/media/`, static files) into `dist/assets/`.
+3. **Image & SVG Optimization**:
+   - Converts raster images directly into `dist/assets/image/` as modern AVIF/WebP formats.
+   - Purges unused SVG symbols from sprites directly into `dist/assets/image/`.
+4. **CSS Bundling**:
+   - Resolves `@import` rules from `layx/layx.css` and combines them with `assets/css/base.css`.
+   - Strips unused grid column classes by scanning your HTML.
+   - Outputs minified bundled CSS into `dist/assets/css/base.css`.
+   - Minifies per-page CSS files into `dist/assets/css/pages/`.
+5. **JavaScript Bundling**:
+   - Bundles framework JS (`layx/layx.js`) and user base JS (`assets/js/base.js`) into `dist/assets/js/base.js` using `esbuild`.
+   - Bundles per-page scripts into `dist/assets/js/pages/`.
+6. **HTML Transformation**:
+   - Strips development `<link href="/layx/layx.css">` and `<script src="/layx/layx.js">` tags completely.
+   - Updates image URLs in HTML and CSS if next-gen formats are used.
+   - Writes production-ready HTML directly into `dist/`.
 
 ---
 
@@ -80,12 +59,13 @@ npm run unbuild
 
 LayX projects are **100% zero-config by default**. No configuration file is required to build, bundle, or optimize.
 
-If you wish to customize build options (such as enabling sourcemaps for debugging, altering browser targets, or tuning image formats), you can optionally create a `layx.config.mjs` (or `config.mjs`) in your project root:
+If you wish to customize build options (such as configuring the output directory, enabling sourcemaps for debugging, altering browser targets, or tuning image formats), you can optionally create a `layx.config.mjs` (or `config.mjs`) in your project root:
 
 ```javascript
 // layx.config.mjs (optional)
 export default {
   build: {
+    outDir: 'dist',     // customize build output folder
     minify: true,
     sourcemap: true,    // enable sourcemaps for debugging
     target: 'es2022',   // customize JS target

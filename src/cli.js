@@ -6,7 +6,6 @@ import * as p from '@clack/prompts';
 import pc from 'picocolors';
 
 import { build } from './commands/build.js';
-import { unbuild } from './commands/unbuild.js';
 import { handleAdd } from './commands/add/index.js';
 import { optimizeImages } from './commands/optimize.js';
 import { createProject } from './commands/create.js';
@@ -31,8 +30,7 @@ async function runInteractiveMenu() {
         message: 'What would you like to do?',
         options: [
             { label: 'Create a new landing page', value: 'create', hint: 'scaffold from template' },
-            { label: 'Build project for production', value: 'build', hint: 'bundle & minify CSS/JS' },
-            { label: 'Unbuild project', value: 'unbuild', hint: 'restore unbundled source files' },
+            { label: 'Build project for production', value: 'build', hint: 'bundle & minify to /dist' },
             { label: 'Optimize images', value: 'optimize', hint: 'convert to AVIF/WebP with sharp' },
             { label: 'Add components or fonts', value: 'add', hint: 'fetch components from registry' },
             { label: 'Install VS Code snippets', value: 'snippets', hint: 'setup .vscode/layx.code-snippets' },
@@ -52,10 +50,6 @@ async function runInteractiveMenu() {
         case 'build':
             await build();
             p.outro(pc.green('Build completed!'));
-            break;
-        case 'unbuild':
-            await unbuild();
-            p.outro(pc.green('Unbuild completed!'));
             break;
         case 'optimize':
             await optimizeImages();
@@ -107,8 +101,7 @@ ${pc.yellow(pc.bold('USAGE:'))}
 
 ${pc.yellow(pc.bold('COMMANDS:'))}
   ${pc.green('create')} [name]          Create a new LayX landing page project
-  ${pc.green('build')}                  Build and optimize project for production
-  ${pc.green('unbuild')}                Restore original development source files
+  ${pc.green('build')} [options]        Build and optimize project into /dist (or configurable outDir)
   ${pc.green('optimize')}               Optimize images (AVIF/WebP) in assets/image/
   ${pc.green('add')} [options]          Add components (-c), other modules (-o), fonts (-f), templates (-t)
   ${pc.green('snippets')} [--global]    Install LayX VS Code snippets (locally or globally)
@@ -116,11 +109,13 @@ ${pc.yellow(pc.bold('COMMANDS:'))}
 ${pc.yellow(pc.bold('OPTIONS:'))}
   -v, --version          Show version number
   -h, --help             Show help documentation
+  --outDir, -o <dir>     Output directory for build (default: dist)
 
 ${pc.yellow(pc.bold('EXAMPLES:'))}
   layx create my-landing-page
   layx add -c navbar -f "Red Hat Display"
   layx build
+  layx build --outDir output
   layx snippets
 `);
 }
@@ -134,12 +129,15 @@ if (!command) {
     }
 } else {
     switch (command) {
-        case 'build':
-            await build();
+        case 'build': {
+            let outDir;
+            const outIdx = args.findIndex(a => a === '--outDir' || a === '--out-dir' || a === '-o');
+            if (outIdx !== -1 && args[outIdx + 1]) {
+                outDir = args[outIdx + 1];
+            }
+            await build({ outDir });
             break;
-        case 'unbuild':
-            await unbuild();
-            break;
+        }
         case 'create':
         case 'init':
             await createProject(args[0], false);

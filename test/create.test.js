@@ -51,7 +51,6 @@ describe('Project Scaffolding (layx create)', () => {
         assert.equal(pkg.name, testProjectName);
         assert.equal(pkg.type, 'module');
         assert.ok(pkg.scripts.build, 'build script should exist');
-        assert.ok(pkg.scripts.unbuild, 'unbuild script should exist');
         assert.ok(pkg.scripts.optimize, 'optimize script should exist');
     });
 

@@ -40,7 +40,7 @@ root/
 │
 ├── src/                     # CLI tool (Node.js, ES modules)
 │   ├── cli.js               # CLI entry point & command router
-│   ├── commands/            # build.js, unbuild.js, optimize.js, add/
+│   ├── commands/            # build.js, optimize.js, add/
 │   ├── processors/          # process.js, html.js
 │   └── utils/               # cli-helper.js, build-info.js, etc.
 │
@@ -316,8 +316,8 @@ element.dispatchEvent(new CustomEvent('my-event', { detail: { ... } }));
 ## CLI Commands
 
 ```bash
-layx build           # Bundle & minify CSS/JS for production with esbuild
-layx unbuild         # Restore to development state (reverse of build)
+layx build           # Bundle & minify CSS/JS into /dist without modifying dev files
+layx build -o <dir>  # Output to custom directory
 layx add -c <name>   # Add a component
 layx add -t <name>   # Add a template
 layx add -f <name>   # Add a font
@@ -326,25 +326,25 @@ layx optimizeImages  # Compress images with sharp
 
 ### Build Process
 
-1. Detects if already built → runs `unbuild` first (rebuild mode)
-2. Optimizes images with `sharp`
-3. Bundles CSS (`assets/css/base.css` + `layx/layx.css`) into single file
-4. Bundles JS (`assets/js/base.js` + `layx/layx.js`) into single file
-5. Minifies all `assets/css/pages/*.css` and `assets/js/pages/*.js` in-place
-6. Processes HTML files
-7. Generates `build-info.json`
+1. Cleans target output directory (`dist/` or configurable `outDir`)
+2. Copies static assets (`font/`, `brand/`, `media/`, root static files) into `dist/assets/`
+3. Optimizes images with `sharp` and purges unused SVG symbols into `dist/assets/image/`
+4. Bundles CSS (`assets/css/base.css` + `layx/layx.css`) into `dist/assets/css/base.css`
+5. Bundles JS (`assets/js/base.js` + `layx/layx.js`) into `dist/assets/js/base.js` using esbuild
+6. Minifies per-page CSS and bundles per-page JS files into `dist/assets/`
+7. Transforms HTML files (completely removes `/layx/layx.css` and `/layx/layx.js` tags) and writes to `dist/`
+8. Development source files and `layx/` folder remain completely untouched
 
-**Build config** (`config.mjs`):
+**Build config** (`config.mjs` or `layx.config.mjs`):
 ```js
 export const config = {
   build: {
-    layx: {
-      minify: true,
-      sourcemap: false,
-      format: 'esm',
-      target: 'esnext',
-      charset: 'utf8',
-    }
+    outDir: 'dist',
+    minify: true,
+    sourcemap: false,
+    format: 'esm',
+    target: 'esnext',
+    charset: 'utf8',
   }
 };
 ```

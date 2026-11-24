@@ -5,11 +5,11 @@ import { projectRoot } from './paths.js';
 
 export { loadProjectConfig, getProjectConfigFile };
 
-function getProjectConfigFile() {
+function getProjectConfigFile(customRoot = projectRoot) {
     const candidates = [
-        path.join(projectRoot, 'layx.config.mjs'),
-        path.join(projectRoot, 'layx.config.js'),
-        path.join(projectRoot, 'config.mjs')
+        path.join(customRoot, 'layx.config.mjs'),
+        path.join(customRoot, 'layx.config.js'),
+        path.join(customRoot, 'config.mjs')
     ];
 
     for (const file of candidates) {
@@ -18,8 +18,8 @@ function getProjectConfigFile() {
     return null;
 }
 
-async function loadProjectConfig() {
-    const configFile = getProjectConfigFile();
+async function loadProjectConfig(customRoot = projectRoot) {
+    const configFile = getProjectConfigFile(customRoot);
     let userConfig = {};
 
     if (configFile) {
@@ -33,9 +33,11 @@ async function loadProjectConfig() {
     }
 
     const buildLayx = userConfig.build?.layx || userConfig.build || {};
+    const outDir = userConfig.build?.outDir || userConfig.outDir || userConfig.build?.dist || userConfig.dist || 'dist';
 
     return {
         build: {
+            outDir,
             minify: buildLayx.minify ?? true,
             sourcemap: buildLayx.sourcemap ?? false,
             format: buildLayx.format ?? 'esm',

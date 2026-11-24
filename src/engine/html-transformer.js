@@ -1,11 +1,41 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import { extractUrls } from './image-optimizer.js';
 
-export { processHtmlFiles };
+export { processHtmlFiles, removeLayxEntries, updateImageUrlsInHtml };
 
-const DEFAULT_EXCLUDES = ['node_modules', '.git', '.vscode', 'template', 'scratch', 'dist'];
+const DEFAULT_EXCLUDES = ['node_modules', '.git', '.vscode', 'template', 'scratch', 'dist', 'layx'];
 
-async function processHtmlFiles(startPath = './', mode = 'comment', exclude = DEFAULT_EXCLUDES) {
+function removeLayxEntries(content) {
+    const linkLineRegex = /^[ \t]*<link\s+[^>]*href=["'](?:\.?\/)?layx\/layx\.css(?:\?[^"']*)?["'][^>]*\/?>\r?\n?/gim;
+    const linkInlineRegex = /<link\s+[^>]*href=["'](?:\.?\/)?layx\/layx\.css(?:\?[^"']*)?["'][^>]*\/?>/gi;
+    const scriptLineRegex = /^[ \t]*<script\s+[^>]*src=["'](?:\.?\/)?layx\/layx\.js(?:\?[^"']*)?["'][^>]*>(?:<\/script\s*>)?\r?\n?/gim;
+    const scriptInlineRegex = /<script\s+[^>]*src=["'](?:\.?\/)?layx\/layx\.js(?:\?[^"']*)?["'][^>]*>(?:<\/script\s*>)?/gi;
+
+    return content
+        .replace(linkLineRegex, '')
+        .replace(linkInlineRegex, '')
+        .replace(scriptLineRegex, '')
+        .replace(scriptInlineRegex, '');
+}
+
+function updateImageUrlsInHtml(content, optimizer) {
+    if (!optimizer) return content;
+    const urls = extractUrls(content, 'html');
+    for (const url of urls) {
+        const optimizedUrl = url.replace(/\.(png|jpg|jpeg)$/i, `.${optimizer}`);
+        content = content.replaceAll(url, optimizedUrl);
+    }
+    return content;
+}
+
+async function processHtmlFiles(startPath = './', outDir = null, options = {}) {
+    const optimizer = options.optimizer || null;
+    const exclude = [...DEFAULT_EXCLUDES, ...(options.exclude || [])];
+    if (outDir) {
+        exclude.push(path.basename(outDir));
+    }
+
     async function* findHtmlFiles(dir) {
         let entries;
         try {
@@ -26,49 +56,24 @@ async function processHtmlFiles(startPath = './', mode = 'comment', exclude = DE
         }
     }
 
-    // Flexible regex supporting single/double quotes, optional whitespace, and self-closing tags
-    const patterns = {
-        comment: [
-            {
-                from: /<link\s+[^>]*href=["']\/layx\/layx\.css["'][^>]*>/gi,
-                to: '<!--<link rel="stylesheet" href="/layx/layx.css">-->'
-            },
-            {
-                from: /<script\s+[^>]*src=["']\/layx\/layx\.js["'][^>]*><\/script>/gi,
-                to: '<!--<script src="/layx/layx.js" type="module"></script>-->'
-            }
-        ],
-        uncomment: [
-            {
-                from: /<!--\s*<link\s+[^>]*href=["']\/layx\/layx\.css["'][^>]*>\s*-->/gi,
-                to: '<link rel="stylesheet" href="/layx/layx.css">'
-            },
-            {
-                from: /<!--\s*<script\s+[^>]*src=["']\/layx\/layx\.js["'][^>]*><\/script>\s*-->/gi,
-                to: '<script src="/layx/layx.js" type="module"></script>'
-            }
-        ]
-    };
-
-    async function processFile(filePath) {
-        let content = await fs.readFile(filePath, 'utf8');
-        let modified = false;
-
-        for (const { from, to } of patterns[mode]) {
-            const newContent = content.replace(from, to);
-            if (newContent !== content) {
-                content = newContent;
-                modified = true;
-            }
-        }
-
-        if (modified) {
-            await fs.writeFile(filePath, content, 'utf8');
-            console.log(`${mode === 'comment' ? 'Commented' : 'Uncommented'} LayX entries in ${filePath}`);
-        }
-    }
-
     for await (const filePath of findHtmlFiles(startPath)) {
-        await processFile(filePath);
+        let content = await fs.readFile(filePath, 'utf8');
+
+        // 1. Remove layx.css and layx.js completely
+        content = removeLayxEntries(content);
+
+        // 2. Update image URLs if raster optimizer active
+        if (optimizer) {
+            content = updateImageUrlsInHtml(content, optimizer);
+        }
+
+        if (outDir) {
+            // Write directly to destination directory, keeping source file untouched!
+            const relPath = path.relative(startPath, filePath);
+            const destPath = path.join(outDir, relPath);
+            await fs.mkdir(path.dirname(destPath), { recursive: true });
+            await fs.writeFile(destPath, content, 'utf8');
+            console.log(`Transformed HTML: ${relPath} -> ${path.join(path.basename(outDir), relPath)}`);
+        }
     }
 }

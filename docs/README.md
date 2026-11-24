@@ -36,7 +36,6 @@ layx
 layx add -c accordion modal
 layx add -o smooth_scroll syntax_highlighter
 
-# Production build and unbuild lifecycle
+# Production build to /dist
 layx build
-layx unbuild
 ```

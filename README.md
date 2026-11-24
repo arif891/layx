@@ -27,8 +27,8 @@
 - 📦 **Landing-Page Focused** — Optimized for conversion with hero sections, pricing tables, testimonials, CTAs, and responsive navbars.
 - 🧩 **Hybrid Component System** — Starter projects ship lean with essential defaults (`button`, `navbar`, `footer`). Add components on-demand (`layx add -c accordion`) with automatic CSS imports.
 - ⚡ **Non-Destructive Bundler** — Preserves modern CSS features (`@layer`, `@starting-style`, dynamic viewport units, relative colors) while stripping unused grid classes.
-- 🔄 **Two-Way Lifecycle (`build` & `unbuild`)** — Bundle for production deployment, then revert back to source files at any time with `layx unbuild`.
-- 🖼️ **Integrated Image Optimizer** — Automatically converts images to next-gen AVIF/WebP formats and minifies SVG sprites.
+- 📦 **Clean Build Output** — Outputs production bundles directly into `/dist` (configurable) without modifying development source files.
+- 🖼️ **Integrated Image Optimizer** — Automatically converts images to next-gen AVIF/WebP formats and purges unused SVG symbols.
 - 💻 **Interactive CLI** — Beautiful, modern interactive terminal interface built with `@clack/prompts`.
 
 ---
@@ -92,25 +92,22 @@ layx add -t saas-landing
 *Note: New projects ship lean with default components (`button`, `navbar`, `footer`) and default others (`icon`, `theme`). Adding components or other modules automatically copies assets into `layx/` and auto-wires `@import` statements into `layx/layx.css` and imports into `layx/layx.js`.*
 
 ### 3. `layx build`
-Compiles and prepares your landing page for high-performance production deployment:
+Compiles and prepares your landing page for high-performance production deployment into `/dist`:
 - Strips unused grid layout classes.
 - Bundles and minifies JavaScript using `esbuild`.
 - Minifies modern CSS without altering cutting-edge CSS syntax.
-- Rewires HTML references to point to production bundles.
-- Converts images in `assets/image/` to AVIF/WebP and optimizes SVGs.
+- Removes development framework references (`/layx/layx.css`, `/layx/layx.js`) completely from HTML.
+- Converts images in `assets/image/` to AVIF/WebP and purges unused SVG symbols.
+- Keeps development source files completely untouched.
 
 ```bash
 layx build
+# or with custom output directory
+layx build --outDir dist
 ```
 
-### 4. `layx unbuild`
-Need to make edits after a build? Restore your project back to its original development state:
-```bash
-layx unbuild
-```
-
-### 5. `layx optimize`
-Manually compress and optimize images in `assets/image/` without performing a full build:
+### 4. `layx optimize`
+Manually compress and optimize images in `assets/image/`:
 ```bash
 layx optimize
 ```

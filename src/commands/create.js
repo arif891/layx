@@ -156,7 +156,6 @@ async function createProject(targetName, isInteractive = true) {
                 type: 'module',
                 scripts: {
                     build: 'layx build',
-                    unbuild: 'layx unbuild',
                     optimize: 'layx optimize'
                 },
                 devDependencies: {
@@ -176,8 +175,7 @@ async function createProject(targetName, isInteractive = true) {
         const nextSteps = [
             `cd ${pc.cyan(projectName)}`,
             `npm install`,
-            `npm run build     ${pc.dim('# build and bundle for production')}`,
-            `npm run unbuild   ${pc.dim('# restore development files')}`,
+            `npm run build     ${pc.dim('# build and bundle for production into /dist')}`,
             `npx layx add -c accordion ${pc.dim('# add additional components anytime')}`
         ].join('\n');
 

@@ -73,35 +73,25 @@ layx add [options]
 ---
 
 ### `build`
-Compiles, bundles, and prepares your landing page project for high-performance production hosting.
+Compiles, bundles, and prepares your landing page project for high-performance production hosting in `/dist` (or a configurable `outDir`).
 
 ```bash
 layx build
+# or with custom output directory
+layx build --outDir custom-output
 ```
 
 **Optimization steps:**
-- **CSS Bundling**: Resolves `@import` rules, strips unused responsive grid classes, and minifies modern CSS without breaking `@layer` or `@starting-style`.
-- **JS Bundling**: Uses `esbuild` for code-splitting, tree-shaking, and ES module bundling.
-- **HTML Transformation**: Rewires development `<link>` and `<script>` tags to point to single production bundles.
-- **Image Optimization**: Converts images in `assets/image/` to AVIF/WebP formats and minifies SVGs.
-
----
-
-### `unbuild`
-Restores production-bundled HTML files back to their original development state.
-
-```bash
-layx unbuild
-```
-
-**What it does:**
-- Restores original development source references in `index.html` and `pages/*.html`.
-- Restores unbundled development CSS/JS files and original SVGs.
+- **CSS Bundling**: Resolves `@import` rules, strips unused responsive grid classes, and minifies modern CSS into `dist/assets/css/base.css`.
+- **JS Bundling**: Uses `esbuild` for code-splitting, tree-shaking, and ES module bundling into `dist/assets/js/base.js`.
+- **HTML Transformation**: Removes development `/layx/layx.css` and `/layx/layx.js` tags completely from HTML entry points.
+- **Image Optimization**: Converts images in `assets/image/` to AVIF/WebP formats and purges unused SVG symbols directly into the output folder.
+- **Source Protection**: Leaves development files in `assets/` and `index.html` completely untouched.
 
 ---
 
 ### `optimize`
-Runs the asset optimizer independently without triggering a full HTML/JS build.
+Runs the asset optimizer independently for raster images.
 
 ```bash
 layx optimize
@@ -109,8 +99,6 @@ layx optimize
 
 **What it does:**
 - Converts PNG/JPEG images in `assets/image/` to AVIF (and WebP fallback) using `sharp`.
-- Minifies SVG vector graphics.
-- Backs up original unoptimized images into `layx/assets/image/` for lossless `unbuild` restoration.
 
 ---
 

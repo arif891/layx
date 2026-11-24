@@ -13,11 +13,8 @@ This is a starter landing page built with [LayX](https://github.com/arif891/Layx
 Inside this project directory, you can run:
 
 ```bash
-# Build & bundle for production (minifies CSS, tree-shakes JS, transforms HTML)
+# Build & bundle for production (outputs to /dist)
 npm run build
-
-# Restore development source files after build
-npm run unbuild
 
 # Optimize images (converts to modern AVIF/WebP) and minifies SVGs
 npm run optimize

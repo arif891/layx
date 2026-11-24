@@ -239,4 +239,88 @@ describe('Production Build Engine', () => {
         await fs.rm(rootCustomTxt, { force: true });
         await fs.rm(rootDownloadDir, { recursive: true, force: true });
     });
+
+    test('statically bakes components in HTML, removes component imports, and unwraps components-ready event listeners', async () => {
+        // 1. Create component library file: components.html
+        const componentsFilePath = path.join(testProjectPath, 'components.html');
+        const componentsContent = `
+<template component="badge-box">
+    <div class="badge-box" style="padding: 10px;">
+        <strong>Badge:</strong> <slot>Default Badge</slot>
+    </div>
+</template>
+`;
+        await fs.writeFile(componentsFilePath, componentsContent, 'utf8');
+
+        // 2. Add component usage and script tag to index.html
+        const indexPath = path.join(testProjectPath, 'index.html');
+        let indexHtml = await fs.readFile(indexPath, 'utf8');
+        const originalIndexHtml = indexHtml;
+        const componentUsage = `
+<script type="module" src="./layx/others/component/component.js"></script>
+<component src="./components.html" name="badge-box" class="custom-badge">
+    <span class="member-tag">VIP Member</span>
+</component>
+`;
+        indexHtml = indexHtml.replace('<body>', `<body>\n${componentUsage}`);
+        await fs.writeFile(indexPath, indexHtml, 'utf8');
+
+        // 3. Add component import and event listener to assets/js/base.js
+        const baseJsPath = path.join(testProjectPath, 'assets/js/base.js');
+        const originalBaseJs = await fs.readFile(baseJsPath, 'utf8');
+        const testJsContent = `
+import Component from '../../layx/others/component/component.js';
+
+new Component({ app: 'Prototype' }, { debug: true });
+
+document.addEventListener('components-ready', () => {
+    console.log('UNWRAPPED_COMPONENTS_READY_SUCCESS');
+});
+
+${originalBaseJs}
+`;
+        await fs.writeFile(baseJsPath, testJsContent, 'utf8');
+
+        // 4. Run build
+        const { stdout } = await execFileAsync('node', [cliPath, 'build'], { cwd: testProjectPath });
+        assert.match(stdout, /Build process completed successfully/);
+
+        const distDir = path.join(testProjectPath, 'dist');
+
+        // 5. Verify HTML output in dist/index.html
+        const distHtml = await fs.readFile(path.join(distDir, 'index.html'), 'utf8');
+        assert.ok(!distHtml.includes('<component'), 'dist/index.html must not contain <component> tags');
+        assert.ok(!distHtml.includes('<slot'), 'dist/index.html must not contain <slot> tags');
+        assert.ok(!distHtml.includes('others/component/component.js'), 'dist/index.html must not import component.js');
+        assert.ok(distHtml.includes('class="badge-box custom-badge"'), 'Baked component must merge classes');
+        assert.ok(distHtml.includes('<span class="member-tag">VIP Member</span>'), 'Slot content must be baked');
+
+        // Verify pure component library components.html is not written to dist
+        assert.ok(!existsSync(path.join(distDir, 'components.html')), 'dist/components.html should not exist');
+
+        // 6. Verify JS output in dist/assets/js/
+        const distJsFiles = await fs.readdir(path.join(distDir, 'assets/js'), { recursive: true });
+        let bundledJsContent = '';
+        for (const file of distJsFiles) {
+            if (file.endsWith('.js')) {
+                bundledJsContent += await fs.readFile(path.join(distDir, 'assets/js', file), 'utf8') + '\n';
+            }
+        }
+
+        assert.ok(bundledJsContent.includes('UNWRAPPED_COMPONENTS_READY_SUCCESS'), 'Unwrapped listener body must be present in bundled JS');
+        assert.ok(!bundledJsContent.includes('components-ready'), 'bundled JS must NOT contain components-ready event listener');
+        assert.ok(!bundledJsContent.includes('new Component'), 'bundled JS must NOT contain new Component');
+        assert.ok(!bundledJsContent.includes('layx/others/component'), 'bundled JS must NOT import component.js');
+
+        // 7. Verify source files remain untouched
+        const currentDevIndex = await fs.readFile(indexPath, 'utf8');
+        const currentDevJs = await fs.readFile(baseJsPath, 'utf8');
+        assert.equal(currentDevIndex, indexHtml, 'Dev index.html must remain untouched by build');
+        assert.equal(currentDevJs, testJsContent, 'Dev base.js must remain untouched by build');
+
+        // Clean up test additions
+        await fs.writeFile(indexPath, originalIndexHtml, 'utf8');
+        await fs.writeFile(baseJsPath, originalBaseJs, 'utf8');
+        await fs.rm(componentsFilePath, { force: true });
+    });
 });

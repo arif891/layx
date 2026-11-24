@@ -103,4 +103,8 @@ When your landing page is ready to deploy:
 ```bash
 npm run build
 ```
-This produces an optimized production build in `/dist` without modifying any of your development source files! It bundles CSS and JS, purges unused layout classes and SVG symbols, optimizes images, and strips development framework tags from HTML.
+This produces an optimized production build in `/dist` without modifying any of your development source files! It:
+- **Bakes Components**: Statically pre-renders `<component>` tags into semantic HTML, removes component imports, and unwraps `components-ready` listeners to run immediately with zero runtime overhead.
+- **Flattens Pages**: Moves `pages/*.html` directly to the root of `dist/` and rewrites links (`/pages/other.html` -> `/other.html`).
+- **Copies Assets**: Automatically copies all root files (`favicon.ico`, `robots.txt`, `_headers`) and folders (`public/`, `downloads/`) while strictly excluding `layx/`.
+- **Bundles & Optimizes**: Bundles CSS & JS, strips unused grid classes and SVG symbols, optimizes images to AVIF/WebP, and removes development framework tags.

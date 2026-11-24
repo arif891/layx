@@ -16,7 +16,7 @@ Welcome to the official documentation for **LayX** (`layx-css`) — a modern, CS
 | 🛠️ **[CLI Reference](CLI-REFERENCE.md)** | Detailed guide to all `layx` commands, flags, and interactive menus. |
 | 🧩 **[Components System](COMPONENTS.md)** | Core components, `manifest.json` schema, auto-wiring, and usage examples. |
 | ⚡ **[Others Modules](OTHERS-MODULES.md)** | Optional UX enhancements (`theme`, `icon`, `smooth_scroll`, `syntax_highlighter`, `pwa`, etc.). |
-| 🏗️ **[Build & Bundling Engine](BUILD-SYSTEM.md)** | Modern CSS preservation, esbuild JS bundling, HTML rewiring, and image optimization. |
+| 🏗️ **[Build & Bundling Engine](BUILD-SYSTEM.md)** | Modern CSS preservation, static component baking, pages flattening, esbuild JS bundling, and image optimization. |
 
 ---
 

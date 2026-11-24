@@ -26,8 +26,9 @@
 - 🚫 **Zero Runtime** — Pure modern CSS architecture. No bulky client-side JavaScript runtime or Virtual DOM overhead.
 - 📦 **Landing-Page Focused** — Optimized for conversion with hero sections, pricing tables, testimonials, CTAs, and responsive navbars.
 - 🧩 **Hybrid Component System** — Starter projects ship lean with essential defaults (`button`, `navbar`, `footer`). Add components on-demand (`layx add -c accordion`) with automatic CSS imports.
+- 🧱 **Static Component Baking** — Use lightweight `<component>` tags for prototyping; the build engine pre-renders them into clean, static HTML and unwraps `components-ready` listeners for zero runtime cost in production.
 - ⚡ **Non-Destructive Bundler** — Preserves modern CSS features (`@layer`, `@starting-style`, dynamic viewport units, relative colors) while stripping unused grid classes.
-- 📦 **Clean Build Output** — Outputs production bundles directly into `/dist` (configurable) without modifying development source files.
+- 📦 **Clean Build Output** — Outputs production bundles directly into `/dist` (configurable) without modifying development source files, flattening `pages/` to root and copying all root assets.
 - 🖼️ **Integrated Image Optimizer** — Automatically converts images to next-gen AVIF/WebP formats and purges unused SVG symbols.
 - 💻 **Interactive CLI** — Beautiful, modern interactive terminal interface built with `@clack/prompts`.
 
@@ -93,12 +94,14 @@ layx add -t saas-landing
 
 ### 3. `layx build`
 Compiles and prepares your landing page for high-performance production deployment into `/dist`:
-- Strips unused grid layout classes.
-- Bundles and minifies JavaScript using `esbuild`.
-- Minifies modern CSS without altering cutting-edge CSS syntax.
-- Removes development framework references (`/layx/layx.css`, `/layx/layx.js`) completely from HTML.
-- Converts images in `assets/image/` to AVIF/WebP and purges unused SVG symbols.
-- Keeps development source files completely untouched.
+- **Static Component Baking**: Pre-renders `<component>` tags into semantic HTML, strips prototype imports, and unwraps `components-ready` event listeners before bundling.
+- **Pages Flattening**: Moves `pages/*.html` directly to the output root (e.g. `pages/other.html` -> `dist/other.html`) and updates links automatically.
+- **Root Asset Copying**: Copies all custom root files (`favicon.ico`, `robots.txt`, `_headers`) and directories (`public/`, `downloads/`) to `dist/`, while strictly excluding the `layx/` framework folder.
+- **CSS Optimization**: Strips unused responsive grid layout classes and minifies CSS without altering modern CSS syntax (`@layer`, `@starting-style`).
+- **JS Bundling**: Uses `esbuild` for code-splitting, tree-shaking, and ES module bundling into `dist/assets/js/`.
+- **HTML Cleanup**: Removes development framework references (`/layx/layx.css`, `/layx/layx.js`) completely from HTML.
+- **Image Optimization**: Converts images in `assets/image/` to AVIF/WebP and purges unused SVG symbols.
+- **Source Protection**: Leaves development source files completely untouched.
 
 ```bash
 layx build

@@ -2,6 +2,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { extractUrls } from './image-optimizer.js';
+import { bakeComponentsInHtml } from './component-baker.js';
 
 export {
     processHtmlFiles,
@@ -9,7 +10,8 @@ export {
     updateImageUrlsInHtml,
     removePagesFromLinks,
     checkPagesCollision,
-    copyPagesNonHtmlFiles
+    copyPagesNonHtmlFiles,
+    bakeComponentsInHtml
 };
 
 const DEFAULT_EXCLUDES = ['node_modules', '.git', '.vscode', 'template', 'scratch', 'dist', 'layx'];
@@ -165,12 +167,21 @@ async function processHtmlFiles(startPath = './', outDir = null, options = {}) {
         // 1. Remove layx.css and layx.js completely
         content = removeLayxEntries(content);
 
-        // 2. Remove /pages/ from links (since pages/ is moved to root)
+        // 2. Statically bake components
+        const dataContext = options.projectConfig?.components?.data || options.projectConfig?.data || {};
+        content = await bakeComponentsInHtml(content, filePath, dataContext, startPath);
+
+        // 3. Remove /pages/ from links (since pages/ is moved to root)
         content = removePagesFromLinks(content);
 
-        // 3. Update image URLs if raster optimizer active
+        // 4. Update image URLs if raster optimizer active
         if (optimizer) {
             content = updateImageUrlsInHtml(content, optimizer);
+        }
+
+        // If the file was purely a component library and has no markup left, skip writing to outDir
+        if (content.replace(/<!--[\s\S]*?-->/g, '').trim() === '') {
+            continue;
         }
 
         if (outDir) {

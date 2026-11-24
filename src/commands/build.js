@@ -7,6 +7,7 @@ import { bundleJs } from '../engine/js-bundler.js';
 import { processHtmlFiles, checkPagesCollision, copyPagesNonHtmlFiles } from '../engine/html-transformer.js';
 import { optimizeImagesForBuild } from '../engine/image-optimizer.js';
 import { purgeUnusedSvgSymbols } from '../engine/svg-purger.js';
+import { unwrapComponentCode } from '../engine/component-unwrapper.js';
 import { loadProjectConfig } from '../core/config.js';
 import { projectPaths } from '../core/paths.js';
 
@@ -70,8 +71,11 @@ async function build(options = {}) {
         // 6. Bundle JS into outDir/assets/js
         await bundleJs(outDir, projectConfig);
 
-        // 7. Transform HTML entry points (flatten pages/ to root, remove layx entries, update links)
-        await processHtmlFiles(projectPaths.root, outDir, { optimizer });
+        // 7. Unwrap any copied non-bundled JS files in outDir
+        await unwrapOutDirJs(outDir);
+
+        // 8. Transform HTML entry points (flatten pages/ to root, remove layx entries, bake components, update links)
+        await processHtmlFiles(projectPaths.root, outDir, { optimizer, projectConfig });
 
         console.log(pc.green(`Build process completed successfully! Output generated in: ${outDir}`));
     } catch (error) {
@@ -174,5 +178,36 @@ async function copyRootFilesAndFolders(srcRoot, destDir) {
             const destFile = path.join(destDir, entry.name);
             await fs.copyFile(srcFile, destFile);
         }
+    }
+}
+
+async function unwrapOutDirJs(outDir) {
+    if (!existsSync(outDir)) return;
+
+    async function* getJsFiles(dir) {
+        let entries;
+        try {
+            entries = await fs.readdir(dir, { withFileTypes: true });
+        } catch {
+            return;
+        }
+        for (const entry of entries) {
+            const fullPath = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                yield* getJsFiles(fullPath);
+            } else if (entry.isFile() && path.extname(entry.name) === '.js') {
+                yield fullPath;
+            }
+        }
+    }
+
+    for await (const file of getJsFiles(outDir)) {
+        try {
+            const content = await fs.readFile(file, 'utf8');
+            const unwrapped = unwrapComponentCode(content);
+            if (unwrapped !== content) {
+                await fs.writeFile(file, unwrapped, 'utf8');
+            }
+        } catch {}
     }
 }

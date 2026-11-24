@@ -89,3 +89,57 @@ layx add -c mouse_tracker
 ```html
 <a href="#features" data-smooth-scroll>Smooth Scroll to Features</a>
 ```
+
+### 4. Prototype Component Loader (`component`)
+The `component` module is designed for rapid prototype development. It lets you compose reusable HTML components with slots, props, and helpers. When you run `layx build`, all components are **statically baked into standard HTML** and `components-ready` listeners are unwrapped for production!
+
+#### Defining Components (`components.html`):
+```html
+<!-- Static component -->
+<template component="simple-alert">
+  <div class="alert alert-info">
+    <slot>Default alert message</slot>
+  </div>
+</template>
+
+<!-- Dynamic component with props & named slot -->
+<div component="profile-card" dynamic prop="name, role" class="card">
+  <h3 class="card-title">${name}</h3>
+  <p class="card-subtitle">${role}</p>
+  <div class="card-badge">
+    <slot name="badge">Standard User</slot>
+  </div>
+</div>
+```
+
+#### Using Components (`index.html`):
+```html
+<!-- Static component with custom slot -->
+<component src="./components.html" name="simple-alert">
+  <strong>Notice:</strong> Prototype preview active!
+</component>
+
+<!-- Dynamic component with props and named slot -->
+<component src="./components.html" name="profile-card" prop="'Alice', 'Lead Developer'" class="shadow">
+  <span slot="badge" class="tag tag-vip">VIP</span>
+</component>
+```
+
+#### Initializing in Development (`assets/js/base.js`):
+```javascript
+import Component from '../../layx/others/component/component.js';
+
+new Component({ appName: "Landing Demo" });
+
+// Code wrapped in components-ready is automatically unwrapped at build time!
+document.addEventListener('components-ready', () => {
+    console.log("Components loaded!");
+    initInteractiveWidgets();
+});
+```
+
+#### Production Build Transformation:
+When running `layx build`:
+1. `<component>` tags are statically pre-rendered directly into the HTML with attributes merged (`class`, `style`) and slots resolved.
+2. `import Component from '...'` and `new Component(...)` are stripped.
+3. `document.addEventListener('components-ready', () => { ... })` is unwrapped to top-level code: `initInteractiveWidgets();` runs immediately with **zero runtime overhead**.

@@ -6,6 +6,7 @@ import { getFilesWithExtension, readFile, writeFile } from '../utils/fs.js';
 import { projectPaths } from '../core/paths.js';
 import { loadProjectConfig } from '../core/config.js';
 import { removePagesFromLinks } from './html-transformer.js';
+import { unwrapComponentCode } from './component-unwrapper.js';
 
 export { bundleJs };
 
@@ -72,6 +73,29 @@ async function bundleJs(outDir, projectConfig = null) {
             }
         };
 
+        const componentUnwrapPlugin = {
+            name: 'layx-component-unwrap',
+            setup(build) {
+                build.onLoad({ filter: /\.js$/ }, async (args) => {
+                    if (args.path.includes('node_modules')) return;
+
+                    let contents;
+                    try {
+                        contents = await readFile(args.path);
+                    } catch {
+                        return;
+                    }
+
+                    const transformed = unwrapComponentCode(contents);
+                    return {
+                        contents: transformed,
+                        loader: 'js',
+                        resolveDir: path.dirname(args.path)
+                    };
+                });
+            }
+        };
+
         const userBuildOptions = { ...projectConfig.build };
         delete userBuildOptions.outDir;
         delete userBuildOptions.dist;
@@ -83,7 +107,7 @@ async function bundleJs(outDir, projectConfig = null) {
             bundle: true,
             splitting: true,
             treeShaking: true,
-            plugins: [virtualPlugin],
+            plugins: [virtualPlugin, componentUnwrapPlugin],
             assetNames: '[path]/[name]',
             chunkNames: 'chunks/[name]-[hash]',
             ...userBuildOptions
@@ -103,7 +127,8 @@ async function bundleJs(outDir, projectConfig = null) {
         }
         for (const file of jsOutputFiles) {
             const content = await readFile(file);
-            const updated = removePagesFromLinks(content);
+            let updated = removePagesFromLinks(content);
+            updated = unwrapComponentCode(updated);
             if (updated !== content) {
                 await writeFile(file, updated);
             }

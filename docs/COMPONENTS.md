@@ -106,3 +106,12 @@ When added, the CLI will:
 4. Auto-install any listed dependencies.
 5. Copy any sample assets.
 6. Print the HTML usage snippet directly to your terminal.
+
+---
+
+## 💡 Prototype Component Templating
+
+Looking for component-based HTML templating during development? LayX includes the [`component` module in Others](OTHERS-MODULES.md#4-prototype-component-loader-component):
+- Define templates with `<template component="name">` or in external files (`components.html`).
+- Use `<component src="./components.html" name="..." prop="...">` with named & default `<slot>` support.
+- During `layx build`, all `<component>` tags are **statically baked into standard semantic HTML**, imports and instantiations are removed, and `components-ready` listeners are unwrapped for production with zero runtime overhead.

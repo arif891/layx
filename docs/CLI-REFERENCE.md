@@ -82,11 +82,14 @@ layx build --outDir custom-output
 ```
 
 **Optimization steps:**
+- **Static Component Baking**: Pre-renders `<component>` tags into standard HTML, merges classes & styles, evaluates props and slots, and strips prototype component definitions.
+- **JS Event Unwrapping & Bundling**: Removes `component.js` imports and instantiations (`new Component`), unwraps `components-ready` listeners to top-level code, and bundles JS with `esbuild` for code-splitting and tree-shaking into `dist/assets/js/`.
+- **Pages Flattening**: Moves files from `pages/` (e.g. `pages/other.html`) to the root of `dist/` (e.g. `dist/other.html`) and updates all links (`/pages/other.html` -> `/other.html`).
+- **Root Asset Copying**: Copies all root files (`favicon.ico`, `robots.txt`, `sitemap.xml`, `_headers`, `_redirects`) and directories (`public/`, `downloads/`) to `dist/`, while strictly excluding the `layx/` framework directory.
 - **CSS Bundling**: Resolves `@import` rules, strips unused responsive grid classes, and minifies modern CSS into `dist/assets/css/base.css`.
-- **JS Bundling**: Uses `esbuild` for code-splitting, tree-shaking, and ES module bundling into `dist/assets/js/base.js`.
 - **HTML Transformation**: Removes development `/layx/layx.css` and `/layx/layx.js` tags completely from HTML entry points.
 - **Image Optimization**: Converts images in `assets/image/` to AVIF/WebP formats and purges unused SVG symbols directly into the output folder.
-- **Source Protection**: Leaves development files in `assets/` and `index.html` completely untouched.
+- **Source Protection**: Leaves development files in `assets/`, `pages/`, and `index.html` completely untouched.
 
 ---
 

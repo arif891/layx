@@ -398,4 +398,51 @@ export default {
         await fs.rm(customSrcDir, { recursive: true, force: true });
         await fs.rm(configPath, { force: true });
     });
+
+    test('supports custom bundles and postBuild hook in project config', async () => {
+        // 1. Create a custom source file (e.g. assets/js/custom-worker.js)
+        const customWorkerSrc = path.join(testProjectPath, 'assets/js/custom-worker.js');
+        await fs.writeFile(customWorkerSrc, 'export const message = "worker running";\nconsole.log(message);', 'utf8');
+
+        // 2. Create config.mjs with custom bundles and postBuild hook
+        const configPath = path.join(testProjectPath, 'config.mjs');
+        const configContent = `
+import fs from 'node:fs/promises';
+import path from 'node:path';
+
+export default {
+    build: {
+        bundles: [
+            {
+                entry: 'assets/js/custom-worker.js',
+                outfile: 'app/worker.js',
+                bundle: true,
+                format: 'esm'
+            }
+        ],
+        postBuild: async ({ outDir }) => {
+            await fs.writeFile(path.join(outDir, 'post-build.txt'), 'post-build executed', 'utf8');
+        }
+    }
+};
+`;
+        await fs.writeFile(configPath, configContent, 'utf8');
+
+        // Run build
+        const { stdout } = await execFileAsync('node', [cliPath, 'build'], { cwd: testProjectPath });
+        assert.match(stdout, /Build process completed successfully/);
+
+        const distDir = path.join(testProjectPath, 'dist');
+        const bundledWorkerPath = path.join(distDir, 'app/worker.js');
+        assert.ok(existsSync(bundledWorkerPath), 'Custom bundle app/worker.js must exist in dist');
+        const workerContent = await fs.readFile(bundledWorkerPath, 'utf8');
+        assert.ok(workerContent.includes('worker running'), 'Custom bundle must contain bundled source content');
+
+        const postBuildPath = path.join(distDir, 'post-build.txt');
+        assert.ok(existsSync(postBuildPath), 'postBuild hook output file must exist in dist');
+
+        // Clean up
+        await fs.rm(customWorkerSrc, { force: true });
+        await fs.rm(configPath, { force: true });
+    });
 });

@@ -195,6 +195,23 @@ export default {
     target: 'es2022',   // customize JS target
     copy: ['docs'],     // additional files or folders to copy
     exclude: ['drafts', '*.log'], // files or patterns to exclude
+
+    // Custom ESBuild bundles (e.g. Web Workers, Service Workers, isolated entry points)
+    bundles: [
+      {
+        entry: 'assets/js/ai/worker.js',   // source file (relative to root)
+        outfile: 'app/worker.js',          // output path (relative to dist/)
+        format: 'esm',                     // 'esm' | 'iife' | 'cjs'
+        target: 'es2020',
+        bundle: true,
+        minify: true
+      }
+    ],
+
+    // Optional programmatic post-build hook
+    postBuild: async ({ outDir, projectPaths, projectConfig }) => {
+      // Execute any custom post-build scripts
+    }
   },
   images: {
     formats: ['avif', 'webp'],

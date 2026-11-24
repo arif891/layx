@@ -32,11 +32,13 @@ async function loadProjectConfig(customRoot = projectRoot) {
         }
     }
 
-    const buildLayx = userConfig.build?.layx || userConfig.build || {};
-    const outDir = userConfig.build?.outDir || userConfig.outDir || userConfig.build?.dist || userConfig.dist || 'dist';
+    const userBuild = userConfig.build || {};
+    const buildLayx = userBuild.layx || userBuild;
+    const outDir = userBuild.outDir || userConfig.outDir || userBuild.dist || userConfig.dist || 'dist';
 
-    const userCopy = buildLayx.copy || userConfig.copy || [];
-    const userExclude = buildLayx.exclude || userConfig.exclude || [];
+    const userCopy = userBuild.copy || buildLayx.copy || userConfig.copy || [];
+    const userExclude = userBuild.exclude || buildLayx.exclude || userConfig.exclude || [];
+    const userBundles = userBuild.bundles || userBuild.customBundles || buildLayx.bundles || buildLayx.customBundles || userConfig.bundles || [];
 
     return {
         build: {
@@ -48,7 +50,9 @@ async function loadProjectConfig(customRoot = projectRoot) {
             charset: buildLayx.charset ?? 'utf8',
             copy: Array.isArray(userCopy) ? userCopy : [userCopy].filter(Boolean),
             exclude: Array.isArray(userExclude) ? userExclude : [userExclude].filter(Boolean),
-            ...buildLayx
+            ...userBuild,
+            ...buildLayx,
+            bundles: Array.isArray(userBundles) ? userBundles : [userBundles].filter(Boolean)
         },
         images: {
             formats: userConfig.images?.formats || ['avif', 'webp'],

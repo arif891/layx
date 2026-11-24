@@ -2,7 +2,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
 import * as esbuild from 'esbuild';
-import { getFilesWithExtension, readFile, writeFile } from '../utils/fs.js';
+import { getFilesWithExtension, readFile, writeFile, ensureDirectoryExists } from '../utils/fs.js';
 import { projectPaths } from '../core/paths.js';
 import { loadProjectConfig } from '../core/config.js';
 import { removePagesFromLinks } from './html-transformer.js';
@@ -206,6 +206,10 @@ async function bundleJs(outDir, projectConfig = null, optimizer = null) {
         delete userBuildOptions.dist;
         delete userBuildOptions.copy;
         delete userBuildOptions.exclude;
+        delete userBuildOptions.bundles;
+        delete userBuildOptions.customBundles;
+        delete userBuildOptions.postBuild;
+        delete userBuildOptions.entryPoints;
 
         const esbuildConfig = {
             entryPoints,
@@ -241,6 +245,90 @@ async function bundleJs(outDir, projectConfig = null, optimizer = null) {
             }
             if (updated !== content) {
                 await writeFile(file, updated);
+            }
+        }
+
+        // 3. Process custom configured bundles (e.g. workers, service workers, isolated entry points)
+        const customBundles = projectConfig.build?.bundles || [];
+        for (const item of customBundles) {
+            if (!item) continue;
+
+            // Resolve entry point(s)
+            let bundleEntries;
+            if (item.entry) {
+                bundleEntries = Array.isArray(item.entry)
+                    ? item.entry.map(e => path.isAbsolute(e) ? e : path.resolve(projectPaths.root, e))
+                    : [path.isAbsolute(item.entry) ? item.entry : path.resolve(projectPaths.root, item.entry)];
+            } else if (item.entryPoints) {
+                if (Array.isArray(item.entryPoints)) {
+                    bundleEntries = item.entryPoints.map(e => path.isAbsolute(e) ? e : path.resolve(projectPaths.root, e));
+                } else if (typeof item.entryPoints === 'object') {
+                    bundleEntries = {};
+                    for (const [k, v] of Object.entries(item.entryPoints)) {
+                        bundleEntries[k] = path.isAbsolute(v) ? v : path.resolve(projectPaths.root, v);
+                    }
+                } else {
+                    bundleEntries = [path.isAbsolute(item.entryPoints) ? item.entryPoints : path.resolve(projectPaths.root, item.entryPoints)];
+                }
+            } else {
+                continue;
+            }
+
+            // Check if entry files exist
+            const checkFiles = Array.isArray(bundleEntries) ? bundleEntries : Object.values(bundleEntries);
+            const missing = checkFiles.filter(f => typeof f === 'string' && !existsSync(f));
+            if (missing.length > 0) {
+                console.warn(`[LayX Bundles] Entry file not found: ${missing.join(', ')}`);
+                continue;
+            }
+
+            // Resolve destination: outfile or outdir relative to outDir
+            const outfile = item.outfile ? (path.isAbsolute(item.outfile) ? item.outfile : path.resolve(outDir, item.outfile)) : undefined;
+            const bundleOutDir = item.outdir ? (path.isAbsolute(item.outdir) ? item.outdir : path.resolve(outDir, item.outdir)) : undefined;
+
+            if (outfile) {
+                await ensureDirectoryExists(path.dirname(outfile));
+            } else if (bundleOutDir) {
+                await ensureDirectoryExists(bundleOutDir);
+            }
+
+            const bundleBuildOptions = {
+                bundle: item.bundle ?? true,
+                format: item.format || projectConfig.build?.format || 'esm',
+                target: item.target || projectConfig.build?.target || 'esnext',
+                minify: item.minify ?? projectConfig.build?.minify ?? true,
+                sourcemap: item.sourcemap ?? projectConfig.build?.sourcemap ?? false,
+                platform: item.platform || 'browser',
+                treeShaking: item.treeShaking ?? true,
+                allowOverwrite: true,
+                plugins: [virtualPlugin, componentUnwrapPlugin, ...(item.plugins || [])],
+                ...item
+            };
+
+            delete bundleBuildOptions.entry;
+            delete bundleBuildOptions.outfile;
+            delete bundleBuildOptions.outdir;
+
+            bundleBuildOptions.entryPoints = bundleEntries;
+            if (outfile) {
+                bundleBuildOptions.outfile = outfile;
+                delete bundleBuildOptions.outdir;
+            } else if (bundleOutDir) {
+                bundleBuildOptions.outdir = bundleOutDir;
+                delete bundleBuildOptions.outfile;
+            }
+
+            await esbuild.build(bundleBuildOptions);
+
+            // Post-process the generated file with unwrapper and optimizer if outfile is specified
+            if (outfile && existsSync(outfile)) {
+                let content = await readFile(outfile);
+                content = removePagesFromLinks(content);
+                content = unwrapComponentCode(content);
+                if (optimizer) {
+                    content = updateUrlsInContent(content, 'js', optimizer);
+                }
+                await writeFile(outfile, content);
             }
         }
 

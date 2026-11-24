@@ -97,6 +97,16 @@ async function build(options = {}) {
         // 9. Transform HTML entry points (flatten pages/ to root, remove layx entries, bake components, update links)
         await processHtmlFiles(projectPaths.root, outDir, { optimizer, projectConfig, exclude: userExclude });
 
+        // 10. Optional user postBuild hook
+        if (typeof projectConfig.build?.postBuild === 'function') {
+            await projectConfig.build.postBuild({
+                outDir,
+                projectPaths,
+                projectConfig,
+                optimizer
+            });
+        }
+
         console.log(pc.green(`Build process completed successfully! Output generated in: ${outDir}`));
     } catch (error) {
         console.error(pc.red(`Build process failed: ${error.message}`));

@@ -1,22 +1,23 @@
 import path from 'node:path';
+import { existsSync } from 'node:fs';
 import { readFile, writeFile, getFilesWithExtension, getFilesContent } from '../utils/fs.js';
 import { minify, getCssContentBlock, extractClasses, extractImportUrls } from '../utils/helpers.js';
 import { breakPoints, optimizableFiles } from '../core/constants.js';
-import { projectPaths } from '../core/paths.js';
+import { projectPaths, packagePaths } from '../core/paths.js';
 import { updateUrlsInContent } from './image-optimizer.js';
 import { removePagesFromLinks } from './html-transformer.js';
 
-export { bundleCss, processPageCss };
+export { bundleCss, processPageCss, resolveImportPath };
 
-async function bundleCss(outDir, optimize = true, optimizer = null) {
+async function bundleCss(outDir, optimize = true, optimizer = null, projectConfig = {}) {
     try {
         const [sourceContent, baseContent] = await Promise.all([
             readFile(projectPaths.layxCss).catch(() => ''),
             readFile(projectPaths.baseCss).catch(() => '')
         ]);
 
-        const finalContent = await processCssContent(sourceContent, projectPaths.layxCss, optimize);
-        const finalBaseContent = await processCssContent(baseContent, projectPaths.baseCss, optimize);
+        const finalContent = await processCssContent(sourceContent, projectPaths.layxCss, optimize, false, projectConfig);
+        const finalBaseContent = await processCssContent(baseContent, projectPaths.baseCss, optimize, false, projectConfig);
 
         let bundledBaseCss = minify(finalContent + finalBaseContent, 'css');
         bundledBaseCss = removePagesFromLinks(bundledBaseCss);
@@ -28,14 +29,14 @@ async function bundleCss(outDir, optimize = true, optimizer = null) {
         await writeFile(outBaseCss, bundledBaseCss);
 
         console.log('Processed LayX base CSS ->', outBaseCss);
-        await processPageCss(outDir, optimize, optimizer);
+        await processPageCss(outDir, optimize, optimizer, projectConfig);
     } catch (error) {
         console.error('Error processing CSS files:', error);
         throw error;
     }
 }
 
-async function processPageCss(outDir, optimize = true, optimizer = null) {
+async function processPageCss(outDir, optimize = true, optimizer = null, projectConfig = {}) {
     let pageFiles = [];
     try {
         pageFiles = await getFilesWithExtension(projectPaths.pagesCss, 'css', true);
@@ -48,7 +49,7 @@ async function processPageCss(outDir, optimize = true, optimizer = null) {
         const outPath = path.join(outDir, 'assets/css/pages', relPath);
         const content = await readFile(file);
 
-        let finalContent = await processCssContent(content, file, optimize, true);
+        let finalContent = await processCssContent(content, file, optimize, true, projectConfig);
         finalContent = minify(finalContent, 'css');
         finalContent = removePagesFromLinks(finalContent);
         if (optimizer) {
@@ -83,44 +84,114 @@ async function processPageCss(outDir, optimize = true, optimizer = null) {
     }
 }
 
-async function processCssContent(content, filePath, optimize, isPageFile = false) {
-    const processed = await processImports(content, filePath, optimize, isPageFile);
+function resolveImportPath(currentFilePath, importUrl) {
+    const cleaned = importUrl.trim();
+    if (cleaned.startsWith('/')) {
+        // 1. Root-relative in project root (e.g. /layx/... or /assets/...)
+        const fromRoot = path.join(projectPaths.root, cleaned.slice(1));
+        if (existsSync(fromRoot)) return fromRoot;
+
+        // 2. Fallback for /layx/... to package framework directory
+        if (cleaned.startsWith('/layx/')) {
+            const rel = cleaned.replace(/^\/layx\//, '');
+            const fromFramework = path.join(packagePaths.framework, rel);
+            if (existsSync(fromFramework)) return fromFramework;
+        }
+
+        return fromRoot;
+    }
+
+    return path.resolve(path.dirname(currentFilePath), cleaned);
+}
+
+async function isBaseCssLoadedForPage(cssFilePath) {
+    try {
+        const htmlFiles = await getFilesWithExtension(projectPaths.root, 'html', true);
+        const cssBaseName = path.basename(cssFilePath);
+        const cssRelRoot = path.relative(projectPaths.root, cssFilePath).replace(/\\/g, '/');
+        const cssRelCss = path.relative(projectPaths.css, cssFilePath).replace(/\\/g, '/');
+
+        for (const htmlFile of htmlFiles) {
+            const relHtml = path.relative(projectPaths.root, htmlFile);
+            if (relHtml.startsWith('dist') || relHtml.startsWith('node_modules')) continue;
+
+            const htmlContent = await readFile(htmlFile);
+            const linksToThisCss = htmlContent.includes(cssBaseName) ||
+                                   htmlContent.includes(cssRelRoot) ||
+                                   htmlContent.includes(cssRelCss);
+
+            if (linksToThisCss) {
+                const hasBase = htmlContent.includes('/assets/css/base.css') ||
+                                htmlContent.includes('assets/css/base.css') ||
+                                htmlContent.includes('/layx/layx.css') ||
+                                htmlContent.includes('layx/layx.css');
+                return hasBase;
+            }
+        }
+        return false;
+    } catch {
+        return false;
+    }
+}
+
+async function processCssContent(content, filePath, optimize, isPageFile = false, projectConfig = {}, visited = new Set()) {
+    const processed = await processImports(content, filePath, optimize, isPageFile, projectConfig, visited);
     return removeImportStatements(processed);
 }
 
-async function processImports(content, filePath, optimize, isPageFile) {
+async function processImports(content, filePath, optimize, isPageFile, projectConfig, visited) {
+    const resolvedCurrent = path.resolve(filePath);
+    if (visited.has(resolvedCurrent)) {
+        return '';
+    }
+    visited.add(resolvedCurrent);
+
     const importUrls = extractImportUrls(content, 'css');
 
     let baseImportPaths = new Set();
-    if (isPageFile) {
-        try {
-            const baseContent = await readFile(projectPaths.layxCss);
-            const baseImports = extractImportUrls(baseContent, 'css');
-            baseImportPaths = new Set(baseImports.map(url =>
-                path.resolve(path.dirname(projectPaths.layxCss), url)
-            ));
-        } catch (error) {
-            console.warn(`Warning: Could not read base CSS file: ${error.message}`);
+    const dropDuplicates = projectConfig.build?.dropDuplicates ?? true;
+
+    // Only collect and drop base imports if:
+    // 1) It's a page CSS file
+    // 2) optimize is enabled
+    // 3) dropDuplicates is not disabled
+    // 4) The page's HTML file actually loads base.css!
+    let shouldCheckBaseDuplicates = false;
+    if (isPageFile && optimize && dropDuplicates) {
+        const pageLoadsBase = await isBaseCssLoadedForPage(filePath);
+        if (pageLoadsBase) {
+            shouldCheckBaseDuplicates = true;
+            try {
+                const baseContent = await readFile(projectPaths.layxCss);
+                const baseImports = extractImportUrls(baseContent, 'css');
+                baseImportPaths = new Set(baseImports.map(url =>
+                    resolveImportPath(projectPaths.layxCss, url)
+                ));
+            } catch (error) {
+                console.warn(`Warning: Could not read base CSS file: ${error.message}`);
+            }
         }
     }
 
     const importedContents = await Promise.all(importUrls.map(async (url) => {
-        const importedFilePath = path.resolve(path.dirname(filePath), url);
+        const importedFilePath = resolveImportPath(filePath, url);
 
-        if (isPageFile && baseImportPaths.has(importedFilePath)) {
+        if (shouldCheckBaseDuplicates && baseImportPaths.has(importedFilePath)) {
             return '';
         }
 
         try {
             if (optimize) {
-                const optimizable = optimizableFiles.find(file =>
-                    path.resolve(path.dirname(filePath), file.url) === importedFilePath
-                );
+                const optimizable = optimizableFiles.find(file => {
+                    const resolvedOpt = resolveImportPath(projectPaths.layxCss, file.url);
+                    return resolvedOpt === importedFilePath;
+                });
                 if (optimizable) {
                     return await processOptimizableFile(url, importedFilePath);
                 }
             }
-            return await readFile(importedFilePath);
+            const fileContent = await readFile(importedFilePath);
+            return await processImports(fileContent, importedFilePath, optimize, false, projectConfig, visited);
         } catch (error) {
             console.error(`Cannot read file ${importedFilePath}: ${error.message}`);
             return '';
@@ -209,5 +280,5 @@ function genStyle(template, num, media = '') {
 }
 
 function removeImportStatements(content) {
-    return content.split('\n').filter(line => !line.trim().startsWith('@import')).join('\n');
+    return content.replace(/@import\s+(?:url\([^)]+\)|['"][^'"]+['"])\s*;?/g, '');
 }

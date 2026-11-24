@@ -87,7 +87,7 @@ async function build(options = {}) {
         }
 
         // 6. Bundle CSS into outDir/assets/css
-        await bundleCss(outDir, optimize, optimizer);
+        await bundleCss(outDir, optimize, optimizer, projectConfig);
 
         // 7. Bundle JS into outDir/assets/js
         await bundleJs(outDir, projectConfig, optimizer);

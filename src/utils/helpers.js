@@ -103,9 +103,11 @@ function extractClasses(html, startClass, type = 'class') {
 }
 
 function extractImportUrls(content, type) {
-    const regex = type === 'css'
-        ? /@import\s+url\(([^)]+)\);/g
-        : /import\s+(?:\w+|\{[^}]+\})\s+from\s+['"]([^'"]+)['"]/g;
+    if (type === 'css') {
+        const regex = /@import\s+(?:url\(([^)]+)\)|['"]([^'"]+)['"])\s*;/g;
+        return [...content.matchAll(regex)].map(match => (match[1] || match[2]).replace(/['"]/g, '').trim());
+    }
 
-    return [...content.matchAll(regex)].map(match => match[1].replace(/['"]/g, ''));
+    const regex = /import\s+(?:\w+|\{[^}]+\})\s+from\s+['"]([^'"]+)['"]/g;
+    return [...content.matchAll(regex)].map(match => match[1].replace(/['"]/g, '').trim());
 }
